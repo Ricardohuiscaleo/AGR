@@ -1,4 +1,4 @@
-import { B as BlogService } from '../../../chunks/blogService_C2-nrjpO.mjs';
+import { B as BlogService } from '../../../chunks/blogService_BiazTkZp.mjs';
 export { renderers } from '../../../renderers.mjs';
 
 const GET = async () => {

@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { B as BlogService } from '../../../chunks/blogService_C2-nrjpO.mjs';
+import { B as BlogService } from '../../../chunks/blogService_BiazTkZp.mjs';
 export { renderers } from '../../../renderers.mjs';
 
 const apiKey = "AIzaSyCc1bdkzVLHXxxKOBndV3poK2KQikLJ6DI";
