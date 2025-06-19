@@ -1,0 +1,17 @@
+[phases.setup]
+nixPkgs = ['nodejs_18']
+
+[phases.install]
+cmds = [
+  'npm ci --include=optional',
+  'rm -rf node_modules/.cache'
+]
+
+[phases.build]
+cmds = [
+  'npm install --force --include=optional',
+  'npm run build:rollup-safe'
+]
+
+[start]
+cmd = 'npm start'
