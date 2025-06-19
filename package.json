@@ -4,8 +4,9 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "rm -rf node_modules/@rollup && npm install @rollup/rollup-linux-x64-gnu --force --no-optional && astro build",
     "build:rollup-safe": "rm -rf node_modules/@rollup && npm install @rollup/rollup-linux-x64-gnu --force && astro build",
+    "railway:build": "rm -rf node_modules/@rollup && npm install @rollup/rollup-linux-x64-gnu --force && astro build",
     "preview": "astro preview",
     "astro": "astro",
     "start": "node ./dist/server/entry.mjs"
