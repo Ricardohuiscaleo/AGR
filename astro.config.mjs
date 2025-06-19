@@ -10,7 +10,6 @@ export default defineConfig({
   adapter: vercel({
     webAnalytics: { enabled: true },
     isr: false,
-    functionPerRoute: false,
   }),
   prefetch: {
     prefetchAll: false,
