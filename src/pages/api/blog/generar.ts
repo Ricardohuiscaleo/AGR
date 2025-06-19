@@ -2,6 +2,8 @@ import type { APIRoute } from 'astro';
 import { GeminiAIService } from '../../../services/geminiService';
 import { BlogService } from '../../../services/blogService';
 
+export const prerender = false;
+
 export const POST: APIRoute = async ({ request }) => {
   try {
     const { temaId } = await request.json();

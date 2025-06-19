@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro';
 import { BlogService } from '../../../services/blogService';
 
+export const prerender = false;
+
 export const POST: APIRoute = async ({ request }) => {
   try {
     const { keywords } = await request.json();

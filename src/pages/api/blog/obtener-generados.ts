@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro';
 import { BlogService } from '../../../services/blogService';
 
+export const prerender = false;
+
 export const GET: APIRoute = async () => {
   try {
     // Obtener posts generados por IA

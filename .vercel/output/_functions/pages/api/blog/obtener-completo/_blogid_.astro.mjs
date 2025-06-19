@@ -1,6 +1,7 @@
 import { s as supabase } from '../../../../chunks/supabase_CE7nV3t4.mjs';
 export { renderers } from '../../../../renderers.mjs';
 
+const prerender = false;
 const GET = async ({ params }) => {
   try {
     const { blogId } = params;
@@ -56,7 +57,8 @@ const GET = async ({ params }) => {
 
 const _page = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   __proto__: null,
-  GET
+  GET,
+  prerender
 }, Symbol.toStringTag, { value: 'Module' }));
 
 const page = () => _page;

@@ -1,6 +1,7 @@
 import { B as BlogService } from '../../../chunks/blogService_BiazTkZp.mjs';
 export { renderers } from '../../../renderers.mjs';
 
+const prerender = false;
 const GET = async () => {
   try {
     const blogs = await BlogService.obtenerPostsGeneradosIA(20);
@@ -33,7 +34,8 @@ const GET = async () => {
 
 const _page = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   __proto__: null,
-  GET
+  GET,
+  prerender
 }, Symbol.toStringTag, { value: 'Module' }));
 
 const page = () => _page;

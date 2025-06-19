@@ -50,14 +50,6 @@
 		{
 			"src": "^/auth/callback/?$",
 			"dest": "_render"
-		},
-		{
-			"src": "^/diagrama-timeline/?$",
-			"dest": "_render"
-		},
-		{
-			"src": "^/$",
-			"dest": "_render"
 		}
 	]
 }
