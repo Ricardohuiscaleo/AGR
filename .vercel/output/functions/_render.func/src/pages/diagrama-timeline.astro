@@ -1,0 +1,304 @@
+---
+import Layout from '../layouts/Layout.astro';
+import TimelineChartsWrapper from '../components/diagrams/TimelineChartsWrapper.astro';
+---
+
+<Layout title="Gráficos de Reducción de Costos con Agentes IA RAG">
+  <div class="container mx-auto py-6 md:py-10 px-4">
+    <h1 class="text-3xl md:text-4xl font-bold mb-4 md:mb-8 text-center text-amber-500">
+      Impacto Económico de Agentes IA RAG
+    </h1>
+    <p class="text-base md:text-lg text-center max-w-3xl mx-auto mb-8 md:mb-12 text-gray-300">
+      Análisis comparativo de los costos operativos antes y después de implementar agentes IA RAG en
+      una empresa con ventas de $10.000.000 CLP mensuales.
+    </p>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 mb-12 md:mb-16">
+      <!-- Gráfico 1: Comparación de costos operativos -->
+      <div class="bg-gray-900 rounded-xl p-4 md:p-6 shadow-lg border border-amber-900/30">
+        <h2 class="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-amber-400">
+          Comparación de Costos Operativos
+        </h2>
+        <div id="cost-comparison-container" class="h-64 md:h-80 relative mb-4 md:mb-6">
+          <!-- El gráfico se inyectará aquí mediante React -->
+        </div>
+        <div class="grid grid-cols-2 gap-3 md:gap-4 text-center text-xs md:text-sm mt-4 md:mt-6">
+          <div class="bg-black/20 p-3 md:p-4 rounded-lg">
+            <span class="block text-xl md:text-2xl font-bold text-red-400">$3.600.000</span>
+            <span class="text-gray-400">Costos con Modelo Tradicional</span>
+          </div>
+          <div class="bg-black/20 p-3 md:p-4 rounded-lg">
+            <span class="block text-xl md:text-2xl font-bold text-green-400">$1.980.000</span>
+            <span class="text-gray-400">Costos con Agentes IA RAG</span>
+          </div>
+        </div>
+        <div class="mt-4">
+          <p class="text-green-400 text-base md:text-lg font-bold text-center">
+            Ahorro mensual: $1.620.000 (45%)
+          </p>
+        </div>
+      </div>
+
+      <!-- Gráfico 2: Distribución de costos antes y después -->
+      <div class="bg-gray-900 rounded-xl p-4 md:p-6 shadow-lg border border-amber-900/30">
+        <h2 class="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-amber-400">
+          Comparación de Distribución de Costos
+        </h2>
+        <div id="pie-charts-container" class="h-[400px] md:h-[450px] lg:h-[400px] relative">
+          <!-- Los gráficos se inyectarán aquí mediante React -->
+        </div>
+        <div class="bg-black/20 p-3 md:p-4 rounded-lg text-xs md:text-sm mt-4 md:mt-6">
+          <p class="mb-2 text-gray-300">
+            La implementación de agentes IA RAG reduce significativamente los costos de personal,
+            atención al cliente y procesamiento de datos, manteniendo o mejorando la calidad del
+            servicio.
+          </p>
+          <ul class="list-disc list-inside space-y-1 text-gray-400">
+            <li>
+              <span class="text-amber-400">Personal:</span> Automatización de tareas repetitivas
+            </li>
+            <li>
+              <span class="text-amber-400">Atención al cliente:</span> Disponibilidad 24/7 sin costos
+              extras
+            </li>
+            <li>
+              <span class="text-amber-400">Errores operativos:</span> Reducción del 85% en errores de
+              procesamiento
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mb-12 md:mb-16">
+      <!-- Gráfico 3: Retorno de inversión -->
+      <div class="bg-gray-900 rounded-xl p-4 md:p-6 shadow-lg border border-amber-900/30">
+        <h2 class="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-amber-400">
+          Retorno de Inversión
+        </h2>
+        <div id="roi-chart-container" class="h-56 md:h-64 relative">
+          <!-- El gráfico ROI se inyectará aquí mediante React -->
+        </div>
+        <div class="mt-4 bg-black/20 p-3 md:p-4 rounded-lg text-xs md:text-sm">
+          <p class="text-gray-300">
+            La inversión inicial en agentes IA RAG se recupera en promedio en <span
+              class="text-amber-400 font-bold">5 meses</span
+            >, con beneficios crecientes a medida que el sistema se optimiza.
+          </p>
+        </div>
+      </div>
+
+      <!-- Gráfico 4: Eficiencia operativa -->
+      <div class="bg-gray-900 rounded-xl p-4 md:p-6 shadow-lg border border-amber-900/30">
+        <h2 class="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-amber-400">
+          Eficiencia Operativa
+        </h2>
+        <div id="efficiency-chart-container" class="h-56 md:h-64 relative">
+          <!-- El gráfico de eficiencia se inyectará aquí mediante React -->
+        </div>
+        <div class="mt-4 bg-black/20 p-3 md:p-4 rounded-lg text-xs md:text-sm">
+          <p class="text-gray-300">
+            Los agentes IA RAG mejoran los tiempos de respuesta en un <span
+              class="text-amber-400 font-bold">75%</span
+            > y aumentan la capacidad de procesamiento de consultas en un <span
+              class="text-amber-400 font-bold">300%</span
+            >.
+          </p>
+        </div>
+      </div>
+
+      <!-- Gráfico 5: Impacto en resultados financieros -->
+      <div class="bg-gray-900 rounded-xl p-4 md:p-6 shadow-lg border border-amber-900/30">
+        <h2 class="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-amber-400">
+          Impacto en Resultados
+        </h2>
+        <div id="financial-chart-container" class="h-56 md:h-64 relative">
+          <!-- El gráfico financiero se inyectará aquí mediante React -->
+        </div>
+        <div class="mt-4 bg-black/20 p-3 md:p-4 rounded-lg text-xs md:text-sm">
+          <p class="text-gray-300">
+            Con el ahorro mensual de <span class="text-amber-400 font-bold">$1.620.000</span>, el
+            margen de beneficio aumenta del <span class="text-amber-400 font-bold">20%</span> al <span
+              class="text-amber-400 font-bold">36%</span
+            > sobre las ventas mensuales.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Incluimos el componente TimelineChartsWrapper para que se cargue el componente React -->
+    <TimelineChartsWrapper />
+
+    <div
+      class="bg-gray-900 rounded-xl p-4 md:p-8 shadow-lg border border-amber-900/30 mb-8 md:mb-16 overflow-hidden"
+    >
+      <h2 class="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-amber-400">
+        Desglose de Costos Mensuales (CLP)
+      </h2>
+      <div class="overflow-x-auto -mx-4 md:mx-0">
+        <div class="min-w-[600px] px-4 md:px-0 md:min-w-full">
+          <table class="w-full text-gray-200 text-xs md:text-base">
+            <thead>
+              <tr class="border-b border-gray-700">
+                <th class="py-2 md:py-3 text-left">Categoría</th>
+                <th class="py-2 md:py-3 text-right">Modelo Tradicional</th>
+                <th class="py-2 md:py-3 text-right">Con Agentes IA RAG</th>
+                <th class="py-2 md:py-3 text-right">Ahorro</th>
+                <th class="py-2 md:py-3 text-right">Reducción %</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b border-gray-800">
+                <td class="py-2 md:py-3">Personal de atención al cliente</td>
+                <td class="py-2 md:py-3 text-right">$1.200.000</td>
+                <td class="py-2 md:py-3 text-right">$480.000</td>
+                <td class="py-2 md:py-3 text-right text-green-400">$720.000</td>
+                <td class="py-2 md:py-3 text-right text-green-400">60%</td>
+              </tr>
+              <tr class="border-b border-gray-800">
+                <td class="py-2 md:py-3">Procesamiento de documentos</td>
+                <td class="py-2 md:py-3 text-right">$850.000</td>
+                <td class="py-2 md:py-3 text-right">$340.000</td>
+                <td class="py-2 md:py-3 text-right text-green-400">$510.000</td>
+                <td class="py-2 md:py-3 text-right text-green-400">60%</td>
+              </tr>
+              <tr class="border-b border-gray-800">
+                <td class="py-2 md:py-3">Infraestructura tecnológica</td>
+                <td class="py-2 md:py-3 text-right">$450.000</td>
+                <td class="py-2 md:py-3 text-right">$380.000</td>
+                <td class="py-2 md:py-3 text-right text-green-400">$70.000</td>
+                <td class="py-2 md:py-3 text-right text-green-400">15%</td>
+              </tr>
+              <tr class="border-b border-gray-800">
+                <td class="py-2 md:py-3">Corrección de errores</td>
+                <td class="py-2 md:py-3 text-right">$350.000</td>
+                <td class="py-2 md:py-3 text-right">$70.000</td>
+                <td class="py-2 md:py-3 text-right text-green-400">$280.000</td>
+                <td class="py-2 md:py-3 text-right text-green-400">80%</td>
+              </tr>
+              <tr class="border-b border-gray-800">
+                <td class="py-2 md:py-3">Capacitación</td>
+                <td class="py-2 md:py-3 text-right">$220.000</td>
+                <td class="py-2 md:py-3 text-right">$180.000</td>
+                <td class="py-2 md:py-3 text-right text-green-400">$40.000</td>
+                <td class="py-2 md:py-3 text-right text-green-400">18%</td>
+              </tr>
+              <tr class="border-b border-gray-800">
+                <td class="py-2 md:py-3">Software y licencias</td>
+                <td class="py-2 md:py-3 text-right">$380.000</td>
+                <td class="py-2 md:py-3 text-right">$480.000</td>
+                <td class="py-2 md:py-3 text-right text-red-400">-$100.000</td>
+                <td class="py-2 md:py-3 text-right text-red-400">-26%</td>
+              </tr>
+              <tr class="border-b border-gray-800">
+                <td class="py-2 md:py-3">Horas extras</td>
+                <td class="py-2 md:py-3 text-right">$150.000</td>
+                <td class="py-2 md:py-3 text-right">$50.000</td>
+                <td class="py-2 md:py-3 text-right text-green-400">$100.000</td>
+                <td class="py-2 md:py-3 text-right text-green-400">67%</td>
+              </tr>
+              <tr class="font-bold">
+                <td class="py-2 md:py-3">TOTAL</td>
+                <td class="py-2 md:py-3 text-right">$3.600.000</td>
+                <td class="py-2 md:py-3 text-right">$1.980.000</td>
+                <td class="py-2 md:py-3 text-right text-green-400">$1.620.000</td>
+                <td class="py-2 md:py-3 text-right text-green-400">45%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="bg-gray-900 rounded-xl p-4 md:p-8 shadow-lg border border-amber-900/30 mb-8 md:mb-16"
+    >
+      <h2 class="text-xl md:text-2xl font-bold mb-4 text-amber-400">
+        5 Áreas Principales de Ahorro
+      </h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 md:gap-6 mb-4 md:mb-6">
+        <div class="bg-black/20 p-3 md:p-4 rounded-lg text-center">
+          <div class="text-2xl md:text-4xl font-bold text-amber-400 mb-1 md:mb-2">60%</div>
+          <h3 class="text-sm md:text-base text-white font-medium mb-1 md:mb-2">Personal</h3>
+          <p class="text-xs md:text-sm text-gray-400">
+            Reducción de personal para tareas repetitivas y básicas
+          </p>
+        </div>
+        <div class="bg-black/20 p-3 md:p-4 rounded-lg text-center">
+          <div class="text-2xl md:text-4xl font-bold text-amber-400 mb-1 md:mb-2">80%</div>
+          <h3 class="text-sm md:text-base text-white font-medium mb-1 md:mb-2">Errores</h3>
+          <p class="text-xs md:text-sm text-gray-400">
+            Menor costo en corrección de errores operativos
+          </p>
+        </div>
+        <div class="bg-black/20 p-3 md:p-4 rounded-lg text-center">
+          <div class="text-2xl md:text-4xl font-bold text-amber-400 mb-1 md:mb-2">67%</div>
+          <h3 class="text-sm md:text-base text-white font-medium mb-1 md:mb-2">Horas extras</h3>
+          <p class="text-xs md:text-sm text-gray-400">Reducción en pagos de horas extras</p>
+        </div>
+        <div class="bg-black/20 p-3 md:p-4 rounded-lg text-center">
+          <div class="text-2xl md:text-4xl font-bold text-amber-400 mb-1 md:mb-2">75%</div>
+          <h3 class="text-sm md:text-base text-white font-medium mb-1 md:mb-2">Tiempo</h3>
+          <p class="text-xs md:text-sm text-gray-400">Reducción en tiempos de procesamiento</p>
+        </div>
+        <div class="bg-black/20 p-3 md:p-4 rounded-lg text-center col-span-2 sm:col-span-1">
+          <div class="text-2xl md:text-4xl font-bold text-amber-400 mb-1 md:mb-2">24/7</div>
+          <h3 class="text-sm md:text-base text-white font-medium mb-1 md:mb-2">Disponibilidad</h3>
+          <p class="text-xs md:text-sm text-gray-400">Atención continua sin costos adicionales</p>
+        </div>
+      </div>
+      <div class="bg-amber-900/20 p-3 md:p-4 rounded-lg">
+        <p class="text-white text-center text-sm md:text-base">
+          <span class="font-bold text-amber-400">Resultado final:</span> Por cada $10.000.000 en ventas,
+          los agentes IA RAG permiten un ahorro de $1.620.000 mensuales, lo que equivale a $19.440.000
+          anuales.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    body {
+      background-color: #111827;
+      color: white;
+    }
+
+    .cost-chart-container,
+    .pie-chart-container,
+    .line-chart-container,
+    .bar-chart-container,
+    .financial-chart-container {
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    /* Estilos para asegurar que los gráficos sean visibles en móvil */
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+      max-height: 100%;
+    }
+
+    /* Mejoras para la visualización móvil de la tabla */
+    @media (max-width: 768px) {
+      .overflow-x-auto {
+        margin-left: -1rem;
+        margin-right: -1rem;
+        padding: 0 1rem;
+        width: calc(100% + 2rem);
+      }
+    }
+
+    /* Mejoras para los gráficos en dispositivos pequeños */
+    @media (max-width: 640px) {
+      #pie-charts-container .doughnut-container {
+        padding-right: 0 !important;
+      }
+
+      #pie-charts-container .chartjs-render-monitor {
+        height: auto !important;
+      }
+    }
+  </style>
+</Layout>

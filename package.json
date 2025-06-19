@@ -4,16 +4,15 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "rm -rf node_modules/@rollup && npm install @rollup/rollup-linux-x64-gnu --force --no-optional && astro build",
-    "build:rollup-safe": "rm -rf node_modules/@rollup && npm install @rollup/rollup-linux-x64-gnu --force && astro build",
-    "railway:build": "rm -rf node_modules/@rollup && npm install @rollup/rollup-linux-x64-gnu --force && astro build",
+    "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "start": "node ./dist/server/entry.mjs"
+    "start": "astro preview"
   },
   "dependencies": {
     "@astrojs/node": "^9.2.2",
     "@astrojs/react": "^4.3.0",
+    "@astrojs/vercel": "^8.2.0",
     "@fullcalendar/core": "^6.1.17",
     "@fullcalendar/daygrid": "^6.1.17",
     "@fullcalendar/google-calendar": "^6.1.17",
