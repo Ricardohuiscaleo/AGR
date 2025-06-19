@@ -2,14 +2,15 @@
 import { defineConfig } from 'astro/config';
 import tailwind from '@astrojs/tailwind';
 import react from '@astrojs/react';
-import vercel from '@astrojs/vercel/serverless';
+import netlify from '@astrojs/netlify';
 
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
-  adapter: vercel({
-    webAnalytics: { enabled: true }
-  }),
+  adapter: netlify(),
+  experimental: {
+    session: true,
+  },
   prefetch: {
     prefetchAll: false,
     defaultStrategy: 'hover',
