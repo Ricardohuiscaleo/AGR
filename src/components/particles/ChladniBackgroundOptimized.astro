@@ -1,0 +1,234 @@
+---
+// ChladniBackground Optimizado - Sin dependencias externas
+interface Props {
+  particleCount?: number;
+  opacity?: number;
+  speed?: number;
+  colors?: string[];
+}
+
+const {
+  particleCount = 150, // Mucho más reducido para mejor rendimiento
+  opacity = 0.3,
+  speed = 0.5,
+  colors = ['#7c3aed', '#a855f7', '#c084fc', '#e879f9'], // Colores morados para contacto
+} = Astro.props;
+---
+
+<div id="chladni-background" class="chladni-background-container">
+  <canvas id="chladni-canvas" class="chladni-canvas"></canvas>
+</div>
+
+<style>
+  .chladni-background-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .chladni-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  /* Asegurar que se aplique correctamente en modo claro y oscuro */
+  html[data-theme='dark'] .chladni-background-container {
+    opacity: 0.8;
+  }
+
+  html[data-theme='light'] .chladni-background-container {
+    opacity: 0.6;
+  }
+</style>
+
+<script type="module" define:vars={{ particleCount, opacity, speed, colors }}>
+  // Implementación pura de JavaScript sin dependencias externas
+  document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('chladni-background');
+    const canvas = document.getElementById('chladni-canvas');
+
+    if (!container || !canvas) {
+      console.warn('ChladniBackground: Elementos no encontrados');
+      return;
+    }
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      console.warn('ChladniBackground: No se pudo obtener contexto 2D');
+      return;
+    }
+
+    console.log('ChladniBackground: Inicializando efecto sin Three.js');
+
+    // Configuración del canvas
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+
+    // Sistema de partículas simple
+    class Particle {
+      constructor() {
+        this.reset();
+        this.phase = Math.random() * Math.PI * 2;
+        this.baseSpeed = 0.5 + Math.random() * 1.5;
+      }
+
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.vx = 0;
+        this.vy = 0;
+        this.life = 1;
+        this.maxLife = 200 + Math.random() * 300;
+        this.currentLife = 0;
+      }
+
+      update(time) {
+        // Patrón de Chladni simplificado
+        const normalizedX = (this.x / canvas.width - 0.5) * 4;
+        const normalizedY = (this.y / canvas.height - 0.5) * 4;
+
+        const frequency1 = 3.2 + Math.sin(time * 0.001) * 0.5;
+        const frequency2 = 2.8 + Math.cos(time * 0.0015) * 0.3;
+
+        const pattern1 = Math.sin(frequency1 * normalizedX) * Math.sin(frequency2 * normalizedY);
+        const pattern2 = Math.sin(frequency2 * normalizedX) * Math.sin(frequency1 * normalizedY);
+        const force = (pattern1 + pattern2 * 0.5) * 0.02;
+
+        // Aplicar fuerzas
+        this.vx += force * Math.cos(this.phase + time * 0.001);
+        this.vy += force * Math.sin(this.phase + time * 0.0008);
+
+        // Damping
+        this.vx *= 0.98;
+        this.vy *= 0.98;
+
+        // Actualizar posición
+        this.x += this.vx * this.baseSpeed * speed;
+        this.y += this.vy * this.baseSpeed * speed;
+
+        // Bounds wrapping
+        if (this.x < 0) this.x = canvas.width;
+        if (this.x > canvas.width) this.x = 0;
+        if (this.y < 0) this.y = canvas.height;
+        if (this.y > canvas.height) this.y = 0;
+
+        // Vida de la partícula
+        this.currentLife++;
+        this.life = Math.max(0, 1 - this.currentLife / this.maxLife);
+
+        if (this.currentLife >= this.maxLife) {
+          this.reset();
+        }
+      }
+
+      draw(ctx, colorIndex, time) {
+        const size = 1 + Math.sin(time * 0.002 + this.phase) * 0.5;
+        const alpha = this.life * opacity;
+
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = colors[colorIndex % colors.length];
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    // Crear partículas
+    const particles = [];
+    for (let i = 0; i < particleCount; i++) {
+      particles.push(new Particle());
+    }
+
+    // Variables de control
+    let isVisible = false;
+    let animationId = null;
+    let startTime = Date.now();
+
+    // Función de animación
+    function animate() {
+      if (!isVisible) {
+        animationId = requestAnimationFrame(animate);
+        return;
+      }
+
+      const currentTime = Date.now() - startTime;
+
+      // Limpiar canvas con fondo semitransparente para trailing effect
+      ctx.fillStyle = `rgba(0, 0, 0, 0.02)`;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Actualizar y dibujar partículas
+      particles.forEach((particle, index) => {
+        particle.update(currentTime);
+        const colorIndex = Math.floor(currentTime * 0.0001 + index * 0.1);
+        particle.draw(ctx, colorIndex, currentTime);
+      });
+
+      animationId = requestAnimationFrame(animate);
+    }
+
+    // Detección de visibilidad de la sección contacto-part3
+    const targetSection = document.getElementById('contacto-part3');
+    if (targetSection) {
+      const sectionObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              console.log('ChladniBackground: Activando en contacto-part3');
+              container.style.opacity = '1';
+              isVisible = true;
+              if (!animationId) {
+                animate();
+              }
+            } else {
+              console.log('ChladniBackground: Desactivando');
+              container.style.opacity = '0';
+              isVisible = false;
+            }
+          });
+        },
+        { threshold: 0.1 }
+      );
+
+      sectionObserver.observe(targetSection);
+    } else {
+      console.warn('ChladniBackground: Sección contacto-part3 no encontrada');
+    }
+
+    // Manejo de redimensionamiento
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        resizeCanvas();
+        // Reposicionar partículas aleatoriamente al redimensionar
+        particles.forEach((particle) => particle.reset());
+      }, 100);
+    });
+
+    // Optimización de visibilidad de página
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        isVisible = false;
+      }
+    });
+
+    // Iniciar la animación
+    animate();
+
+    console.log('ChladniBackground: Efecto iniciado con', particleCount, 'partículas');
+  });
+</script>

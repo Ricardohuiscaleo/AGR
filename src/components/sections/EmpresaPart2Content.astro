@@ -1,0 +1,293 @@
+---
+// =====================================================================
+// COMPONENTE PARA 'empresa-part2' (VERSIÓN FINAL, AHORA SÍ)
+// Se respeta la estructura de dos bloques y se usan las clases originales
+// para el tamaño de fuente, eliminando CSS nuevo.
+// =====================================================================
+interface Props {
+  section: any;
+}
+const { section } = Astro.props;
+---
+
+<!-- Contenedor principal con estructura mínima como el ejemplo -->
+<div
+  id="empresa-part2-timeline"
+  class="w-full relative z-10"
+  style="height: 100%; position: relative; margin: 2rem; margin-left: 1rem; margin-right: 1rem;"
+>
+  <div class="timeline-wrapper">
+    <!-- Título principal con propiedades CSS específicas -->
+    <h2
+      class="text-5xl sm:text-5xl md:text-6xl lg:text-8xl xl:text-9xl font-bold text-white mb-4 md:mb-6 leading-tight"
+    >
+      Nuestra identidad corporativa
+    </h2>
+    <div class="max-w-7xl">
+      <p
+        class="text-base sm:text-lg md:text-2xl lg:text-3xl xl:text-4xl text-gray-300 leading-relaxed"
+      >
+        Los principios y valores que guían cada decisión en{' '}
+        <span
+          class="animated-gradient-text"
+          style="background-image: linear-gradient(45deg, #00ff41 0%, #5fff78 25%, #85ff99 50%, #5fff78 75%, #00ff41 100%); -webkit-background-clip: text; background-clip: text; color: transparent; display: inline;"
+        >
+          Agente RAG
+        </span>, con el compromiso de transformar las{' '}
+        <span
+          class="inline-block bg-gradient-to-r from-white via-gray-100 to-white bg-[length:200%_100%] text-transparent bg-clip-text font-semibold italic transform -rotate-1 animate-shimmer"
+        >
+          PyMEs de Latinoamérica
+        </span>{' '}
+        🌟.
+      </p>
+    </div>
+  </div>
+
+  <!-- CONTENIDO CON MÁRGENES LATERALES -->
+  <div class="mx-auto pb-16 lg:pb-24 mt-16 px-2" style="max-width: calc(100vw - 2rem);">
+    <!-- Grid principal con Misión y Visión -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+      <!-- Misión -->
+      <div
+        class="bg-gradient-to-br from-green-900/60 to-emerald-800/40 backdrop-blur-md rounded-xl p-8 border border-green-400/30 hover:border-green-400/50 transition-all duration-300"
+      >
+        <div class="flex items-center mb-6">
+          <div class="w-16 h-16 bg-green-400 rounded-full flex items-center justify-center mr-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8 text-gray-900"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h3 class="text-3xl font-bold text-white">Nuestra Misión</h3>
+        </div>
+        <p class="text-green-100 text-lg leading-relaxed">
+          Transformar la gestión administrativa en las PYMEs con IA, permitiendo que cada empresa
+          opere de forma ágil y rentable. Aspiramos a que, a través de nuestra tecnología, nuestros
+          clientes se liberen de tareas repetitivas y se concentren en desarrollar su negocio,
+          consolidándonos como líderes en soluciones de IA que reducen costos y potencian el
+          crecimiento.
+        </p>
+      </div>
+
+      <!-- Visión -->
+      <div
+        class="bg-gradient-to-br from-emerald-900/60 to-teal-800/40 backdrop-blur-md rounded-xl p-8 border border-green-400/30 hover:border-green-400/50 transition-all duration-300"
+      >
+        <div class="flex items-center mb-6">
+          <div class="w-16 h-16 bg-emerald-400 rounded-full flex items-center justify-center mr-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8 text-gray-900"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+              ></path>
+            </svg>
+          </div>
+          <h3 class="text-3xl font-bold text-white">Nuestra Visión</h3>
+        </div>
+        <p class="text-green-100 text-lg leading-relaxed">
+          Ser la empresa líder en soluciones IA que reduce costos y potencia la eficiencia en las
+          PYMEs en Latino América.
+        </p>
+      </div>
+    </div>
+
+    <!-- Nuestro Propósito - Sección destacada -->
+    <div
+      class="bg-gradient-to-r from-green-900/60 to-emerald-800/40 rounded-xl p-6 md:p-8 backdrop-blur-sm border border-green-400/30 mb-8 md:mb-12"
+    >
+      <div class="text-center">
+        <div
+          class="w-20 h-20 md:w-24 md:h-24 bg-teal-400 rounded-full flex items-center justify-center mx-auto mb-6 md:mb-8"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-10 w-10 md:h-12 md:w-12 text-gray-900"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+            ></path>
+          </svg>
+        </div>
+        <h3 class="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-4 md:mb-6">
+          Nuestro Propósito
+        </h3>
+        <p class="text-green-200 text-lg md:text-xl leading-relaxed max-w-4xl mx-auto px-2">
+          En Agente RAG, creemos que todas las PYMEs merecen acceder a soluciones tecnológicas
+          avanzadas que impulsen su crecimiento. Por ello, nos dedicamos a desarrollar herramientas
+          de inteligencia artificial que automatizan tareas administrativas, permitiendo a las
+          empresas enfocarse en lo que realmente importa: su desarrollo y éxito sostenible.
+        </p>
+      </div>
+    </div>
+
+    <!-- Nuestros Valores -->
+    <div
+      class="bg-black/50 backdrop-blur-md rounded-xl p-6 md:p-8 border border-green-400/30 mb-6 md:mb-8"
+    >
+      <div class="text-center mb-8 md:mb-10">
+        <h3 class="text-2xl md:text-3xl font-bold text-white mb-4 md:mb-6">Nuestros Valores</h3>
+        <p class="text-green-200 text-base md:text-lg max-w-3xl mx-auto px-2">
+          Los principios que definen nuestra forma de trabajar y nos comprometen con el éxito de
+          nuestros clientes.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+        <!-- Innovación -->
+        <div class="text-center group">
+          <div
+            class="w-16 h-16 md:w-20 md:h-20 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 group-hover:scale-105 transition-transform duration-300"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8 md:h-10 md:w-10 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+              ></path>
+            </svg>
+          </div>
+          <h4 class="text-lg md:text-xl font-bold text-white mb-3 md:mb-4">Innovación</h4>
+          <p class="text-green-200 text-sm md:text-base leading-relaxed">
+            Desarrollamos soluciones tecnológicas de vanguardia que anticipan las necesidades del
+            mercado.
+          </p>
+        </div>
+
+        <!-- Accesibilidad -->
+        <div class="text-center group">
+          <div
+            class="w-16 h-16 md:w-20 md:h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 group-hover:scale-105 transition-transform duration-300"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8 md:h-10 md:w-10 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+              ></path>
+            </svg>
+          </div>
+          <h4 class="text-lg md:text-xl font-bold text-white mb-3 md:mb-4">Accesibilidad</h4>
+          <p class="text-green-200 text-sm md:text-base leading-relaxed">
+            Democratizamos la tecnología avanzada, haciéndola asequible para todas las PYMEs.
+          </p>
+        </div>
+
+        <!-- Transparencia -->
+        <div class="text-center group">
+          <div
+            class="w-16 h-16 md:w-20 md:h-20 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 group-hover:scale-105 transition-transform duration-300"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8 md:h-10 md:w-10 text-gray-900"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+              ></path>
+            </svg>
+          </div>
+          <h4 class="text-lg md:text-xl font-bold text-white mb-3 md:mb-4">Transparencia</h4>
+          <p class="text-green-200 text-sm md:text-base leading-relaxed">
+            Operamos con honestidad total, sin costos ocultos ni promesas irreales.
+          </p>
+        </div>
+
+        <!-- Compromiso -->
+        <div class="text-center group">
+          <div
+            class="w-16 h-16 md:w-20 md:h-20 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 group-hover:scale-105 transition-transform duration-300"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8 md:h-10 md:w-10 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              ></path>
+            </svg>
+          </div>
+          <h4 class="text-lg md:text-xl font-bold text-white mb-3 md:mb-4">Compromiso</h4>
+          <p class="text-green-200 text-sm md:text-base leading-relaxed">
+            Nos dedicamos completamente al éxito de nuestros clientes y al crecimiento sostenible.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Llamada a la acción -->
+    <div
+      class="bg-gradient-to-r from-green-800/60 to-emerald-700/40 rounded-xl p-4 md:p-6 backdrop-blur-sm border border-green-400/30 text-center"
+    >
+      <h3 class="text-xl md:text-2xl font-bold text-white mb-3 md:mb-4">
+        ¿Listo para Transformar tu PYME?
+      </h3>
+      <p class="text-green-200 text-base md:text-lg mb-4 md:mb-6 max-w-2xl mx-auto">
+        Descubre cómo nuestra tecnología puede liberar a tu empresa de tareas repetitivas y
+        potenciar su crecimiento.
+      </p>
+      <div class="flex justify-center items-center">
+        <a
+          href="#contacto-part2"
+          class="bg-green-500 hover:bg-green-600 text-gray-900 font-bold py-3 px-6 rounded-lg transition-colors duration-300 min-w-[200px] inline-block text-center"
+        >
+          Solicitar Consulta Gratuita
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

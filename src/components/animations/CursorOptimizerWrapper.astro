@@ -1,0 +1,12 @@
+---
+// CursorOptimizerWrapper.astro - Componente wrapper para CursorOptimizer
+import CursorOptimizer from './CursorOptimizer';
+
+interface Props {
+  showMarkers?: boolean;
+}
+
+const { showMarkers = true } = Astro.props;
+---
+
+<CursorOptimizer client:load showMarkers={showMarkers} />

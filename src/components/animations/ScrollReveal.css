@@ -1,0 +1,113 @@
+.scroll-reveal {
+  margin: 30px 0;
+  perspective: 1000px;
+  will-change: transform;
+  position: relative;
+  z-index: 2;
+  /* Evitar que el navegador aplique transiciones automáticas */
+  transition: none;
+}
+
+.scroll-reveal-text {
+  font-size: clamp(1.4rem, 3vw, 2.5rem);
+  line-height: 1.5;
+  font-weight: 500;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  position: relative;
+}
+
+.word {
+  display: inline-block;
+  transform-origin: 0% 50%;
+  margin-right: 0.1em;
+  will-change: opacity, filter, transform;
+  position: relative;
+  z-index: 1;
+  /* Evitar transiciones automáticas */
+  transition: none;
+}
+
+/* Añadir un resplandor sutil para mejor legibilidad en fondos oscuros */
+.word {
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+}
+
+.text-orange-300 .word,
+.text-indigo-200 .word,
+.text-white .word {
+  text-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Estilos iniciales controlados por GSAP, no por CSS */
+.scroll-reveal:not(.in-view) .word {
+  /* No establecer estados aquí, dejar que GSAP lo maneje */
+  /* opacity y transform ahora son controlados por las variables CSS y GSAP */
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+  .scroll-reveal-text {
+    font-size: clamp(1.1rem, 5vw, 1.8rem);
+    line-height: 1.4;
+  }
+}
+
+/* Animación adicional al entrar en viewport */
+.scroll-reveal.in-view .word {
+  animation: slight-pop 0.5s forwards;
+  animation-delay: calc(0.05s * var(--word-index, 0));
+}
+
+@keyframes slight-pop {
+  0% {
+    transform: scale(0.95);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Cambiar la implementación del indicador de scroll para que se muestre siempre */
+.scroll-reveal::after {
+  content: '⬇️ Scroll para ver el efecto';
+  position: absolute;
+  bottom: -35px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  animation: bounce 1.5s ease infinite;
+  pointer-events: none;
+}
+
+/* Esconder el indicador cuando está en vista */
+.scroll-reveal.in-view::after {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+@keyframes bounce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Simplificar los indicadores visuales */
+.scroll-reveal:not(.in-view)::before {
+  display: none; /* Quitar el punto parpadeante */
+}

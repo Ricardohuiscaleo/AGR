@@ -1,0 +1,382 @@
+---
+// =====================================================================
+// COMPONENTE PARA 'empresa-part4' (Competencias Técnicas)
+// VERSIÓN MEJORADA: Títulos y subtítulos optimizados
+// =====================================================================
+interface Props {
+  section: any;
+}
+const { section } = Astro.props;
+
+const competencies = {
+  'AI / ML': [
+    'Inteligencia Artificial',
+    'Machine Learning',
+    'LLMs',
+    'NLP',
+    'Computer Vision',
+    'LangChain',
+    'PyTorch',
+    'TensorFlow',
+    'Hugging Face',
+    'Scikit-learn',
+  ],
+  'Data': [
+    'Data Analytics',
+    'Pandas',
+    'NumPy',
+    'ETL',
+    'Bases de Datos Vectoriales',
+    'PostgreSQL',
+    'MySQL',
+    'MongoDB',
+    'Redis',
+    'Firebase',
+  ],
+  'Backend': [
+    'Python',
+    'Node.js',
+    'FastAPI',
+    'Django',
+    'Flask',
+    'Express.js',
+    'Go',
+    'Rust',
+    'Java',
+    'Spring Boot',
+    'REST APIs',
+    'GraphQL',
+    'WebSockets',
+    'Microservicios',
+    'Clean Architecture',
+    'SOLID Principles',
+    'Design Patterns',
+    'API Gateway',
+    'Message Queues',
+    'RabbitMQ',
+    'Apache Kafka',
+    'Event-Driven Architecture',
+    'CQRS',
+    'Domain-Driven Design',
+    'Serverless Functions',
+  ],
+  'Frontend': [
+    'Astro',
+    'React',
+    'TypeScript',
+    'JavaScript (ES6+)',
+    'HTML5',
+    'CSS3',
+    'Tailwind CSS',
+    'Svelte',
+    'Vue.js',
+  ],
+  'DevOps & Cloud': [
+    'AWS',
+    'Google Cloud Platform',
+    'Microsoft Azure',
+    'Docker',
+    'Kubernetes',
+    'Helm',
+    'Terraform',
+    'Ansible',
+    'Jenkins',
+    'GitHub Actions',
+    'GitLab CI/CD',
+    'CircleCI',
+    'ArgoCD',
+    'Prometheus',
+    'Grafana',
+    'ELK Stack',
+    'Nginx',
+    'Apache',
+    'Load Balancing',
+    'CDN',
+    'Vercel',
+    'Netlify',
+    'Railway',
+    'DigitalOcean',
+    'Monitoring & Alerting',
+    'Infrastructure as Code',
+    'Blue-Green Deployment',
+    'Canary Releases',
+    'Service Mesh',
+    'Istio',
+    'Container Orchestration',
+    'Secrets Management',
+    'Vault',
+    'Linux Administration',
+    'Bash Scripting',
+    'Network Security',
+    'VPN',
+    'SSL/TLS',
+    'OAuth & JWT',
+  ],
+};
+
+// Colores de consola para cada especialidad - VERSIÓN MONOCROMÁTICA
+const categoryColors = {
+  'AI / ML': '#00ff41', // Verde terminal clásico
+  'Data': '#00ff41', // Verde terminal clásico
+  'Backend': '#00ff41', // Verde terminal clásico
+  'Frontend': '#00ff41', // Verde terminal clásico
+  'DevOps & Cloud': '#00ff41', // Verde terminal clásico
+};
+---
+
+<!-- Contenedor principal con estructura optimizada como otras secciones -->
+<div
+  id="empresa-part4-timeline"
+  class="w-full relative z-10"
+  style="height: 100%; position: relative; margin: 2rem; margin-left: 1rem; margin-right: 1rem;"
+>
+  <div class="timeline-wrapper">
+    <!-- Título principal con propiedades CSS específicas -->
+    <h2
+      class="text-7xl sm:text-5xl md:text-6xl lg:text-8xl xl:text-9xl font-bold text-white mb-4 md:mb-6 leading-tight"
+    >
+      Competencias técnicas
+    </h2>
+    <div class="max-w-8xl">
+      <p
+        class="text-base sm:text-lg md:text-2xl lg:text-3xl xl:text-4xl text-gray-300 leading-relaxed"
+      >
+        Nuestro{' '}
+        <span
+          class="animated-gradient-text"
+          style="background-image: linear-gradient(45deg, #00ff41 0%, #5fff78 25%, #85ff99 50%, #5fff78 75%, #00ff41 100%); -webkit-background-clip: text; background-clip: text; color: transparent; display: inline;"
+        >
+          stack tecnológico avanzado
+        </span>{' '}
+        construye soluciones{' '}
+        <span
+          class="inline-block bg-gradient-to-r from-white via-gray-100 to-white bg-[length:200%_100%] text-transparent bg-clip-text font-semibold italic transform -rotate-1 animate-shimmer"
+        >
+          robustas y escalables
+        </span>{' '}
+        🚀.
+      </p>
+    </div>
+  </div>
+
+  <!-- Múltiples Carruseles por Especialidad -->
+  <div class="space-y-12 mt-16">
+    {Object.entries(competencies).map(([category, techs], index) => (
+      <div class="specialty-row">
+        <!-- Título de la especialidad con color específico -->
+        <h3 
+          class="text-3xl md:text-4xl font-bold mb-6 text-center font-mono"
+          style={`color: ${categoryColors[category]}`}
+        >
+          {`> ${category}`}
+        </h3>
+        
+        <!-- Carrusel infinito que se activa con viewport -->
+        <div 
+          class="scroller viewport-carousel" 
+          data-speed="slow"
+          data-direction={index % 2 === 0 ? 'right' : 'left'}
+          data-category={category}
+        >
+          <ul class="tag-list scroller__inner">
+            {techs.map((tech) => (
+              <li class="tech-tag" data-category={category}>{tech}</li>
+            ))}
+            <!-- Duplicamos para el efecto infinito -->
+            {techs.map((tech) => (
+              <li class="tech-tag" data-category={category}>{tech}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  .scroller {
+    max-width: 100%;
+  }
+
+  .scroller__inner {
+    padding-block: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  /* Carrusel activado por viewport - más lento */
+  .viewport-carousel {
+    overflow: hidden;
+    -webkit-mask: linear-gradient(90deg, transparent, white 20%, white 80%, transparent);
+    mask: linear-gradient(90deg, transparent, white 20%, white 80%, transparent);
+  }
+
+  .viewport-carousel .scroller__inner {
+    width: max-content;
+    flex-wrap: nowrap;
+    animation-play-state: paused; /* Pausado por defecto */
+    animation: scroll var(--_animation-duration, 120s) var(--_animation-direction, forwards) linear infinite;
+    transition: animation-play-state 0.3s ease;
+  }
+
+  /* Se activa cuando entra en vista */
+  .viewport-carousel.in-view .scroller__inner {
+    animation-play-state: running;
+  }
+
+  .scroller[data-direction='right'] {
+    --_animation-direction: reverse;
+  }
+  .scroller[data-direction='left'] {
+    --_animation-direction: forwards;
+  }
+  .scroller[data-speed='slow'] {
+    --_animation-duration: 120s; /* Más lento: 2 minutos por ciclo */
+  }
+
+  @keyframes scroll {
+    to {
+      transform: translate(calc(-50% - 0.5rem));
+    }
+  }
+
+  .tag-list {
+    margin: 0;
+    padding-inline: 0;
+    list-style: none;
+  }
+
+  /* Estilos base para las tags - TEXTO NEGRO Y NEGRITA */
+  .tech-tag {
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    font-weight: 500; /* Negrita */
+    white-space: nowrap;
+    color: #000000; /* Negro para todas las tags */
+    border: 2px solid;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    font-family: 'Courier New', monospace;
+  }
+
+  /* Colores específicos por categoría - AI/ML */
+  .tech-tag[data-category='AI / ML'] {
+    background: #00ff41;
+    border-color: #5fff78;
+    color: #000000; /* Negro y negrita */
+  }
+
+  .tech-tag[data-category='AI / ML']:hover {
+    background: #5fff78;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 255, 65, 0.4);
+    color: #000000; /* Mantener negro en hover */
+  }
+
+  /* Colores específicos por categoría - Data */
+  .tech-tag[data-category='Data'] {
+    background: #00ff41;
+    border-color: #5fff78;
+    color: #000000; /* Negro y negrita */
+  }
+
+  .tech-tag[data-category='Data']:hover {
+    background: #5fff78;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 255, 65, 0.4);
+    color: #000000; /* Mantener negro en hover */
+  }
+
+  /* Colores específicos por categoría - Backend */
+  .tech-tag[data-category='Backend'] {
+    background: #00ff41;
+    border-color: #5fff78;
+    color: #000000; /* Negro y negrita */
+  }
+
+  .tech-tag[data-category='Backend']:hover {
+    background: #5fff78;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 255, 65, 0.4);
+    color: #000000; /* Mantener negro en hover */
+  }
+
+  /* Colores específicos por categoría - Frontend */
+  .tech-tag[data-category='Frontend'] {
+    background: #00ff41;
+    border-color: #5fff78;
+    color: #000000; /* Negro y negrita */
+  }
+
+  .tech-tag[data-category='Frontend']:hover {
+    background: #5fff78;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 255, 65, 0.4);
+    color: #000000; /* Mantener negro en hover */
+  }
+
+  /* Colores específicos por categoría - DevOps & Cloud */
+  .tech-tag[data-category='DevOps & Cloud'] {
+    background: #00ff41;
+    border-color: #5fff78;
+    color: #000000; /* Negro y negrita */
+  }
+
+  .tech-tag[data-category='DevOps & Cloud']:hover {
+    background: #5fff78;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 255, 65, 0.4);
+    color: #000000; /* Mantener negro en hover */
+  }
+
+  .specialty-row {
+    margin-bottom: 3rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .tech-tag {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+    }
+  }
+</style>
+
+<!-- 
+  =======================================
+  LA CORRECCIÓN: EL SCRIPT VA AQUÍ AFUERA
+  =======================================
+-->
+<script>
+  // Script para carruseles activados por viewport
+  const viewportCarousels = document.querySelectorAll('.viewport-carousel');
+
+  // Solo activar si el usuario no prefiere movimiento reducido
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    setupViewportCarousels();
+  }
+
+  function setupViewportCarousels() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          // Activar carrusel cuando entra en vista
+          entry.target.classList.add('in-view');
+        } else {
+          // Pausar carrusel cuando sale de vista (opcional)
+          entry.target.classList.remove('in-view');
+        }
+      });
+    }, {
+      threshold: 0.2, // Se activa cuando el 20% del elemento es visible
+      rootMargin: '0px 0px -50px 0px' // Se activa un poco antes de ser completamente visible
+    });
+
+    // Observar todos los carruseles
+    viewportCarousels.forEach((carousel) => {
+      observer.observe(carousel);
+    });
+  }
+</script>

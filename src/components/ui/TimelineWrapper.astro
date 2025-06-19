@@ -1,0 +1,69 @@
+---
+import { Timeline } from './Timeline';
+
+interface Props {
+  data: Array<{
+    title: string;
+    date?: string;
+    content: any;
+  }>;
+  title?: string;
+  subtitle?: string;
+  className?: string;
+  titleColor?: string;
+  dateColor?: string;
+  lineColor?: string;
+  lineBaseColor?: string;
+  lineOffset?: number;
+  sectionId?: string;
+  titleClassName?: string;
+  style?: Record<string, string>;
+  usePageScroll?: boolean; // Nueva propiedad para usar el scroll de la página
+}
+
+const {
+  data,
+  title,
+  subtitle,
+  className,
+  titleColor,
+  dateColor,
+  lineColor,
+  lineBaseColor,
+  lineOffset = 5,
+  sectionId,
+  titleClassName,
+  style,
+  usePageScroll = false, // Por defecto, usar scroll interno
+} = Astro.props;
+---
+
+<div class="timeline-wrapper">
+  <Timeline
+    client:load
+    data={data}
+    title={title}
+    subtitle={subtitle}
+    className={`timeline-container ${className || ''}`}
+    titleColor={titleColor}
+    dateColor={dateColor}
+    lineColor={lineColor}
+    lineBaseColor={lineBaseColor}
+    lineOffset={lineOffset}
+    sectionId={sectionId}
+    titleClassName={titleClassName}
+    style={style}
+    usePageScroll={usePageScroll}
+  />
+</div>
+
+<style>
+  .timeline-wrapper {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    position: relative;
+  }
+</style>

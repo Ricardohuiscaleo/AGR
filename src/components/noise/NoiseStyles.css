@@ -1,0 +1,10 @@
+.noise-overlay {
+  position: fixed; /* Cambiado de absolute a fixed para que cubra toda la pantalla */
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1; /* Aumentado el z-index para asegurar que sea visible */
+  pointer-events: none; /* Para que no interfiera con los clicks */
+  mix-blend-mode: overlay; /* Utilizar blend mode overlay para mejor efecto visual */
+}

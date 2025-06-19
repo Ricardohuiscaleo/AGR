@@ -1,0 +1,323 @@
+---
+// BookingCalendarWrapper.astro - Un wrapper mejorado para el componente de reserva de citas
+import BookingCalendar from './BookingCalendar.jsx';
+
+interface Props {
+  calendarId: string;
+  title?: string;
+  description?: string;
+  accentColor?: string;
+  className?: string;
+  workingHoursStart?: number;
+  workingHoursEnd?: number;
+  slotDuration?: number;
+  timeZone?: string;
+  apiEndpoint?: string;
+}
+
+const {
+  calendarId,
+  title = 'Asesoría Personalizada con IA',
+  description = 'Reserva tu consultoría sobre implementación de sistemas RAG y soluciones de IA',
+  accentColor = '#3B82F6',
+  className = '',
+  workingHoursStart = 9,
+  workingHoursEnd = 22,
+  slotDuration = 60,
+  timeZone = 'America/Santiago',
+  apiEndpoint = '/api/calendar',
+} = Astro.props;
+---
+
+<!-- Contenedor principal que ocupa todo el ancho disponible -->
+<section class={`booking-calendar-section w-full ${className}`}>
+  <!-- Header de la sección con información integrada -->
+  <div class="calendar-header">
+    <div class="header-content">
+      <h2 class="calendar-title">{title}</h2>
+      <p class="calendar-description">{description}</p>
+
+      <!-- Información clave integrada en el header -->
+      <div class="key-info">
+        <div class="info-item">
+          <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span>Duración: 60 minutos</span>
+        </div>
+        <div class="info-item">
+          <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+            ></path>
+          </svg>
+          <span>Reunión vía Meet</span>
+        </div>
+        <div class="info-item">
+          <svg class="info-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span>Confirmación inmediata</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Componente de calendario con ancho completo -->
+  <div class="calendar-container">
+    <BookingCalendar
+      client:only="react"
+      calendarId={calendarId}
+      title={title}
+      description={description}
+      accentColor={accentColor}
+      workingHoursStart={workingHoursStart}
+      workingHoursEnd={workingHoursEnd}
+      slotDuration={slotDuration}
+      timeZone={timeZone}
+      sessionPrice="$20.000 CLP"
+    />
+  </div>
+
+  <!-- Información adicional integrada al final -->
+  <div class="calendar-footer">
+    <div class="footer-content">
+      <div class="benefits-grid">
+        <div class="benefit-item">
+          <div class="benefit-icon">🤖</div>
+          <h4>IA Personalizada</h4>
+          <p>Soluciones RAG adaptadas a tu negocio específico</p>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon">⚡</div>
+          <h4>Implementación Rápida</h4>
+          <p>Desde la consultoría hasta la producción en tiempo récord</p>
+        </div>
+        <div class="benefit-item">
+          <div class="benefit-icon">🎯</div>
+          <h4>Resultados Medibles</h4>
+          <p>ROI comprobable y métricas de rendimiento claras</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .booking-calendar-section {
+    max-width: 100%;
+    margin: 0 auto;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 51, 234, 0.05) 100%);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .calendar-header {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
+    padding: 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .header-content {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .calendar-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.75rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .calendar-description {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 2rem;
+    line-height: 1.6;
+  }
+
+  .key-info {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .info-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: #3b82f6;
+  }
+
+  .calendar-container {
+    padding: 0;
+    background: white;
+  }
+
+  .calendar-footer {
+    background: linear-gradient(135deg, rgba(31, 41, 55, 0.95) 0%, rgba(55, 65, 81, 0.95) 100%);
+    padding: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .footer-content {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+  }
+
+  .benefit-item {
+    text-align: center;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .benefit-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .benefit-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .benefit-item h4 {
+    color: white;
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .benefit-item p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .calendar-header {
+      padding: 1.5rem 1rem;
+    }
+
+    .calendar-title {
+      font-size: 1.5rem;
+    }
+
+    .calendar-description {
+      font-size: 1rem;
+    }
+
+    .key-info {
+      gap: 1rem;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .calendar-footer {
+      padding: 1.5rem 1rem;
+    }
+
+    .benefits-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .benefit-item {
+      padding: 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .calendar-header {
+      padding: 1rem;
+    }
+
+    .calendar-title {
+      font-size: 1.25rem;
+    }
+
+    .key-info {
+      gap: 0.75rem;
+    }
+
+    .info-item {
+      font-size: 0.75rem;
+    }
+
+    .info-icon {
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+
+  /* Animaciones sutiles */
+  .booking-calendar-section {
+    animation: fadeInUp 0.6s ease-out;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .benefit-item {
+    animation: fadeInUp 0.6s ease-out;
+    animation-fill-mode: both;
+  }
+
+  .benefit-item:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+  .benefit-item:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  .benefit-item:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+</style>

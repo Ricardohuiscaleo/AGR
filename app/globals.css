@@ -1,0 +1,25 @@
+/* Tooltip Styles */
+.animated-tooltip-content {
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+}
+
+.animated-tooltip-content::-webkit-scrollbar {
+  width: 5px;
+}
+
+.animated-tooltip-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.animated-tooltip-content::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.animated-tooltip-content::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

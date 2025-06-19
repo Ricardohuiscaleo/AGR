@@ -1,0 +1,12 @@
+---
+// TextParallaxEffectWrapper.astro - Componente wrapper para TextParallaxEffect
+import TextParallaxEffect from '../animations/TextParallaxEffect';
+
+interface Props {
+  sectionId?: string;
+}
+
+const { sectionId = 'hola-part2' } = Astro.props;
+---
+
+<TextParallaxEffect sectionId={sectionId} client:load />

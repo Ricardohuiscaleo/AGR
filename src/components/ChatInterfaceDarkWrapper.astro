@@ -1,0 +1,34 @@
+---
+// src/components/ChatInterfaceDarkWrapper.astro
+---
+
+<div id="chat-interface-dark-container" class="w-full">
+  <!-- El componente React se montará aquí -->
+</div>
+
+<script>
+  import React from 'react';
+  import { createRoot } from 'react-dom/client';
+  import ChatInterfaceDark from './ChatInterfaceDark.jsx';
+
+  // Función para montar el componente React
+  function mountChatInterfaceDark() {
+    const container = document.getElementById('chat-interface-dark-container');
+
+    if (container && !container.hasAttribute('data-react-mounted')) {
+      container.setAttribute('data-react-mounted', 'true');
+
+      const root = createRoot(container);
+      root.render(React.createElement(ChatInterfaceDark));
+
+      console.log('ChatInterfaceDark montado correctamente');
+    }
+  }
+
+  // Montar cuando el DOM esté listo
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', mountChatInterfaceDark);
+  } else {
+    mountChatInterfaceDark();
+  }
+</script>

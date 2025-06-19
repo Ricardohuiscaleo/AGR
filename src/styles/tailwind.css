@@ -1,0 +1,49 @@
+/* Tailwind CSS directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background-color: #0a1144; /* Color de fondo oscuro mejorado */
+    --text-color: #ffffff;
+  }
+
+  html.dark,
+  html[data-theme='dark'] {
+    --background-color: #0a1144; /* Color de fondo oscuro mejorado */
+    --text-color: #ffffff;
+  }
+
+  /* Asegurar que el fondo se aplique correctamente */
+  html,
+  body {
+    @apply bg-transparent;
+    background-color: var(--background-color) !important;
+    transition: background-color 0.3s ease-in-out;
+  }
+
+  /* Forzar color blanco para textos en modo oscuro */
+  .dark .cover-text-dark {
+    color: white !important;
+  }
+}
+
+@layer utilities {
+  .animate-aurora {
+    animation: aurora 60s linear infinite;
+  }
+
+  @keyframes aurora {
+    from {
+      background-position:
+        50% 50%,
+        50% 50%;
+    }
+    to {
+      background-position:
+        350% 50%,
+        350% 50%;
+    }
+  }
+}

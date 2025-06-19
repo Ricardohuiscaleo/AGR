@@ -1,0 +1,34 @@
+---
+// Propiedades para controlar el gradiente
+export interface Props {
+  colors?: string;
+  className?: string;
+}
+
+// Valores por defecto
+const {
+  colors = '#00a6ff, #f700f3, #fe6100', // Colores del gradiente por defecto
+  className = '',
+} = Astro.props;
+---
+
+<span class={`gradient-span ${className}`}>
+  <slot />
+</span>
+
+<style define:vars={{ colors }}>
+  .gradient-span {
+    background-image: linear-gradient(90deg, var(--colors));
+    background-size: 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    display: inline-block;
+    font-weight: 700;
+    text-shadow: none;
+  }
+
+  html[data-theme='dark'] .gradient-span {
+    filter: drop-shadow(0 0 12px rgba(247, 0, 243, 0.3));
+  }
+</style>

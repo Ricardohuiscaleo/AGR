@@ -1,0 +1,75 @@
+---
+// src/components/AstroP5Container.astro
+// Importa el componente React que contiene el sketch de p5.js
+import P5CursorSketch from './P5CursorSketch';
+
+// Puedes añadir estilos o clases al contenedor si lo necesitas
+const containerClass = Astro.props.class || '';
+const containerStyle = Astro.props.style || {};
+const fullWidth = Astro.props.fullWidth || false;
+const fullHeight = Astro.props.fullHeight || false;
+const isFixed = Astro.props.isFixed || false; // Nueva propiedad para posición fija
+const sectionId = Astro.props.sectionId || ''; // ID de la sección para ScrollTrigger
+---
+
+<div
+  class={`p5-astro-wrapper ${containerClass} ${isFixed ? 'fixed-p5-container' : ''}`}
+  style={{
+    ...containerStyle,
+  }}
+  data-section-id={sectionId}
+>
+  {
+    /*
+    Renderiza el componente React.
+    client:only="react" asegura que el JS solo se ejecute en el cliente, no en el servidor.
+    */
+  }
+  <P5CursorSketch
+    client:only="react"
+    width={fullWidth ? '100%' : '100%'}
+    height={fullHeight ? '100%' : '100%'}
+    isFixed={isFixed}
+    sectionId={sectionId}
+  />
+
+  <!-- El indicador visual de depuración ha sido eliminado -->
+</div>
+
+<style>
+  /*
+  Opcional: Estilos para el div wrapper de Astro si necesitas
+  controlar el diseño exterior del componente React.
+  Los estilos internos del contenedor de p5.js se manejan en el componente React.
+  */
+  .p5-astro-wrapper {
+    /* Ejemplo: si quieres que el wrapper tenga un tamaño específico */
+    width: 100%;
+    height: 100%;
+    position: relative;
+    z-index: 5; /* Asegurar que esté por encima de otros elementos si es necesario */
+    pointer-events: none; /* Permite hacer clic en elementos debajo del canvas */
+  }
+
+  /* Estilo para el contenedor con posición fija */
+  .fixed-p5-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1; /* Por debajo del contenido pero visible */
+    pointer-events: none; /* Permite hacer clic en elementos encima */
+  }
+
+  /*
+  Estilo global opcional para ocultar el cursor del navegador
+  cuando el canvas de p5.js esté activo.
+  Puedes añadir esto en un archivo CSS global o en el <style> de tu layout.
+  */
+  /*
+  canvas {
+      cursor: none !important;
+  }
+  */
+</style>

@@ -1,0 +1,200 @@
+.animated-gradient-text {
+  position: relative;
+  margin: 0;
+  display: inline-block;
+  max-width: fit-content;
+  font-weight: 500;
+  transition: color 0.5s ease-out;
+  cursor: pointer;
+  background-color: transparent !important;
+  border: none; /* Eliminamos el borde */
+  padding: 0; /* Eliminamos el padding */
+}
+
+.animated-gradient-text::before {
+  display: none; /* Eliminamos completamente el elemento pseudo que crea el borde con gradiente */
+}
+
+/* Efecto shimmer mejorado */
+.animated-gradient-text.shimmer .text-content {
+  position: relative;
+  background-size: 300% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation:
+    gradient 8s linear infinite,
+    shimmerEffect 2.5s infinite;
+}
+
+/* Garantizar legibilidad en modo claro */
+html[data-theme='light'] .text-content,
+body[data-theme='light'] .text-content {
+  filter: brightness(0.9);
+}
+
+/* Garantizar legibilidad en modo oscuro */
+html[data-theme='dark'] .text-content,
+:root:not([data-theme='light']) .text-content {
+  filter: brightness(1.1);
+}
+
+/* Clase para garantizar visibilidad */
+.text-content.enhanced-contrast {
+  filter: brightness(0.95);
+}
+
+/* Intensidades de shimmer */
+.animated-gradient-text.shimmer-low .text-content {
+  animation:
+    gradient 8s linear infinite,
+    shimmerEffect 3s infinite;
+}
+
+.animated-gradient-text.shimmer-high .text-content {
+  animation:
+    gradient 8s linear infinite,
+    shimmerEffect 2s infinite;
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.3); /* Añadir un ligero resplandor */
+}
+
+/* Animación del shimmer mejorada para colores más brillantes */
+@keyframes shimmerEffect {
+  0% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.2); /* Reducido de 1.5 a 1.2 para menor intensidad */
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
+/* Eliminar el pseudo-elemento anterior que causaba problemas */
+.animated-gradient-text.shimmer .text-content::after {
+  display: none;
+}
+
+.animated-gradient-text.shimmer-low .text-content::after,
+.animated-gradient-text.shimmer-medium .text-content::after,
+.animated-gradient-text.shimmer-high .text-content::after {
+  display: none;
+}
+
+.animated-gradient-text.shimmer:hover .text-content {
+  animation-duration: 8s, 1.5s; /* Más rápido en hover */
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.134); /* Resplandor más intenso en hover */
+}
+
+/* Shimmer adaptado para tema oscuro */
+html[data-theme='dark'] .animated-gradient-text.shimmer .text-content::after,
+:root:not([data-theme='light']) .animated-gradient-text.shimmer .text-content::after {
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    /* Aumentado de 0.2 a 0.4 */ rgba(0, 0, 0, 0) 100%
+  );
+}
+
+/* Intensidades de shimmer en modo oscuro */
+html[data-theme='dark'] .animated-gradient-text.shimmer-low .text-content::after,
+:root:not([data-theme='light']) .animated-gradient-text.shimmer-low .text-content::after {
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
+html[data-theme='dark'] .animated-gradient-text.shimmer-high .text-content::after,
+:root:not([data-theme='light']) .animated-gradient-text.shimmer-high .text-content::after {
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
+/* Destacar el shimmer en hover para mayor interactividad */
+.animated-gradient-text.shimmer:hover .text-content::after {
+  animation-duration: 1.8s; /* Más rápido en hover */
+  width: 80%; /* Más ancho en hover */
+}
+
+.theme-aware::before {
+  transition: background-image 0.3s ease;
+}
+
+.text-content {
+  display: inline-block;
+  position: relative;
+  z-index: 2;
+  padding: 0; /* Eliminamos el padding */
+  margin: 5px; /* Eliminamos el margen */
+  background-size: 300% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  animation: gradient 8s linear infinite;
+}
+
+/* Eliminamos las sombras que pueden estar causando efectos visuales no deseados */
+html[data-theme='light'] .animated-gradient-text,
+body[data-theme='light'] .animated-gradient-text,
+html[data-theme='dark'] .animated-gradient-text,
+:root:not([data-theme='light']) .animated-gradient-text {
+  box-shadow: none;
+}
+
+/* Específicamente para el pseudo-elemento en tema oscuro */
+html[data-theme='dark'] .theme-aware::before,
+:root:not([data-theme='light']) .theme-aware::before {
+  background: linear-gradient(to right, #06b6d4, #22c55e, #fb923c, #d946ef, #00b8ff, #22c55e);
+  background-size: 300% 100%;
+  animation: gradient 8s linear infinite;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 200%;
+  }
+}
+
+/* Clases personalizadas para eliminar efectos */
+.animated-gradient-text.no-shadow {
+  box-shadow: none !important;
+}
+
+.animated-gradient-text.no-blur {
+  filter: blur(0) !important;
+}
+
+.animated-gradient-text.clean-gradient::before {
+  display: none !important; /* Eliminar completamente el borde */
+}
+
+html[data-theme='light'] .animated-gradient-text.no-shadow,
+body[data-theme='light'] .animated-gradient-text.no-shadow,
+html[data-theme='dark'] .animated-gradient-text.no-shadow,
+:root:not([data-theme='light']) .animated-gradient-text.no-shadow {
+  box-shadow: none !important;
+}

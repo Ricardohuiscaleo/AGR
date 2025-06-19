@@ -1,0 +1,116 @@
+---
+// NoiseEffect.astro - Implementación nativa de Astro del efecto de ruido visual (versión estática)
+interface Props {
+  patternSize?: number;
+  patternScaleX?: number;
+  patternScaleY?: number;
+  patternAlpha?: number;
+  targetId?: string;
+}
+
+const { 
+  patternSize = 250, 
+  patternScaleX = 1, 
+  patternScaleY = 1, 
+  patternAlpha = 40,
+  targetId
+} = Astro.props;
+---
+
+<div class="noise-container" data-target={targetId}>
+  <canvas id={`noise-canvas-${targetId || 'main'}`} class="noise-overlay"></canvas>
+</div>
+
+<style>
+  .noise-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .noise-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    mix-blend-mode: soft-light;
+    opacity: 0.4;
+  }
+
+  /* Asegurar que se aplique correctamente en modo claro y oscuro */
+  html[data-theme='dark'] .noise-overlay {
+    mix-blend-mode: overlay;
+    opacity: 0.3;
+  }
+</style>
+
+<script define:vars={{ patternSize, patternScaleX, patternScaleY, patternAlpha, targetId }}>
+  // Inicialización del efecto de ruido estático (sin animación)
+  document.addEventListener('DOMContentLoaded', () => {
+    const canvasId = `noise-canvas-${targetId || 'main'}`;
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const patternCanvas = document.createElement('canvas');
+    patternCanvas.width = patternSize;
+    patternCanvas.height = patternSize;
+    const patternCtx = patternCanvas.getContext('2d');
+    if (!patternCtx) return;
+
+    const patternData = patternCtx.createImageData(patternSize, patternSize);
+    const patternPixelDataLength = patternSize * patternSize * 4;
+
+    const resize = () => {
+      const targetElement = targetId ? document.getElementById(targetId) : document.body;
+      if (!targetElement) return;
+
+      const rect = targetElement.getBoundingClientRect();
+      canvas.width = rect.width * window.devicePixelRatio;
+      canvas.height = rect.height * window.devicePixelRatio;
+      ctx.scale(patternScaleX, patternScaleY);
+      drawGrain();
+    };
+
+    // Generar el patrón de ruido una sola vez
+    const generateNoisePattern = () => {
+      for (let i = 0; i < patternPixelDataLength; i += 4) {
+        const value = Math.random() * 255;
+        patternData.data[i] = value;
+        patternData.data[i + 1] = value;
+        patternData.data[i + 2] = value;
+        patternData.data[i + 3] = patternAlpha;
+      }
+      patternCtx.putImageData(patternData, 0, 0);
+    };
+
+    const drawGrain = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = ctx.createPattern(patternCanvas, 'repeat');
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    };
+
+    // Configuración inicial
+    window.addEventListener('resize', resize);
+    generateNoisePattern();
+    resize();
+
+    // Observar cambios en el elemento objetivo si existe
+    if (targetId) {
+      const observer = new ResizeObserver(resize);
+      const targetElement = document.getElementById(targetId);
+      if (targetElement) {
+        observer.observe(targetElement);
+      }
+    }
+  });
+</script>

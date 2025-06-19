@@ -1,0 +1,2001 @@
+/* Importar estilos de aurora */
+@import './aurora.css';
+
+/* Estilos globales */
+.layout-container {
+  display: flex;
+  min-height: 100vh;
+  overflow-x: hidden; /* Evitar desbordamiento horizontal */
+  width: 100%;
+}
+
+.sidebar {
+  width: 200px;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  background: transparent;
+  overflow-y: auto; /* Permitir scroll vertical */
+  overflow-x: hidden;
+  padding: 1rem;
+  max-height: 100vh; /* Asegurar que ocupe todo el alto de la ventana */
+  scrollbar-width: thin; /* Scrollbar delgado para Firefox */
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent; /* Color del scrollbar para Firefox */
+  display: flex; /* Añadimos flexbox */
+  flex-direction: column; /* Dirección de columna */
+}
+
+/* Estilo para el scrollbar en Chrome/Safari/Edge */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+}
+
+.nav-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+  padding-bottom: 2rem; /* Espacio adicional al final para mejor scroll */
+  flex-grow: 1; /* Permitir que crezca si es necesario */
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 180px;
+  padding: 1rem;
+  width: calc(100% - 180px); /* Asegurar que el ancho es correcto */
+  overflow-x: hidden; /* Prevenir desbordamiento horizontal */
+  box-sizing: border-box; /* Incluir padding en el cálculo del ancho */
+}
+
+.content-section {
+  margin-bottom: 1rem;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%; /* Asegurar que la sección ocupa el 100% del contenedor */
+  overflow: hidden; /* Prevenir desbordamiento */
+}
+
+.section-inner {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 2rem 3rem;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  box-sizing: border-box; /* Incluir padding en el cálculo de dimensiones */
+}
+
+.section-number {
+  font-weight: bold;
+  margin-bottom: 1rem;
+  font-size: clamp(60px, 8vw, 120px);
+}
+
+.section-title {
+  font-weight: bold;
+  font-size: clamp(40px, 15vw, 300px);
+}
+
+.section-subtitle {
+  font-size: clamp(14px, 2vw, 16px);
+  position: relative;
+  z-index: 10; /* Asegurar que esté por encima de otros elementos */
+  opacity: 0;
+  animation: fadeIn 1s ease-in-out 0.5s forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.section-parrafo {
+  font-size: clamp(100px, 15vw, 300px);
+}
+
+.claim-text {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+}
+
+.text-pressure-wrapper {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  width: 100%;
+}
+
+/* Section rows y columns styles */
+.section-rows {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.section-rows-2 {
+  grid-template-rows: repeat(2, 1fr);
+}
+
+.section-rows-3 {
+  grid-template-rows: repeat(3, 1fr);
+}
+
+.section-columns {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.section-columns-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.section-columns-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.section-columns-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 768px) {
+  .section-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: auto;
+    width: 100%;
+    height: auto;
+    background: transparent;
+    z-index: 100;
+    padding: 0.5rem;
+  }
+
+  .nav-container {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-behavior: smooth;
+    gap: 0.5rem;
+    padding: 0 0.5rem;
+  }
+
+  .nav-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .main-content {
+    margin-left: 0;
+    padding: 1rem;
+    padding-bottom: calc(100px + 1rem);
+  }
+
+  .text-pressure-wrapper {
+    bottom: 40px;
+    left: 0;
+    width: 100%;
+    padding: 0 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-inner {
+    padding: 1rem 1.5rem;
+  }
+
+  .text-pressure-wrapper {
+    bottom: 30px;
+  }
+}
+
+/* Estilos específicos para rag-home */
+#rag-home .text-pressure-wrapper {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  transform: translate(-50%, 50%);
+  width: 100%;
+  text-align: center;
+}
+
+/* Estilos para la sección hola-part2 */
+.grid-wrapper {
+  display: grid;
+  grid-template-rows: auto auto auto auto auto;
+  width: 100%;
+  height: auto;
+}
+
+.grid-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  padding: 1.5rem 0;
+  align-items: center;
+}
+
+.big-text {
+  font-size: 300px;
+  line-height: 1;
+  font-weight: bold;
+  margin: 0;
+}
+
+/* Estilos para los colores de texto */
+.gray-text {
+  color: #6b7280;
+  text-shadow:
+    0 0 1px rgba(0, 0, 0, 0.062),
+    0 0 2px rgba(0, 0, 0, 0.049),
+    1px 1px 1px rgba(0, 0, 0, 0.045);
+}
+
+.white-text {
+  color: white;
+  text-shadow:
+    0 0 1px rgba(0, 0, 0, 0.062),
+    0 0 2px rgba(0, 0, 0, 0.049),
+    1px 1px 1px rgba(0, 0, 0, 0.045);
+}
+
+.orange-text {
+  color: #f97316;
+  text-shadow:
+    0 0 1px rgba(0, 0, 0, 0.062),
+    0 0 2px rgba(0, 0, 0, 0.049),
+    1px 1px 1px rgba(0, 0, 0, 0.045);
+}
+
+/* Estilos para párrafos */
+.description-box {
+  max-width: 80%;
+}
+
+.description-box p {
+  font-size: clamp(28px, 4vw, 32px);
+  line-height: 1.5;
+  color: #6b7280;
+  margin: 0;
+}
+
+.separator {
+  height: 1px;
+  width: 100%;
+  background-color: rgba(12, 12, 12, 0.5);
+  margin: 0;
+}
+
+/* Vista móvil específica para hola-part2 */
+@media (max-width: 768px) {
+  #hola-part2 .grid-row {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  #hola-part2 .description-box {
+    max-width: 100%;
+    order: 2;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  #hola-part2 .big-text {
+    font-size: clamp(40px, 15vw, 150px);
+    width: 100%;
+    text-align: center;
+    order: 1;
+    margin: 0 auto;
+  }
+
+  #hola-part2 .grid-wrapper {
+    gap: 2rem;
+  }
+
+  #hola-part2 .separator {
+    margin: 1rem 0;
+  }
+
+  #hola-part2 .description-box p {
+    text-align: center;
+    max-width: 90%;
+    margin: 0 auto;
+  }
+}
+
+/* Estilos mejorados para las gráficas circulares */
+#pie-charts-container {
+  min-height: 300px !important;
+}
+
+#pie-charts-container .doughnut-container {
+  position: relative !important;
+  width: 100% !important;
+}
+
+/* Media queries mejorados */
+/* Breakpoint para 1366px y superior - Vista completa escritorio */
+@media (min-width: 1366px) {
+  .section-title {
+    font-size: clamp(40px, 15vw, 280px);
+  }
+
+  .big-text {
+    font-size: 280px;
+  }
+
+  /* Ajustes específicos para los gráficos circulares en pantallas grandes */
+  #pie-charts-container {
+    height: 320px !important;
+  }
+}
+
+/* Breakpoint para el rango problemático 1365px-1200px */
+@media (max-width: 1365px) and (min-width: 1201px) {
+  .section-title {
+    font-size: clamp(40px, 12vw, 220px);
+  }
+
+  .main-content {
+    padding: 0.8rem;
+  }
+
+  .section-inner {
+    padding: 1.8rem 2.8rem;
+  }
+
+  .big-text {
+    font-size: 220px;
+  }
+
+  /* Ajustes específicos para los gráficos circulares */
+  #pie-charts-container {
+    height: 300px !important;
+  }
+}
+
+/* Breakpoint para el rango problemático 1200px-1015px */
+@media (max-width: 1200px) and (min-width: 1015px) {
+  .big-text {
+    font-size: 14vw;
+  }
+
+  .section-title {
+    font-size: clamp(40px, 12vw, 180px);
+  }
+
+  .section-inner {
+    padding: 1.5rem 2.5rem;
+  }
+
+  /* Ajustes específicos para los gráficos circulares */
+  #pie-charts-container {
+    height: 340px !important;
+  }
+}
+
+/* Breakpoint para el rango problemático 1014px-906px */
+@media (max-width: 1014px) and (min-width: 906px) {
+  .big-text {
+    font-size: 13vw;
+  }
+
+  .section-title {
+    font-size: clamp(40px, 10vw, 160px);
+  }
+
+  .section-inner {
+    padding: 1.2rem 2rem;
+  }
+
+  #hola-part2 .grid-row {
+    gap: 1.5rem;
+  }
+
+  .description-box p {
+    font-size: clamp(20px, 3vw, 28px);
+  }
+
+  /* Ajustes específicos para los gráficos circulares */
+  #pie-charts-container {
+    height: 350px !important;
+  }
+
+  /* Asegurar que las leyendas de los gráficos circulares se muestren correctamente */
+  #pie-charts-container .doughnut-container canvas {
+    max-height: 180px !important;
+  }
+}
+
+/* Breakpoint para el rango problemático 905px-769px (tablets y pantallas medianas) */
+@media (max-width: 905px) and (min-width: 769px) {
+  .big-text {
+    font-size: 12vw;
+  }
+
+  .section-title {
+    font-size: clamp(40px, 9vw, 140px);
+  }
+
+  .section-inner {
+    padding: 1rem 1.8rem;
+  }
+
+  .main-content {
+    padding: 0.8rem;
+  }
+
+  #hola-part2 .grid-row {
+    gap: 1rem;
+  }
+
+  .description-box p {
+    font-size: clamp(18px, 2.8vw, 24px);
+  }
+
+  /* Mejoras específicas para los gráficos circulares en tablets */
+  #pie-charts-container {
+    height: 400px !important;
+    min-height: 350px !important;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #pie-charts-container > div {
+    flex-direction: column !important;
+    gap: 1.5rem !important;
+  }
+
+  #pie-charts-container .doughnut-container {
+    max-height: 160px !important;
+  }
+
+  /* Asegurar que las leyendas tengan suficiente espacio */
+  #pie-charts-container canvas {
+    max-height: 250px !important;
+    margin-bottom: 0.5rem !important;
+  }
+}
+
+/* Vista móvil - Se mantiene igual */
+@media (max-width: 768px) {
+  #hola-part2 .grid-row {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  #hola-part2 .description-box {
+    max-width: 100%;
+    order: 2;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  #hola-part2 .big-text {
+    font-size: clamp(40px, 15vw, 150px);
+    width: 100%;
+    text-align: center;
+    order: 1;
+    margin: 0 auto;
+  }
+
+  #hola-part2 .grid-wrapper {
+    gap: 2rem;
+  }
+
+  #hola-part2 .separator {
+    margin: 1rem 0;
+  }
+
+  #hola-part2 .description-box p {
+    text-align: center;
+    max-width: 90%;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 480px) {
+  #rag-home .text-pressure-wrapper {
+    bottom: 40%;
+  }
+}
+
+/* Estilos para la nueva sección de ASCII Art */
+.ascii-section-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 2rem;
+}
+
+.ascii-text-example {
+  width: 100%;
+  height: 400px;
+  margin: 1rem 0;
+  position: relative;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+#ascii-art .ascii-text-example {
+  animation: glow 3s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+  }
+  to {
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.6);
+  }
+}
+
+@media (max-width: 768px) {
+  .ascii-text-example {
+    height: 300px;
+  }
+
+  #ascii-art p {
+    font-size: 16px;
+  }
+}
+
+/* Estilos para la sección usage-part1 con scroll */
+.usage-scroll-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.usage-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 1rem;
+  gap: 2rem;
+}
+
+.usage-item {
+  width: 100%;
+  padding: 0.5rem 0;
+}
+
+.usage-text {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  font-size: clamp(2.5rem, 8vw, 8rem);
+  line-height: 1.1;
+  color: white;
+}
+
+.usage-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: clamp(2.5rem, 6vw, 6rem);
+  height: clamp(2.5rem, 6vw, 6rem);
+  margin-right: 1rem;
+  font-size: clamp(1.2rem, 3vw, 3rem);
+  font-weight: bold;
+  color: #f97316; /* orange-text */
+  background: linear-gradient(135deg, #ffffff);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.usage-text span:last-child {
+  flex: 1;
+}
+
+/* Media queries para la sección usage */
+@media (max-width: 768px) {
+  .usage-text {
+    font-size: clamp(2rem, 6vw, 6rem);
+  }
+
+  .usage-number {
+    min-width: clamp(2rem, 5vw, 5rem);
+    height: clamp(2rem, 5vw, 5rem);
+    margin-right: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .usage-content {
+    padding: 0.75rem;
+    gap: 1.5rem;
+  }
+
+  .usage-text {
+    font-size: clamp(1.5rem, 5vw, 4.5rem);
+  }
+}
+
+@keyframes moveHorizontal {
+  0% {
+    transform: translateX(-50%) translateY(-10%);
+  }
+  50% {
+    transform: translateX(50%) translateY(10%);
+  }
+  100% {
+    transform: translateX(-50%) translateY(-10%);
+  }
+}
+
+@keyframes moveInCircle {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes moveVertical {
+  0% {
+    transform: translateY(-50%);
+  }
+  50% {
+    transform: translateY(50%);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+.animate-first {
+  animation: moveVertical 30s ease infinite;
+}
+
+.animate-second {
+  animation: moveInCircle 20s reverse infinite;
+}
+
+.animate-third {
+  animation: moveInCircle 40s linear infinite;
+}
+
+.animate-fourth {
+  animation: moveHorizontal 40s ease infinite;
+}
+
+.animate-fifth {
+  animation: moveInCircle 20s ease infinite;
+}
+
+/* Añadiendo estilos para la nueva sección 'hola-part3' con tarjetas de características */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  width: 100%;
+  padding: 1rem 2rem;
+}
+
+.feature-card {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.feature-icon {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+  color: #f97316;
+}
+
+.feature-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.feature-description {
+  color: #d1d5db;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.feature-cta {
+  display: inline-block;
+  margin-top: 1.5rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #f97316, #f43f5e);
+  color: white;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.feature-cta:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(249, 115, 22, 0.4);
+}
+
+.hola-part3-container {
+  background-color: #1f2937;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-top: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hola-part3-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, rgba(249, 115, 22, 0.1), transparent);
+  z-index: 0;
+}
+
+.hola-part3-title {
+  font-size: 2.5rem;
+  color: white;
+  margin-bottom: 2rem;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* Efectos de brillo para las cards */
+.glow-effect {
+  position: absolute;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  background: radial-gradient(circle, rgba(249, 115, 22, 0.4) 0%, rgba(249, 115, 22, 0) 70%);
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+  opacity: 0;
+}
+
+.feature-card:hover .glow-effect {
+  opacity: 1;
+}
+
+/* Media queries para responsive */
+@media (max-width: 768px) {
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hola-part3-title {
+    font-size: 2rem;
+  }
+
+  .feature-card {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 1024px) and (min-width: 769px) {
+  .feature-grid {
+    gap: 1.5rem;
+  }
+}
+
+/* Estilos para el scroll gradual en rag-home */
+.section-title,
+.section-number {
+  transition: color 0.3s ease;
+}
+
+#rag-home {
+  transition: background-color 0.3s ease;
+}
+
+/* Asegura que el componente TextPressure mantenga su gradiente */
+.text-pressure-wrapper {
+  z-index: 10;
+  position: relative;
+}
+
+.nav-aurora-effect {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background: linear-gradient(
+    125deg,
+    rgba(156, 138, 192, 0.8) 0%,
+    rgba(120, 168, 214, 0.8) 25%,
+    rgba(172, 222, 216, 0.8) 50%,
+    rgba(237, 100, 90, 0.8) 75%,
+    rgba(255, 140, 0, 0.8) 100%
+  );
+  background-size: 400% 400%;
+  animation: aurora-animation 15s ease infinite;
+}
+
+@keyframes aurora-animation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Estilos adicionales para garantizar que la tarjeta rag tenga los colores correctos */
+.nav-item-container[data-section='rag'] .nav-number,
+.nav-item-container[data-section='rag'] .nav-link {
+  transition: color 0.3s ease;
+  position: relative;
+  z-index: 2;
+}
+
+/* Estilo para la tarjeta activa */
+.nav-item-container[data-section='rag'].active {
+  background-color: rgb(255, 255, 255) !important;
+}
+
+.nav-item-container[data-section='rag'].active .nav-number,
+.nav-item-container[data-section='rag'].active .nav-link {
+  color: rgb(0, 0, 0);
+}
+
+/* Garantizar que el contenido está encima del efecto aurora */
+.nav-item-container[data-section='rag'] .nav-content {
+  position: relative;
+  z-index: 2;
+}
+
+.section-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.section-container .content-section {
+  position: relative;
+}
+
+.section-container .content-section[id='hola-part3'] {
+  flex: 1;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.section-container .content-section[id='hola-part4'] {
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .section-container {
+    flex-direction: column;
+  }
+
+  .section-container .content-section {
+    width: 100% !important;
+  }
+
+  .section-container .content-section[id='hola-part3'] {
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* Estilos específicos para el timeline de la sección usage-part1 */
+#usage-part1 .section-inner {
+  padding: 0;
+  margin: 0;
+}
+
+/* Asegurar que el contenedor del timeline ocupe todo el ancho disponible */
+#usage-part1 .timeline-wrapper,
+#usage-part1 .timeline-container {
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+/* Estilos para las transiciones de los elementos del timeline */
+#usage-part1 [id^='timeline-circle-'],
+#usage-part1 [id^='timeline-title-'],
+#usage-part1 [id^='timeline-content-'] {
+  transition: all 0.4s ease;
+}
+
+/* Mejorar visibilidad de la línea vertical */
+#usage-part1 .overflow-hidden.w-\[2px\] {
+  z-index: 10;
+  opacity: 1;
+}
+
+/* Estilos para las animaciones de la línea de progreso */
+#usage-part1 .overflow-hidden.w-\[2px\] > div {
+  transition: height 0.3s ease-out;
+}
+
+/* Estilos específicos para el timeline de la sección hola-part3 */
+#hola-part3 .section-inner {
+  padding: 0;
+  margin: 0;
+}
+
+#hola-part3-timeline .section-inner {
+  padding: 0;
+  margin: 0;
+}
+
+/* Asegurar que el contenedor del timeline ocupe todo el ancho disponible */
+#hola-part3-timeline .timeline-wrapper,
+#hola-part3-timeline .timeline-container {
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+/* Estilos para las transiciones de los elementos del timeline */
+#hola-part3-timeline [id^='timeline-circle-'],
+#hola-part3-timeline [id^='timeline-title-'],
+#hola-part3-timeline [id^='timeline-content-'] {
+  transition: all 0.4s ease;
+}
+
+/* Mejorar visibilidad de la línea vertical */
+#hola-part3-timeline .overflow-hidden.w-\[2px\] {
+  z-index: 10;
+  opacity: 1;
+  background-color: rgba(107, 114, 128, 0.3);
+  border-radius: 6px;
+}
+
+/* Estilos para las animaciones de la línea de progreso */
+#hola-part3-timeline .overflow-hidden.w-\[2px\] > div {
+  transition: height 0.3s ease-out;
+  background: linear-gradient(to bottom, #e7e0de, #9c99b3, #00e5ff);
+  box-shadow: 0 0 8px rgba(255, 87, 34, 0.7);
+  border-radius: 6px;
+}
+
+/* Animación para los círculos activos en la línea de tiempo */
+#hola-part3-timeline [id^='timeline-circle-'] {
+  animation: none;
+}
+
+#hola-part3-timeline [id^='timeline-circle-'].active {
+  animation: timeline-pulse 2s infinite ease-in-out;
+  background-color: #22ff6c !important;
+  border-color: #65f0ff !important;
+  box-shadow: 0 0 15px rgba(34, 255, 108, 0.8) !important;
+}
+
+@keyframes timeline-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 15px rgba(34, 255, 108, 0.8);
+  }
+  50% {
+    transform: scale(1.2);
+    box-shadow: 0 0 20px rgba(34, 255, 108, 1);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 15px rgba(34, 255, 108, 0.8);
+  }
+}
+
+/* Asegurar que el título del timeline ocupe el ancho completo - regla unificada */
+#hola-part3-timeline .timeline-wrapper h2 {
+  width: 100% !important;
+  max-width: 98% !important;
+  text-align: left;
+  font-size: clamp(5.5rem, 11vw, 9rem) !important; /* Aumentado de 6.5rem a 8rem para PC */
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  margin: 2rem 0 1rem !important;
+  padding: 1rem;
+  color: white !important;
+}
+
+/* Estilo específico para pantallas móviles */
+@media (max-width: 768px) {
+  #hola-part3-timeline .timeline-wrapper h2 {
+    width: 100% !important;
+    max-width: 95% !important;
+    font-size: clamp(4.3rem, 8vw, 3.5rem) !important;
+    padding: 1rem;
+    margin: 1rem 0.5rem;
+    line-height: 1.3 !important;
+    text-align: left !important;
+  }
+
+  #hola-part3-timeline .timeline-wrapper p {
+    text-align: left !important;
+    margin-left: 1rem;
+    padding: 0 1rem;
+    font-size: clamp(1.2rem, 1.8vw, 1.4rem); /* Aumentado en un 10% de 1rem, 1.8vw, 1.4rem */
+    max-width: 95%; /* Limitar un poco el ancho */
+    line-height: 1.5;
+    margin-top: -1rem; /* Acercar al título */
+    margin-bottom: 3rem; /* Espacio hacia abajo */
+  }
+}
+
+/* Ajuste específico para el subtítulo en hola-part3-timeline */
+#hola-part3-timeline .timeline-wrapper p {
+  margin-left: 1rem; /* Mismo margen que el título principal */
+  font-size: clamp(1.1rem, 1.98vw, 2.2rem); /* Aumentado de 1.54rem a 2.2rem para PC */
+  max-width: 95%; /* Limitar un poco el ancho */
+  line-height: 1.5;
+  margin-top: -1rem; /* Acercar al título */
+  margin-bottom: 3rem; /* Espacio hacia abajo */
+}
+
+/* Asegurar que el título insertado como HTML se renderice correctamente */
+#hola-part3-timeline [id^='timeline-title'] {
+  display: block !important;
+  width: 100% !important;
+  font-size: clamp(1.5rem, 4vw, 3rem) !important;
+  font-weight: 700 !important;
+  color: white !important;
+}
+
+/* Aumentar específicamente el tamaño de los párrafos dentro del contenido */
+#hola-part3-timeline [id^='timeline-content-'] p {
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  line-height: 1.5;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Aumentar el tamaño de los títulos en las cajas */
+#hola-part3-timeline [id^='timeline-content-'] h4 {
+  font-size: clamp(1.2rem, 3vw, 4rem); /* Aumentado de 3.2rem a 4rem para PC */
+  margin-bottom: 0.75rem;
+  width: 100%;
+}
+
+/* Aumentar el tamaño de los títulos de las secciones en vista PC */
+@media (min-width: 768px) {
+  #hola-part3-timeline [id^='timeline-title-'] {
+    font-size: 6.5rem !important; /* Aumentado de 5rem a 6.5rem */
+  }
+
+  /* Aumentar títulos de problema, desafío y solución */
+  #hola-part3-timeline .text-amber-400 {
+    font-size: 1rem !important; /* Este es el controlador de estilos para textos "Personal" */
+  }
+
+  /* Controlar específicamente el tamaño de texto para "5 meses" y textos similares */
+  #hola-part3-timeline span.text-amber-400.font-bold.text-sm.md\:text-base,
+  #hola-part3-timeline span.text-amber-400.font-bold {
+    font-size: 1rem !important; /* Ajustado a 1.0rem como solicitado */
+  }
+}
+
+/* Controlar el tamaño de texto para "5 meses" y "Personal" en móviles */
+#hola-part3-timeline span.text-amber-400.font-bold.text-sm,
+#hola-part3-timeline span.text-amber-400.font-bold {
+  font-size: 1rem !important; /* Ajustado a 1.0rem como solicitado */
+}
+
+/* Controlar el tamaño de texto para "5 meses" y "Personal" en móviles */
+#hola-part3-timeline span.text-amber-400.font-bold.text-sm,
+#hola-part3-timeline span.text-amber-400.font-bold {
+  font-size: 1rem !important; /* Ajustado a 1.0rem como solicitado */
+}
+
+/* Asegurar que la línea de progreso del timeline sea claramente visible */
+#hola-part3-timeline .timeline-progress-container {
+  width: 6px !important;
+  background-color: rgba(107, 114, 128, 0.3) !important;
+  border-radius: 6px !important;
+  overflow: hidden !important;
+  z-index: 20 !important;
+}
+
+#hola-part3-timeline #timeline-progress-orange {
+  background: linear-gradient(to bottom, #22ff6c, #43ffba, #65f0ff) !important;
+  box-shadow: 0 0 8px rgba(255, 87, 34, 0.7) !important;
+  border-radius: 6px !important;
+}
+
+/* Estilos específicos para el gradiente en hola-part3-timeline */
+#hola-part3-timeline .animated-gradient-text {
+  background-image: linear-gradient(
+    45deg,
+    #22ff6c 0%,
+    #43ffba 25%,
+    #65f0ff 50%,
+    #43ffba 75%,
+    #22ff6c 100%
+  ) !important;
+  background-clip: text !important;
+  -webkit-background-clip: text !important;
+  color: transparent !important;
+  text-shadow: none !important;
+  font-weight: 600 !important;
+}
+
+/* Estilos para el texto "low-cost" con tono indigo, itálica y rotación leve */
+#hola-part3-timeline .low-cost-text {
+  color: #00fbff !important; /* Color indigo */
+  font-style: italic !important;
+  transform: rotate(-2deg) !important; /* Rotación leve hacia la izquierda */
+  display: inline-block !important; /* Para que la rotación se aplique correctamente */
+  font-weight: 600 !important;
+  text-shadow: 0px 0px 1px rgba(99, 102, 241, 0.3) !important; /* Sutil sombra para profundidad */
+  transition: all 0.3s ease !important; /* Transición suave para efectos hover */
+}
+
+/* Efecto hover opcional para low-cost */
+#hola-part3-timeline .low-cost-text:hover {
+  transform: rotate(0deg) scale(1.05) !important;
+}
+
+/* Estilos para el timeline en la sección hola-part3 */
+#hola-part3-timeline {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Asegurar que los círculos se mantengan visibles durante el scroll */
+#hola-part3-timeline [id^='timeline-circle-'] {
+  transition: all 0.4s ease;
+}
+
+/* Aumentar significativamente el espaciado entre elementos para una mejor lectura */
+#hola-part3-timeline .timeline-item {
+  margin-bottom: 3rem;
+}
+
+/* Hacer los títulos más prominentes para mejor alineación visual con los círculos */
+#hola-part3-timeline [id^='timeline-title-'] {
+  font-size: clamp(1.8rem, 5vw, 1.5rem) !important;
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+  position: sticky;
+  top: 40%;
+  transition: all 0.3s ease;
+}
+
+/* Mejorar la altura de los contenedores para evitar cortes en párrafos */
+#hola-part3-timeline [id^='timeline-content-'] {
+  min-height: 300px;
+  padding-bottom: 5rem;
+}
+
+/* Estilos específicos para mejorar el espacio en sección Costos Ocultos */
+#hola-part3-timeline .flex.flex-col.md\:flex-row.gap-6 {
+  max-width: 100%;
+  margin-right: -2rem; /* Extender el contenido para aprovechar más espacio horizontal */
+  padding-right: 0;
+}
+
+#hola-part3-timeline .w-full.md\:w-1\/2 {
+  max-width: 100%;
+  padding-right: 3rem; /* Más espacio a la derecha */
+}
+
+/* Optimización del título para que aparezca en una línea */
+#hola-part3-timeline [id^='timeline-title-']:first-child {
+  font-size: clamp(1rem, 8vw, 2rem) !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  letter-spacing: -0.02em;
+  padding-right: 2rem;
+  max-width: 100% !important;
+}
+
+/* Mejorar visualización del texto "Estás perdiendo clientes..." */
+#hola-part3-timeline .mb-6.text-lg.md\:text-2xl.font-bold.text-amber-50 {
+  font-size: clamp(1.25rem, 3vw, 1.75rem) !important;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+  max-width: 90%;
+}
+
+/* Optimizar espaciado y diseño de la tarjeta con puntos */
+#hola-part3-timeline .bg-black\/30.p-5 {
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  max-width: 90%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Dar más espacio a los elementos de la lista */
+#hola-part3-timeline .list-disc.list-inside.space-y-2 li {
+  margin-bottom: 0.5rem;
+  padding-left: 0.5rem;
+  line-height: 1.4;
+}
+
+/* Hacer que el texto del date sea más visible */
+#hola-part3-timeline [id^='timeline-content-']:first-child .text-amber-300 {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  margin-bottom: 1rem;
+  display: block;
+  max-width: 85%;
+  line-height: 1.5;
+}
+
+/* Ajuste específico para tablets y pantallas medianas */
+@media (min-width: 768px) and (max-width: 1200px) {
+  #hola-part3-timeline [id^='timeline-title-']:first-child {
+    font-size: clamp(1.8rem, 5vw, 3.5rem) !important;
+  }
+
+  #hola-part3-timeline .w-full.md\:w-1\/2 {
+    padding-right: 1.5rem;
+  }
+}
+
+/* Estilos para mejorar la estructura horizontal del Timeline - especialmente para la sección Costos Ocultos */
+#hola-part3-timeline .timeline-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  /* En vista PC, reorganiza el espacio para que el contenido fluya a la derecha del título */
+  #hola-part3-timeline .timeline-content-wrapper {
+    padding-left: 0;
+  }
+
+  /* La sección Timeline tiene una estructura específica con el título a la izquierda */
+  #hola-part3-timeline [id^='timeline-content-']:first-child {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  /* Ubicar el contenido real a la derecha del título en PC */
+  #hola-part3-timeline .timeline-content-inner {
+    margin-left: auto;
+    max-width: 85%;
+    width: 100%;
+  }
+
+  /* Ajustar la alineación de títulos específicamente para la sección "Costos Ocultos" */
+  #hola-part3-timeline [id^='timeline-title-']:first-child {
+    white-space: nowrap;
+    font-size: clamp(1.2rem, 5vw, 1.5rem) !important;
+    padding-right: 2rem;
+    letter-spacing: -0.02em;
+    position: sticky;
+    top: 40vh;
+  }
+}
+
+/* Ajustes específicos para tablets */
+@media (min-width: 768px) and (max-width: 1200px) {
+  #hola-part3-timeline .timeline-content-inner {
+    max-width: 75%;
+  }
+}
+
+/* Mantener el diseño vertical en móvil */
+@media (max-width: 767px) {
+  #hola-part3-timeline .timeline-content-inner {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* Mejorar los márgenes en dispositivos móviles */
+@media (max-width: 767px) {
+  /* Ajustes específicos para el título "Costos Ocultos" en vista móvil */
+  #hola-part3-timeline [id^='timeline-title-mobile-'] {
+    font-size: clamp(1.6rem, 6vw, 2rem) !important;
+    padding-right: 1rem !important;
+    padding-left: 0.5rem !important;
+    margin-right: auto !important;
+    width: auto !important;
+    white-space: normal !important;
+    overflow: visible;
+  }
+
+  /* Ajustar el contenido a la derecha en vista móvil */
+  #hola-part3-timeline .relative.w-full.md\:w-\[70\%\].pl-16.pr-4 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    width: 100% !important;
+  }
+
+  /* Más espacio para los párrafos en vista móvil */
+  #hola-part3-timeline [id^='timeline-content-'] {
+    padding-right: 1rem !important;
+    padding-left: 0.5rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Evitar que el contenido se pegue al borde derecho */
+  #hola-part3-timeline .timeline-content-wrapper,
+  #hola-part3-timeline .timeline-content-inner {
+    padding-right: 1rem !important;
+    width: 98% !important;
+    margin-right: auto;
+    box-sizing: border-box;
+  }
+
+  /* Ajustar la fecha en vista móvil */
+  #hola-part3-timeline [id^='timeline-content-']:first-child .text-amber-300 {
+    padding-right: 1.5rem;
+    max-width: 95%;
+  }
+
+  /* Ajustar las tarjetas en vista móvil */
+  #hola-part3-timeline .bg-black\/30.p-5 {
+    margin-right: 1rem;
+    width: 95%;
+    box-sizing: border-box;
+  }
+
+  /* Asegurar que los elementos de la lista no se desborden */
+  #hola-part3-timeline .list-disc.list-inside.space-y-2 li {
+    padding-right: 1rem;
+    margin-right: 0;
+    word-wrap: break-word;
+  }
+}
+
+/* Asegurar que el título del timeline ocupe el ancho completo */
+#usage-part1 .timeline-wrapper h1 {
+  width: 100% !important;
+  max-width: 100% !important;
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 0 1rem;
+}
+
+/* Estilos para garantizar que el contenido de Timeline ocupe todo el ancho */
+#usage-part1 .timeline-container {
+  width: 100%;
+  max-width: 100% !important;
+}
+
+#usage-part1 .relative.max-w-7xl {
+  max-width: 100% !important;
+  width: 100%;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Asegurar que el título insertado como HTML se renderice correctamente */
+.timeline-wrapper [id^='timeline-title'] {
+  display: block !important;
+  width: 100% !important;
+}
+
+/* Aumentar específicamente el tamaño de los párrafos dentro del contenido */
+#usage-part1 [id^='timeline-content-'] p {
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  line-height: 1.5;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Aumentar el tamaño de los títulos en las cajas */
+#usage-part1 [id^='timeline-content-'] h4 {
+  font-size: clamp(1.2rem, 3vw, 2rem);
+  margin-bottom: 0.75rem;
+  width: 100%;
+}
+
+/* Mobile-centered typewriter effect for better alignment on small screens */
+.typewriter-effect.mobile-centered {
+  display: block;
+  text-align: center;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.typewriter-effect.mobile-centered .typewriter-wrapper {
+  text-align: center;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.typewriter-effect.mobile-centered .typewriter-container,
+.typewriter-effect.mobile-centered .typewriter-visible-text {
+  text-align: center;
+  margin: 0 auto;
+  display: inline-block;
+}
+
+/* Fixes the cursor positioning for mobile view */
+.typewriter-effect.mobile-centered .typewriter-cursor {
+  position: static;
+  display: inline;
+  margin-left: 0;
+  animation: blink 1s step-end infinite;
+  color: currentColor; /* Match text color */
+  font-weight: inherit;
+}
+
+/* Specific text alignment for mobile description */
+@media (max-width: 768px) {
+  .description-box p {
+    text-align: center;
+    width: 100%;
+  }
+
+  /* Ensure the typewriter text container is full width and centered */
+  .typewriter-effect.mobile-centered .typewriter-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 0;
+    margin: 0 auto;
+  }
+
+  .typewriter-effect.mobile-centered .typewriter-container {
+    width: auto;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    margin: 0 auto;
+  }
+
+  .typewriter-effect.mobile-centered .typewriter-visible-text {
+    text-align: center;
+    width: auto;
+    display: inline;
+  }
+
+  /* Make sure the cursor displays correctly inline with text */
+  .typewriter-effect.mobile-centered .typewriter-cursor {
+    font-weight: normal;
+    vertical-align: baseline;
+    position: relative;
+    display: inline-block;
+  }
+
+  /* Center text in description box for mobile */
+  #hola-part2 .description-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+/* Estilos para la sección hola-part3-timeline - scroll global */
+.timeline-global-scroll {
+  overflow-y: visible !important;
+  overflow-x: hidden !important;
+  position: relative !important;
+  height: auto !important;
+}
+
+/* Contenedor principal del timeline con scroll de página */
+.use-page-scroll {
+  overflow: visible !important;
+  height: auto !important;
+}
+
+/* Mejorar visualización de elementos de timeline en scroll de página */
+.use-page-scroll .timeline-item {
+  position: relative;
+  margin-bottom: 4rem;
+}
+
+/* Posicionamiento sticky para círculos en scroll de página */
+.page-scroll-circle {
+  position: relative !important; /* Cambiado de sticky a relative para que se mueva con el contenido */
+  z-index: 40 !important;
+  margin: 0 !important;
+  height: 40px !important;
+  width: 40px !important;
+}
+
+/* Posicionamiento sticky para títulos en scroll de página */
+.page-scroll-title {
+  position: relative !important; /* Cambiado de sticky a relative para que se mueva con el contenido */
+  z-index: 40 !important;
+}
+
+/* Ajustes para los círculos activos */
+.use-page-scroll [id^='timeline-circle-'].active {
+  background-color: #22ff6c !important;
+  border-color: #65f0ff !important;
+  transform: scale(1.2) !important;
+  box-shadow: 0 0 15px rgba(34, 255, 108, 0.8) !important;
+  animation: circle-pulse 2s infinite ease-in-out;
+}
+
+@keyframes circle-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(34, 255, 108, 0.7);
+  }
+  50% {
+    transform: scale(1.2);
+    box-shadow: 0 0 15px rgba(34, 255, 108, 1);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(34, 255, 108, 0.7);
+  }
+}
+
+/* Corregir posición de la barra de progreso en modo global scroll */
+#hola-part3-timeline .timeline-progress-container.global-scroll {
+  position: fixed !important;
+  height: 70vh !important;
+  top: 15vh !important;
+  z-index: 30 !important;
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Asegurarse de que la barra de progreso sea visible */
+.timeline-progress-container {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Mejorar visualización de la barra de progreso */
+#timeline-progress,
+#timeline-progress-orange {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Espaciado entre elementos del timeline */
+.timeline-global-scroll .timeline-item {
+  padding-top: 5rem !important;
+  position: relative !important;
+}
+
+/* Para viewport móvil */
+@media (max-width: 768px) {
+  .timeline-global-scroll .timeline-item {
+    padding-top: 3rem !important;
+  }
+
+  #hola-part3-timeline .timeline-progress-container.global-scroll {
+    height: 60vh !important;
+    top: 20vh !important;
+  }
+}
+
+/* Elementos con scroll de página tendrán posicionamiento especial */
+.page-scroll-circle {
+  position: sticky !important;
+  top: 40vh !important; /* Centrado verticalmente en viewport */
+  z-index: 40 !important;
+  transform: translateY(0) !important; /* Prevenir desplazamiento vertical */
+  margin: 0 !important;
+  height: 40px !important;
+  width: 40px !important;
+}
+
+.page-scroll-title {
+  position: sticky !important;
+  top: 40vh !important; /* Centrado verticalmente en viewport */
+  z-index: 40 !important;
+  transform: translateY(0) !important; /* Prevenir desplazamiento vertical */
+}
+
+/* Hacer que los elementos inactivos en scroll de página queden desenfocados */
+.use-page-scroll [data-index]:not(.active) {
+  opacity: 0.7;
+}
+
+/* Transiciones suaves para elementos con scroll de página */
+.use-page-scroll [id^='timeline-title-'],
+.use-page-scroll [id^='timeline-content-'],
+.use-page-scroll [id^='timeline-circle-'] {
+  transition: all 0.4s ease-in-out;
+}
+
+/* Mejorar la visualización de la línea de progreso en scroll global */
+#hola-part3-timeline .timeline-progress-container.global-scroll {
+  position: fixed !important;
+  height: 70vh !important;
+  top: 15vh !important;
+  z-index: 30 !important;
+  /* La posición exacta left se calcula dinámicamente en el código JS */
+}
+
+/* Línea de progreso en scroll global para versión móvil */
+@media (max-width: 768px) {
+  #hola-part3-timeline .timeline-progress-container.global-scroll {
+    left: 10px !important; /* Más cerca del borde en móvil */
+    height: 60vh !important;
+    top: 20vh !important;
+  }
+}
+
+/* Añadir sombra suave a los elementos activos en scroll global */
+.use-page-scroll [id^='timeline-content-'].active {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Mejorar la visualización y animación de círculos en scroll de página */
+.use-page-scroll [id^='timeline-circle-'] {
+  transition:
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background-color 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.use-page-scroll [id^='timeline-circle-'].active {
+  animation: circle-pulse 2s infinite ease-in-out;
+  background-color: #22ff6c !important;
+  border-color: #65f0ff !important;
+  transform: scale(1.2) !important;
+  box-shadow: 0 0 15px rgba(34, 255, 108, 0.8) !important;
+}
+
+.use-page-scroll [id^='timeline-circle-']:not(.active) {
+  background-color: #525252 !important;
+  border-color: #6b7280 !important;
+  transform: scale(1);
+  box-shadow: none !important;
+}
+
+@keyframes circle-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(34, 255, 108, 0.7);
+  }
+  50% {
+    transform: scale(1.2);
+    box-shadow: 0 0 15px rgba(34, 255, 108, 1);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(34, 255, 108, 0.7);
+  }
+}
+
+/* Mejorar la visualización y animación de títulos en scroll de página */
+.use-page-scroll [id^='timeline-title-'],
+.use-page-scroll [id^='timeline-title-mobile-'] {
+  transition:
+    color 0.5s ease,
+    font-weight 0.4s ease,
+    filter 0.5s ease,
+    transform 0.5s ease;
+  will-change: color, font-weight, filter, transform;
+}
+
+.use-page-scroll [id^='timeline-title-'].active,
+.use-page-scroll [id^='timeline-title-mobile-'].active {
+  color: white !important;
+  font-weight: 700 !important;
+  filter: none !important;
+  transform: translateY(0) !important;
+}
+
+.use-page-scroll [id^='timeline-title-']:not(.active),
+.use-page-scroll [id^='timeline-title-mobile']:not(.active) {
+  color: #737373 !important;
+  opacity: 0.7 !important;
+  filter: blur(2px) !important;
+  transform: translateY(10px) !important;
+}
+
+/* Mejorar la visualización y animación de contenido en scroll de página */
+.use-page-scroll [id^='timeline-content-'] {
+  transition:
+    opacity 0.5s ease,
+    filter 0.5s ease,
+    transform 0.5s ease;
+  will-change: opacity, filter, transform;
+}
+
+.use-page-scroll [id^='timeline-content-'].active {
+  opacity: 1 !important;
+  filter: none !important;
+  transform: translateY(0) !important;
+}
+
+.use-page-scroll [id^='timeline-content-']:not(.active) {
+  opacity: 0.5 !important;
+  filter: blur(3px) !important;
+  transform: translateY(20px) !important;
+}
+
+/* Añadir efectos de entrada/salida suaves para el timeline con scroll global */
+.use-page-scroll .timeline-item {
+  position: relative;
+  margin-bottom: 4rem; /* Mayor separación entre elementos */
+  transition: opacity 0.5s ease;
+}
+
+/* Mejora para la barra de progreso en modo scroll de página */
+.timeline-progress-container.global-scroll {
+  position: fixed;
+  height: 70vh !important;
+  top: 15vh;
+  z-index: 5;
+}
+
+/* Indicador visual para elementos actualmente visibles en el viewport */
+.viewport-indicator {
+  position: fixed;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Solo mostrar en desarrollo o con flag de debug */
+.viewport-indicator .indicator-item {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.viewport-indicator .indicator-item.active {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+/* Corregir altura del timeline para eliminar scroll interno */
+.timeline-global-scroll {
+  overflow-y: visible !important;
+  overflow-x: hidden !important;
+  position: relative !important;
+  height: auto !important; /* Altura automática basada en contenido */
+}
+
+/* Mejorar la visualización de elementos en timeline con scroll global */
+.use-page-scroll {
+  overflow: visible !important;
+  height: auto !important;
+}
+
+/* Asegurar que los elementos activos en scroll global tengan estilos correctos */
+.use-page-scroll [id^='timeline-circle-'].active {
+  background-color: #22ff6c !important;
+  border-color: #65f0ff !important;
+  transform: scale(1.2) !important;
+  box-shadow: 0 0 15px rgba(34, 255, 108, 0.8) !important;
+}
+
+.use-page-scroll [id^='timeline-title-'].active,
+.use-page-scroll [id^='timeline-title-mobile-'].active {
+  color: white !important;
+  opacity: 1 !important;
+  filter: none !important;
+  transform: translateY(0) !important;
+}
+
+.use-page-scroll [id^='timeline-content-'].active {
+  opacity: 1 !important;
+  filter: none !important;
+  transform: translateY(0) !important;
+}
+
+/* Asegurar que los elementos inactivos tengan estilos adecuados */
+.use-page-scroll [id^='timeline-circle-']:not(.active) {
+  background-color: #525252 !important;
+  border-color: #6b7280 !important;
+  transform: scale(1);
+  box-shadow: none !important;
+}
+
+.use-page-scroll [id^='timeline-title-']:not(.active),
+.use-page-scroll [id^='timeline-title-mobile-']:not(.active) {
+  color: #737373 !important;
+  opacity: 0.7 !important;
+  filter: blur(2px) !important;
+  transform: translateY(10px) !important;
+}
+
+.use-page-scroll [id^='timeline-content-']:not(.active) {
+  opacity: 0.5 !important;
+  filter: blur(3px) !important;
+  transform: translateY(20px) !important;
+}
+
+/* Posicionamiento fijo correcto para la barra de progreso en scroll global */
+#hola-part3-timeline .timeline-progress-container {
+  position: fixed !important;
+  height: 70vh !important;
+  top: 15vh !important;
+  z-index: 30 !important;
+  left: 15px !important; /* Posicionamiento explícito a la izquierda */
+}
+
+/* Línea de progreso en scroll global para versión móvil */
+@media (max-width: 768px) {
+  #hola-part3-timeline .timeline-progress-container {
+    left: 10px !important; /* Más cerca del borde en móvil */
+    height: 60vh !important;
+    top: 20vh !important;
+  }
+}
+
+/* Estilos para el efecto de scroll horizontal en timeline */
+.timeline-horizontal-scroll .timeline-slides-container {
+  display: flex;
+  width: 100%;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.timeline-horizontal-scroll .timeline-slide {
+  flex: 0 0 100%;
+  width: 100%;
+  transform: translateX(0);
+  opacity: 1;
+  transition:
+    transform 0.5s ease-out,
+    opacity 0.5s ease-out;
+}
+
+/* Clase para los elementos activos e inactivos */
+.timeline-horizontal-scroll [id^='timeline-content-'] {
+  opacity: 0;
+  transform: translateX(50px);
+  transition:
+    transform 0.8s ease-out,
+    opacity 0.8s ease-out;
+}
+
+.timeline-horizontal-scroll [id^='timeline-content-'].active {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Ajustes para el contendor de los números grandes */
+.timeline-horizontal-scroll [id^='timeline-date-'] {
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  transform: scale(1);
+}
+
+.timeline-horizontal-scroll [id^='timeline-date-'].active {
+  transform: scale(1.2);
+  color: #f59e0b; /* Amber-500 */
+}
+
+/* Estilos para resaltar los números activos */
+.timeline-horizontal-scroll [id^='timeline-circle-'] {
+  transition: all 0.4s ease;
+}
+
+.timeline-horizontal-scroll [id^='timeline-circle-'].active {
+  transform: scale(1.3);
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.6);
+}
+
+/* Estilos para la sección de login */
+.login-section-container {
+  background-color: rgba(139, 92, 246, 0.05);
+  min-height: calc(100vh - 2rem);
+}
+
+/* Ajustes para el contenedor del formulario de login */
+.login-section-container .lg\:bg-black\/20 {
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+@media (max-width: 1024px) {
+  .login-section-container .lg\:bg-black\/20 {
+    background-color: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+}
+
+/* Excepción específica para empresa-part2: eliminar padding lateral */
+#empresa-part2 .section-inner {
+  padding-left: 0rem !important;
+  padding-right: 2rem !important;
+}
+#empresa-part3 .section-inner {
+  padding-left: 0rem !important;
+  padding-right: 2rem !important;
+}
+#empresa-part4 .section-inner {
+  padding-left: 0rem !important;
+  padding-right: 2rem !important;
+}
+#blog-part2 .section-inner {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+#faq-part2 .section-inner {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+#soluciones-part2 .section-inner {
+  padding-left: 0 !important;
+  padding-right: 2rem !important;
+}
+#contacto-part2 .section-inner {
+  padding-left: 0 !important;
+  padding-right: 2 !important;
+}
+#contacto-part3 .section-inner {
+  padding-left: 0 !important;
+  padding-right: 2 !important;
+}

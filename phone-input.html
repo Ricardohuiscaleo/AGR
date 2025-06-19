@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Phone Input</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css"
+    />
+  </head>
+  <body>
+    <form>
+      <label for="phone">Teléfono:</label>
+      <input id="phone" type="tel" />
+    </form>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
+    <script>
+      const input = document.querySelector('#phone');
+      const iti = window.intlTelInput(input, {
+        initialCountry: 'cl', // Chile como predeterminado
+        preferredCountries: ['cl', 'us', 'es'], // Países preferidos
+        utilsScript: 'https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js',
+      });
+
+      // Opcional: Validar el número al enviar el formulario
+      input.form.addEventListener('submit', (e) => {
+        if (!iti.isValidNumber()) {
+          e.preventDefault();
+          alert('Por favor, ingresa un número de teléfono válido.');
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,145 @@
+---
+// =====================================================================
+// COMPONENTE ESPECIALISTA PARA 'hola-part2'
+// =====================================================================
+
+import TextParallaxEffectWrapper from '../animations/TextParallaxEffectWrapper.astro';
+import TypewriterTextWrapper from '../text/TypewriterTextWrapper.astro';
+
+interface Props {
+  section: any;
+}
+const { section } = Astro.props;
+---
+
+<div class="grid-wrapper">
+  {/* Componente de efecto paralax con GSAP */}
+  <TextParallaxEffectWrapper sectionId="hola-part2" />
+
+  {/* Fila 1 - Somos (párrafo izquierda, título derecha) */}
+  <div class="grid-row relative z-10">
+    <div class="description-box">
+      <p></p>
+    </div>
+    <h3 id="somos-text" class="big-text text-gray-800">Somos</h3>
+  </div>
+
+  {/* Separador 1 */}
+  <div class="separator relative z-10"></div>
+
+  {/* Fila 2 - Agente (título izquierda, párrafo derecha) */}
+  <div class="grid-row relative z-10">
+    <h3 id="agente-text" class="big-text text-gray-700">Agente</h3>
+    <div class="description-box">
+      <p class="hidden md:block" style="line-height: 1.6;">
+        Reducimos Costos. Asesoramos y Desarrollamos automatizaciones para,
+        <TypewriterTextWrapper
+          staticText=""
+          text={[
+            ' abogados.',
+            ' clínicas.',
+            ' terapias.',
+            ' constructoras.',
+            ' agencias.',
+            ' restaurantes.',
+            ' hoteles.',
+            ' PyMEs.',
+            ' agricultura.',
+            ' finanzas.',
+            ' comercio.',
+            ' educación.',
+            ' salud.',
+            ' turismo.',
+            ' logística.',
+            ' manufactura.',
+            ' retail.',
+            ' tecnología.',
+            ' telecomunicaciones.',
+            ' transporte.',
+            ' servicios.',
+            ' distribución.',
+            ' consultoría.',
+            ' marketing.',
+            ' ventas.',
+            ' atención al cliente.',
+            ' e-commerce.',
+            ' startups.',
+            ' ONGs.',
+            ' gobierno.',
+            ' fundaciones.',
+          ]}
+          speed={50}
+          deleteSpeed={30}
+          startDelay={500}
+          cursor={true}
+          className="typewriter-effect"
+          loop={true}
+          loopDelay={2000}
+          blinkCursor={true}
+        />
+      </p>
+    </div>
+  </div>
+
+  {/* Separador 2 */}
+  <div class="separator relative z-10"></div>
+
+  {/* Fila 3 - RAG (párrafo izquierda, título derecha) */}
+  <div class="grid-row relative z-10">
+    <div class="description-box">
+      <p class="block md:hidden text-center w-full" style="line-height: 1.6;">
+        Reducimos costos.
+        <br />
+        Asesoramos y Desarrollamos.
+        <br />
+        Automatizaciones para,
+        <TypewriterTextWrapper
+          staticText=""
+          text={[
+            ' abogados.',
+            ' clínicas.',
+            ' terapias.',
+            ' constructoras.',
+            ' agencias.',
+            ' restaurantes.',
+            ' hoteles.',
+            ' PyMEs.',
+            ' agricultura.',
+            ' finanzas.',
+            ' comercio.',
+            ' educación.',
+            ' salud.',
+            ' turismo.',
+            ' logística.',
+            ' manufactura.',
+            ' retail.',
+            ' tecnología.',
+            ' telecomunicaciones.',
+            ' transporte.',
+            ' servicios.',
+            ' distribución.',
+            ' consultoría.',
+            ' marketing.',
+            ' ventas.',
+            ' atención al cliente.',
+            ' e-commerce.',
+            ' startups.',
+            ' ONGs.',
+            ' gobierno.',
+            ' fundaciones.',
+            ' PYMEs.',
+          ]}
+          speed={50}
+          deleteSpeed={30}
+          startDelay={500}
+          cursor={true}
+          className="typewriter-effect mobile-centered"
+          loop={true}
+          loopDelay={2000}
+          blinkCursor={true}
+        />
+      </p>
+    </div>
+    <h3 id="rag-text" class="big-text orange-text">RAG</h3>
+  </div>
+</div>

@@ -1,0 +1,154 @@
+---
+interface Props {
+  id: string;
+  sectionNumber: string;
+  title: string;
+  subtitle: string;
+  bgColor: string;
+  hoverColor: string;
+  isActive?: boolean;
+  layout?: 'default' | 'columns' | 'rows';
+  columns?: 2 | 3 | 4;
+  rows?: 2 | 3;
+  showDivider?: boolean; // Nueva propiedad para controlar la visibilidad de la línea divisoria
+}
+
+const {
+  id,
+  sectionNumber,
+  title,
+  subtitle,
+  bgColor = 'bg-gray-800',
+  hoverColor = 'hover:bg-gray-700',
+  isActive = false,
+  layout = 'default',
+  columns = 2,
+  rows = 2,
+  showDivider = true, // Por defecto, mostrar la línea divisoria
+} = Astro.props;
+
+// Determinar qué clases aplicar al section-body según el layout elegido
+const bodyClasses =
+  layout === 'default'
+    ? 'section-body'
+    : layout === 'columns'
+      ? `section-body section-columns section-columns-${columns} ${showDivider ? 'show-divider' : 'hide-divider'}`
+      : `section-body section-rows section-rows-${rows} ${showDivider ? 'show-divider' : 'hide-divider'}`;
+---
+
+<section
+  id={id}
+  class:list={['main-section text-white', bgColor, { active: isActive }]}
+  data-section-number={sectionNumber}
+  data-section-title={title}
+>
+  <div class="card-content">
+    <div class="section-header">
+      <p class="text-xl mb-4">{subtitle}</p>
+      <h1 class="section-number">{sectionNumber}</h1>
+      <h2 class="section-title">{title}</h2>
+    </div>
+    <div class={bodyClasses}>
+      <slot />
+    </div>
+  </div>
+</section>
+
+<style>
+  .main-section {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    border-radius: 1rem;
+    margin-bottom: 1rem;
+    box-sizing: border-box;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .card-content {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .section-header {
+    text-align: center;
+  }
+
+  .section-number {
+    font-size: 4rem;
+    font-weight: bold;
+    opacity: 0.8;
+  }
+
+  .section-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+  }
+
+  .section-body {
+    width: 100%;
+  }
+
+  /* Estilos para layout de columnas */
+  .section-columns {
+    display: grid;
+    gap: 1.5rem;
+    position: relative;
+  }
+
+  .section-columns-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .section-columns-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .section-columns-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  /* Estilos para layout de filas */
+  .section-rows {
+    display: grid;
+    gap: 1.5rem;
+    position: relative;
+  }
+
+  .section-rows-2 {
+    grid-template-rows: repeat(2, auto);
+  }
+
+  .section-rows-3 {
+    grid-template-rows: repeat(3, auto);
+  }
+
+  /* Estilos para líneas divisorias */
+  .section-columns.show-divider > :not(:last-child) {
+    border-right: 1px solid rgba(255, 255, 255, 0.3);
+    padding-right: 1.5rem;
+  }
+
+  .section-rows.show-divider > :not(:last-child) {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    padding-bottom: 1.5rem;
+  }
+
+  .section-columns.hide-divider > :not(:last-child),
+  .section-rows.hide-divider > :not(:last-child) {
+    border: none;
+  }
+
+  /* Media queries para responsividad */
+  @media (max-width: 768px) {
+    .section-columns {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

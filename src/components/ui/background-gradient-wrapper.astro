@@ -1,0 +1,31 @@
+---
+import { BackgroundGradientAnimation } from './background-gradient-animation.jsx';
+---
+
+<div class="background-gradient-wrapper">
+  <BackgroundGradientAnimation
+    client:load
+    gradientBackgroundStart="rgb(156, 138, 192)"
+    gradientBackgroundEnd="rgb(120, 168, 214)"
+    firstColor="172, 222, 184"
+    secondColor="237, 100, 90"
+    thirdColor="255, 140, 0"
+    fourthColor="120, 168, 214"
+    fifthColor="212, 212, 212"
+    containerClassName="h-full w-full absolute top-0 left-0 z-0"
+    className="z-0"
+    interactive={true}
+  >
+    {/* Contenido vacío para satisfacer el requisito de children */}
+    <div></div>
+  </BackgroundGradientAnimation>
+</div>
+
+<style>
+  .background-gradient-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+</style>

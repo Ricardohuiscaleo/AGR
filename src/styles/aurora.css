@@ -1,0 +1,66 @@
+@keyframes aurora {
+  from {
+    background-position:
+      50% 50%,
+      50% 50%;
+  }
+  to {
+    background-position:
+      350% 50%,
+      350% 50%;
+  }
+}
+
+.animate-aurora {
+  animation: aurora 60s linear infinite;
+}
+
+/* Asegurar compatibilidad con diferentes navegadores */
+@-webkit-keyframes aurora {
+  from {
+    background-position:
+      50% 50%,
+      50% 50%;
+  }
+  to {
+    background-position:
+      350% 50%,
+      350% 50%;
+  }
+}
+
+/* Clase para cuando se necesite fondo completo sin radial */
+.aurora-full {
+  mask-image: none !important;
+}
+
+/* Estilos para controlar el estado de la animación en pseudo-elementos */
+.aurora-element::after {
+  animation-play-state: var(--aurora-animation-state, running);
+  animation-duration: var(--aurora-animation-duration, 100s);
+}
+
+/* Soporte adicional para las animaciones cuando están pausadas */
+:root {
+  --aurora-animation-state: running;
+  --aurora-animation-duration: 100s;
+}
+
+/* Clases específicas para diferentes velocidades de animación */
+.animate-aurora-smooth {
+  animation: aurora 80s linear infinite;
+  animation-play-state: var(--aurora-animation-state, running);
+  animation-duration: var(--aurora-animation-duration, 80s);
+}
+
+.animate-aurora-slow {
+  animation: aurora-slow 100s linear infinite;
+  animation-play-state: var(--aurora-animation-state, running);
+  animation-duration: var(--aurora-animation-duration, 100s);
+}
+
+.animate-aurora-basic {
+  animation: aurora 120s linear infinite;
+  animation-play-state: var(--aurora-animation-state, running);
+  animation-duration: var(--aurora-animation-duration, 120s);
+}

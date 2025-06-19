@@ -1,0 +1,47 @@
+/* Estilos básicos para el contenedor */
+.scroll-reveal {
+  opacity: 1;
+  overflow: visible;
+  margin: 2rem 0;
+}
+
+/* Estilos para cada palabra antes de la revelación */
+.scroll-reveal-word {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(20px) rotate(3deg);
+  filter: blur(5px);
+  transition:
+    opacity 0.5s ease,
+    transform 0.7s ease,
+    filter 0.5s ease;
+  will-change: opacity, transform, filter;
+}
+
+/* Estilos que se aplican cuando el componente es visible */
+.scroll-reveal-visible .scroll-reveal-word {
+  opacity: 1;
+  transform: translateY(0) rotate(0);
+  filter: blur(0);
+}
+
+/* Estilo para el contenedor del texto */
+.scroll-reveal-content {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+/* Ajustes para modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .scroll-reveal-content {
+    color: #f3f4f6;
+  }
+}
+
+/* Media query para dispositivos móviles */
+@media (max-width: 768px) {
+  .scroll-reveal-word {
+    transform: translateY(10px) rotate(2deg);
+  }
+}

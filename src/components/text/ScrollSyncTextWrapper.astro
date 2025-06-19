@@ -1,0 +1,42 @@
+---
+// ScrollSyncTextWrapper.astro - Wrapper para ScrollSyncText
+import ScrollSyncText from './ScrollSyncText';
+
+interface Props {
+  id?: string;
+  text?: string;
+  className?: string;
+  direction?: 'left' | 'right' | 'top' | 'bottom';
+  distance?: number;
+  speed?: number;
+}
+
+const {
+  id,
+  text = '',
+  className = '',
+  direction = 'right',
+  distance = 100,
+  speed = 1,
+} = Astro.props;
+---
+
+<ScrollSyncText
+  id={id}
+  text={text}
+  className={className}
+  direction={direction}
+  distance={distance}
+  speed={speed}
+  client:visible
+>
+  <slot />
+</ScrollSyncText>
+
+<style>
+  /* Estilos para asegurar que el componente hijo se renderice con los estilos correctos */
+  :global(.scroll-sync-text) {
+    display: inline-block;
+    position: relative;
+  }
+</style>

@@ -1,0 +1,24 @@
+.entity-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.entity-item {
+  /* Add your entity styling here */
+  margin: 10px;
+}
+
+@media screen and (max-width: 750px) {
+  /* Mobile specific styles */
+  .entity-container {
+    /* Adjust layout for mobile if needed */
+  }
+}
+
+@media screen and (min-width: 751px) {
+  /* PC specific styles */
+  .entity-container {
+    /* Adjust layout for PC if needed */
+  }
+}

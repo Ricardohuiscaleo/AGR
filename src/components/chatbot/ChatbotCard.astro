@@ -1,0 +1,104 @@
+---
+import type { ChatbotCardProps } from './types';
+
+const {
+  title = 'Asistente Virtual',
+  description = 'Chatbot inteligente que responde preguntas basadas en tus datos',
+  icon = '💬',
+  color = '#4079ff',
+}: ChatbotCardProps = Astro.props;
+---
+
+<div class="chatbot-card">
+  <div class="chatbot-icon" style={`background: ${color}`}>
+    <span>{icon}</span>
+  </div>
+  <div class="chatbot-content">
+    <h3>{title}</h3>
+    <p>{description}</p>
+  </div>
+</div>
+
+<style>
+  .chatbot-card {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background-color: var(--card-bg, rgba(255, 255, 255, 0.05));
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    border: 1px solid var(--card-border, rgba(255, 255, 255, 0.1));
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .chatbot-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    border-color: var(--card-border-hover, rgba(255, 255, 255, 0.2));
+  }
+
+  .chatbot-icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+  }
+
+  .chatbot-content {
+    flex: 1;
+  }
+
+  .chatbot-content h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    color: var(--title-color, #333);
+  }
+
+  .chatbot-content p {
+    font-size: 0.95rem;
+    margin: 0;
+    color: var(--text-color, #666);
+    line-height: 1.5;
+  }
+
+  html[data-theme='dark'] .chatbot-card {
+    --card-bg: rgba(30, 30, 35, 0.5);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --card-border-hover: rgba(255, 255, 255, 0.3);
+  }
+
+  html[data-theme='dark'] .chatbot-content h3 {
+    --title-color: #f0f0f0;
+  }
+
+  html[data-theme='dark'] .chatbot-content p {
+    --text-color: #b0b0b0;
+  }
+
+  @media (max-width: 768px) {
+    .chatbot-card {
+      padding: 1.2rem;
+      gap: 1rem;
+    }
+
+    .chatbot-icon {
+      width: 2.8rem;
+      height: 2.8rem;
+      font-size: 1.5rem;
+    }
+
+    .chatbot-content h3 {
+      font-size: 1.1rem;
+    }
+
+    .chatbot-content p {
+      font-size: 0.85rem;
+    }
+  }
+</style>

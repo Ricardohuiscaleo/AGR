@@ -1,0 +1,39 @@
+/* Fallback animations using CSS when GSAP isn't available */
+.gsap-fallback .hero-text-container .phrase-container {
+  animation: fadeInUp 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+.gsap-fallback .hero-text-container .phrase-container:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.gsap-fallback .hero-text-container .phrase-container:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.gsap-fallback .skills-text {
+  animation: fadeInUp 0.8s ease-out 0.6s forwards;
+  opacity: 0;
+}
+
+.gsap-fallback .hero-gradient-text {
+  animation: fadeInUp 1s ease-out 0.8s forwards;
+  opacity: 0;
+}
+
+.gsap-fallback .value-proposition-section {
+  animation: fadeInUp 1s ease-out 1s forwards;
+  opacity: 0;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

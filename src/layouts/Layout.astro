@@ -1,0 +1,291 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="es" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Prevenir solicitudes automáticas de apple-touch-icon -->
+    <link rel="apple-touch-icon" href="/compressed/logo-oscuro-optimizado.png" />
+    <link rel="apple-touch-icon-precomposed" href="/compressed/logo-oscuro-optimizado.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    <!-- p5.js library from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.2/p5.min.js"></script>
+    <!-- Font Awesome para iconos del chat -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body class="dark:bg-[#ece6dc] bg-[#ece6dc]">
+    <!-- Contenedor principal del sitio -->
+    <slot />
+
+    <!-- Iframe aislado para el chat (solución nuclear) -->
+    <div
+      id="chat-overlay-container"
+      style="position: fixed; bottom: 0; right: 0; width: 100%; height: 600px; z-index: 99999; pointer-events: none;"
+    >
+      <div
+        style="width: 400px; height: 100%; margin-left: auto; margin-right: 0; pointer-events: none;"
+      >
+        <div
+          id="chat-overlay-inner"
+          style="width: 100%; height: 100%; position: relative; pointer-events: none;"
+        >
+          <!-- Aquí se cargará el componente chat -->
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Script para posicionar el chat y hacerlo interactivo
+      document.addEventListener('DOMContentLoaded', function () {
+        // Modificado para ignorar el chat en la sección "Chat (Parte 2)" y "Hola (Parte 4)"
+        const chatSections = [
+          document.getElementById('chat-part2'),
+          document.getElementById('hola-part4'),
+        ];
+        const chatContainer = document.querySelector(
+          '.chat-container:not(.in-section), .chatbot-container:not(.in-section)'
+        );
+        const overlayInner = document.getElementById('chat-overlay-inner');
+
+        // Marcar el chat dentro de las secciones específicas para que no sean movidos
+        chatSections.forEach((section) => {
+          if (section) {
+            const chatInSection = section.querySelector('.chat-container, .chatbot-container');
+            if (chatInSection) {
+              chatInSection.classList.add('in-section');
+            }
+          }
+        });
+
+        // Si existe un contenedor de chat (y NO está en una sección especial), moverlo al overlay
+        if (chatContainer && overlayInner) {
+          // Verificar que no está dentro de una sección especial
+          let isInSpecialSection = false;
+          let parent = chatContainer.parentNode;
+          while (parent) {
+            if (
+              parent instanceof Element &&
+              (parent.id === 'chat-part2' || parent.id === 'hola-part4')
+            ) {
+              isInSpecialSection = true;
+              break;
+            }
+            parent = parent.parentNode;
+          }
+
+          // Solo proceder si NO está en la sección de chat
+          if (!isInSpecialSection) {
+            // Clonar el nodo para evitar referencias
+            const chatClone = chatContainer.cloneNode(true);
+
+            // Hacer que solo el contenedor del chat sea interactivo
+            if (chatClone instanceof HTMLElement) {
+              chatClone.style.pointerEvents = 'auto';
+              chatClone.style.zIndex = '100000';
+              chatClone.style.position = 'relative';
+              chatClone.style.borderRadius = '10px'; // Agregar bordes redondeados
+              chatClone.style.overflow = 'hidden'; // Asegura que el contenido respete los bordes
+
+              // Hacer interactivos solo los elementos dentro del chat
+              const allChatElements = chatClone.querySelectorAll('*');
+              allChatElements.forEach((el) => {
+                if (el instanceof HTMLElement) {
+                  el.style.pointerEvents = 'auto';
+                  if (
+                    el.tagName === 'INPUT' ||
+                    el.tagName === 'TEXTAREA' ||
+                    el.tagName === 'BUTTON'
+                  ) {
+                    el.style.zIndex = '100001';
+                  }
+                }
+              });
+            }
+
+            // Insertar el clon en el overlay
+            overlayInner.appendChild(chatClone);
+
+            // Ocultar el original
+            if (chatContainer instanceof HTMLElement) {
+              chatContainer.style.display = 'none';
+            }
+
+            // Configurar el overlay interno para permitir eventos solo sobre el chat
+            if (overlayInner instanceof HTMLElement) {
+              overlayInner.style.pointerEvents = 'none';
+            }
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --background-color: #ece6dc;
+    --accent: 136, 58, 234;
+    --accent-light: 224, 204, 250;
+    --accent-dark: 49, 10, 101;
+    --accent-gradient: linear-gradient(
+      45deg,
+      rgb(var(--accent)),
+      rgb(var(--accent-light)) 30%,
+      white 60%
+    );
+  }
+
+  html {
+    font-family: system-ui, sans-serif;
+    background: var(--background-color);
+    background-size: 224px;
+    scroll-behavior: smooth;
+    transition: background-color 0.3s ease-in-out;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background-color: var(--background-color);
+    transition: background-color 0.3s ease-in-out;
+    overflow-x: hidden;
+  }
+
+  .layout-container {
+    position: relative;
+    z-index: 10; /* Aumentamos el z-index para que esté por encima de otros elementos */
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  /* Asegurar que el texto sea seleccionable en toda la aplicación */
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  span,
+  div,
+  li,
+  a,
+  label,
+  input,
+  textarea,
+  th,
+  td {
+    user-select: text !important;
+  }
+
+  /* Chat component interactivity fixes */
+  .chat-astro-wrapper,
+  .chat-astro-wrapper *,
+  .chat-container,
+  .chat-container * {
+    pointer-events: auto !important;
+  }
+
+  .chat-input,
+  .chat-input *,
+  #userInput {
+    pointer-events: auto !important;
+    z-index: 9999 !important;
+    position: relative !important;
+  }
+
+  /* Hide cursor when hovering over p5.js canvas - COMENTADO PARA MOSTRAR EL CURSOR REAL
+  canvas.p5Canvas {
+    cursor: none !important;
+  }
+  */
+
+  /* Animaciones necesarias para el chat */
+  @keyframes planeFlight {
+    0% {
+      transform: rotate(0deg);
+    }
+    25% {
+      transform: rotate(-40deg);
+    }
+    50% {
+      transform: rotate(10deg);
+    }
+    75% {
+      transform: rotate(-40deg);
+    }
+    100% {
+      transform: rotate(0deg);
+    }
+  }
+
+  @keyframes typing-dynamic {
+    from {
+      width: 0;
+    }
+    to {
+      width: var(--target-width);
+    }
+  }
+
+  @keyframes erase-dynamic {
+    from {
+      width: var(--target-width);
+    }
+    to {
+      width: 0;
+    }
+  }
+
+  @keyframes hide-caret {
+    from {
+      border-right-color: #007bff;
+    }
+    to {
+      border-right-color: transparent;
+    }
+  }
+
+  @keyframes typingBlink {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.3;
+      transform: scale(1.2);
+    }
+  }
+
+  @keyframes shimmer {
+    from {
+      background-position: 200% 0;
+    }
+    to {
+      background-position: -200% 0;
+    }
+  }
+</style>

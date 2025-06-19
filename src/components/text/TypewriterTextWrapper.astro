@@ -1,0 +1,99 @@
+---
+// TypewriterTextWrapper.astro - Componente wrapper para TypewriterText
+import TypewriterText from './TypewriterText';
+
+interface Props {
+  text: string | string[];
+  speed?: number;
+  startDelay?: number;
+  cursor?: boolean;
+  className?: string;
+  loop?: boolean;
+  loopDelay?: number;
+  blinkCursor?: boolean;
+  deleteSpeed?: number;
+  staticText?: string;
+}
+
+const {
+  text,
+  speed = 40,
+  startDelay = 100,
+  cursor = true,
+  className = '',
+  loop = false,
+  loopDelay = 2000,
+  blinkCursor = true,
+  deleteSpeed = 30,
+  staticText = '',
+} = Astro.props;
+---
+
+<TypewriterText
+  text={text}
+  speed={speed}
+  startDelay={startDelay}
+  cursor={cursor}
+  className={className}
+  loop={loop}
+  loopDelay={loopDelay}
+  blinkCursor={blinkCursor}
+  deleteSpeed={deleteSpeed}
+  staticText={staticText}
+  client:only="react"
+/>
+
+<style>
+  /* Estilos para el cursor y el texto con efecto máquina de escribir */
+  :global(.typewriter-wrapper) {
+    display: inline-block;
+    position: relative;
+  }
+
+  :global(.typewriter-text) {
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 0;
+    border-right: 0em solid transparent;
+    vertical-align: bottom;
+    animation:
+      typing-dynamic var(--typing-speed) steps(var(--text-length)) 1s forwards,
+      blink-caret var(--blink-speed) step-end infinite;
+  }
+
+  @keyframes typing-dynamic {
+    from {
+      width: 0;
+    }
+    to {
+      width: var(--target-width);
+    }
+  }
+
+  @keyframes erase-dynamic {
+    from {
+      width: var(--target-width);
+    }
+    to {
+      width: 0;
+    }
+  }
+
+  :global(.typewriter-cursor) {
+    display: inline-block;
+    margin-left: 0px; /* Eliminado margen izquierdo del cursor */
+    font-weight: bold;
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    from,
+    to {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+</style>

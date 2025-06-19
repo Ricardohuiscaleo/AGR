@@ -1,0 +1,142 @@
+---
+// Wrapper para ChatInterface (versión clara) con tonos que combinen con FAQ
+---
+
+<div id="chat-interface-wrapper" class="w-full h-full">
+  <!-- El componente React se montará aquí -->
+</div>
+
+<script>
+  // Importaciones dinámicas para evitar problemas de SSR
+  async function initializeChatInterface() {
+    try {
+      // Importar React y ReactDOM dinámicamente
+      const [{ default: React }, { createRoot }] = await Promise.all([
+        import('react'),
+        import('react-dom/client'),
+      ]);
+
+      // Importar el componente ChatInterface
+      const { default: ChatInterface } = await import('./ChatInterface.jsx');
+
+      // Configuración específica para FAQ con fondo blanco limpio
+      const config = {
+        theme: 'light',
+        primaryColor: '#dc2626', // rojo principal para FAQ
+        secondaryColor: '#ffffff', // fondo blanco puro
+        accentColor: '#ef4444', // rojo accent
+        backgroundColor: '#ffffff', // fondo blanco
+        textColor: '#1f2937', // texto oscuro
+        borderColor: '#e5e7eb', // bordes grises neutros
+        containerStyles: {
+          background: '#ffffff', // Fondo blanco puro sin gradientes
+          border: '1px solid #e2e8f0', // Borde más sutil y consistente
+          borderRadius: '1rem',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.06)', // Sombra multicapa mejorada
+          backdropFilter: 'none',
+        },
+        messageStyles: {
+          userMessage: {
+            background: 'linear-gradient(135deg, #dc2626, #ef4444)',
+            color: '#ffffff',
+          },
+          botMessage: {
+            background: '#f9fafb',
+            color: '#1f2937',
+            border: '1px solid #e5e7eb',
+          },
+        },
+      };
+
+      // Montar el componente usando la nueva API de React 18
+      const container = document.getElementById('chat-interface-wrapper');
+      if (container) {
+        const root = createRoot(container);
+        const element = React.createElement(ChatInterface, config);
+        root.render(element);
+      }
+    } catch (error) {
+      console.error('Error inicializando ChatInterface:', error);
+
+      // Fallback: mostrar mensaje de carga con fondo blanco
+      const container = document.getElementById('chat-interface-wrapper');
+      if (container) {
+        container.innerHTML = `
+          <div class="flex items-center justify-center h-64 bg-white rounded-xl border border-gray-200">
+            <div class="text-center">
+              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-400 mx-auto mb-4"></div>
+              <p class="text-gray-600">Cargando chat inteligente...</p>
+            </div>
+          </div>
+        `;
+      }
+    }
+  }
+
+  // Inicializar cuando el DOM esté listo
+  if (typeof window !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeChatInterface);
+    } else {
+      initializeChatInterface();
+    }
+  }
+</script>
+
+<style>
+  #chat-interface-wrapper {
+    min-height: 500px;
+    position: relative;
+  }
+
+  /* Estilos específicos para FAQ con fondo blanco limpio */
+  #chat-interface-wrapper :global(.chat-container) {
+    background: #ffffff; /* Fondo blanco puro sin gradientes */
+    border: 1px solid #e2e8f0; /* Borde más sutil y consistente */
+    border-radius: 1rem;
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.1),
+      0 1px 3px rgba(0, 0, 0, 0.06); /* Sombra multicapa mejorada */
+  }
+
+  #chat-interface-wrapper :global(.message-user) {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    color: white;
+  }
+
+  #chat-interface-wrapper :global(.message-bot) {
+    background: #f9fafb;
+    color: #1f2937;
+    border: 1px solid #e5e7eb;
+  }
+
+  #chat-interface-wrapper :global(.input-field) {
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+  }
+
+  #chat-interface-wrapper :global(.input-field:focus) {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+  }
+
+  #chat-interface-wrapper :global(.send-button) {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    color: white;
+  }
+
+  #chat-interface-wrapper :global(.send-button:hover) {
+    background: linear-gradient(135deg, #b91c1c, #dc2626);
+  }
+
+  /* Animación de carga */
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .animate-spin {
+    animation: spin 1s linear infinite;
+  }
+</style>

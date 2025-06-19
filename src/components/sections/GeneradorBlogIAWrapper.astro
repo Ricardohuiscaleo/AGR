@@ -1,0 +1,27 @@
+---
+// =====================================================================
+// WRAPPER DE ASTRO PARA EL SISTEMA DE BLOG
+// Su única responsabilidad es importar y renderizar el componente de React.
+// =====================================================================
+
+// 1. Importamos el componente de React.
+//    Recuerda no usar la extensión .tsx aquí. Astro es lo suficientemente inteligente.
+import GeneradorBlogIA from '../react/GeneradorBlogIA';
+
+// 2. Recibimos las props de la sección desde index.astro, aunque no las usemos directamente.
+//    Es una buena práctica para mantener la consistencia.
+interface Props {
+  section: any;
+}
+const { section } = Astro.props;
+---
+
+<!-- 
+  3. Renderizamos el componente React.
+  La directiva `client:load` es la magia aquí. Le dice a Astro que
+  envíe el JavaScript de React al navegador para que el componente
+  sea interactivo y toda tu aplicación cobre vida.
+-->
+<div class="w-full max-w-8xl mx-auto min-h-[800px] px-4 py-8">
+  <GeneradorBlogIA client:load />
+</div>

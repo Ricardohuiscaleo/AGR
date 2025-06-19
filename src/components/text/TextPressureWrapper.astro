@@ -1,0 +1,74 @@
+---
+import TextPressureComponent from './TextPressure';
+// Eliminamos la importación innecesaria de solid-js
+---
+
+<div class="text-pressure-container">
+  <TextPressureComponent
+    client:only="solid"
+    text="Agente RAG"
+    flex={true}
+    alpha={false}
+    stroke={true}
+    width={true}
+    weight={true}
+    italic={true}
+    textColor="#FFFFFF"
+    strokeColor="#333333"
+    strokeWidth={1}
+    minFontSize={60}
+    id="textPressureComponent"
+  />
+</div>
+
+<style>
+  .text-pressure-container {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    height: 350px;
+    position: relative;
+  }
+
+  /* Estilos responsivos para dispositivos medianos */
+  @media (max-width: 1200px) {
+    .text-pressure-container {
+      height: 260px;
+    }
+  }
+
+  /* Estilos responsivos para dispositivos tablet */
+  @media (max-width: 768px) {
+    .text-pressure-container {
+      height: 200px;
+      padding: 0 10px;
+    }
+  }
+
+  /* Estilos responsivos para dispositivos móviles pequeños */
+  @media (max-width: 480px) {
+    .text-pressure-container {
+      height: 150px;
+    }
+  }
+</style>
+
+<script>
+  // Script simplificado que no interfiere con los estilos originales
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('TextPressure component initialized');
+
+    // Encontrar el componente
+    const textPressureComponent = document.getElementById('textPressureComponent');
+
+    // Asegurarse de que el componente esté listo
+    if (textPressureComponent) {
+      // Simplemente añadir un atributo para indicar que está inicializado
+      textPressureComponent.setAttribute('data-initialized', 'true');
+    }
+  });
+</script>

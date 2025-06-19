@@ -1,0 +1,81 @@
+/* 
+ * card-size-fix.css
+ * Este archivo contiene correcciones de estilo específicas para las tarjetas de cifras
+ * que aparecen con tamaño excesivo debido a reglas globales en index-styles.css
+ */
+
+/* Corregir tamaño de cifras grandes en tarjetas */
+.text-xl.md\:text-3xl,
+.text-2xl.md\:text-4xl,
+.text-3xl.md\:text-5xl {
+  font-size: 1.5rem !important; /* Tamaño base para móviles */
+}
+
+/* Tamaño para pantallas medianas */
+@media (min-width: 768px) {
+  .text-xl.md\:text-3xl {
+    font-size: 1.75rem !important;
+  }
+
+  .text-2xl.md\:text-4xl {
+    font-size: 2rem !important;
+  }
+
+  .text-3xl.md\:text-5xl {
+    font-size: 2.25rem !important;
+  }
+}
+
+/* Corregir tamaño específicamente para cifras de costos */
+#retorno-inversion .text-[5rem],
+#eficiencia-operativa .text-[7rem],
+#impacto-resultados .text-[4rem] {
+  font-size: 2rem !important;
+}
+
+@media (min-width: 768px) {
+  #retorno-inversion .text-[5rem],
+  #eficiencia-operativa .text-[7rem],
+  #impacto-resultados .text-[4rem] {
+    font-size: 2.5rem !important;
+  }
+}
+
+/* Ajustes específicos para cifras de porcentajes */
+.text-amber-400.mb-1.md\:mb-2 {
+  font-size: 1.75rem !important;
+}
+
+@media (min-width: 768px) {
+  .text-amber-400.mb-1.md\:mb-2 {
+    font-size: 2rem !important;
+  }
+}
+
+/* Ajustes para cifras monetarias grandes */
+.font-bold.text-amber-400:not(.mb-1) {
+  font-size: 1.5rem !important;
+}
+
+@media (min-width: 768px) {
+  .font-bold.text-amber-400:not(.mb-1) {
+    font-size: 1.75rem !important;
+  }
+}
+
+/* Ajustes para las tarjetas de Retorno de Inversión, Eficiencia Operativa e Impacto en Resultados */
+#retorno-inversion .text-5xl,
+#eficiencia-operativa .text-5xl,
+#impacto-resultados .text-5xl {
+  font-size: 2.5rem !important;
+}
+
+/* Ajustes para cifras porcentuales específicas */
+.text-amber-400:has(+ h3) {
+  font-size: 1.75rem !important;
+}
+
+/* Ajustes para cifras monetarias */
+div:has(> .text-xl.md\:text-3xl.font-bold.text-amber-400) {
+  font-size: inherit !important;
+}

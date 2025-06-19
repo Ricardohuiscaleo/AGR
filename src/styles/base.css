@@ -1,0 +1,246 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Variables CSS globales para temas */
+:root {
+  /* Colores para modo oscuro (por defecto) */
+  --background-color: #0a1144; /* Azul oscuro más intenso */
+  --text-color: #ffffff;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --card-bg: rgba(20, 20, 30, 0.8); /* Más oscuro */
+
+  /* Fuente Chakra UI */
+  --chakra-fonts-body:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+
+  /* Estilos globales */
+  --section-spacing: 2rem;
+}
+
+/* Variables para modo claro */
+html[data-theme='light'],
+body[data-theme='light'],
+:root[data-theme='light'] {
+  --background-color: #283593; /* Azul medio-oscuro en lugar de claro */
+  --text-color: #ffffff;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --card-bg: rgba(30, 30, 50, 0.8); /* Más oscuro para el modo claro también */
+}
+
+/* Aplicar variables a los elementos HTML base */
+html,
+body {
+  background-color: var(--background-color) !important;
+  color: var(--text-color);
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--chakra-fonts-body);
+  transition:
+    background-color 0.5s ease-in-out,
+    color 0.5s ease-in-out;
+  font-family: 'Inter', sans-serif;
+  scroll-behavior: smooth;
+}
+
+/* Asegurar que el fondo se mantenga en el contenedor principal */
+#app,
+.layout-container,
+main {
+  background-color: transparent;
+}
+
+/* Aplicar la fuente a todos los elementos de texto principales */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+a,
+button,
+input,
+textarea,
+select,
+li {
+  font-family: var(--chakra-fonts-body);
+}
+
+html {
+  background: var(--background-color);
+  background-attachment: fixed;
+  transition: background 0.5s ease-in-out;
+}
+
+/* Garantizar que el texto del componente Cover sea siempre blanco en modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .cover-text-dark {
+    color: white !important; /* Usar !important para sobreescribir cualquier otra regla */
+  }
+}
+
+/* Clase específica para compatibilidad con el selector de tema manual */
+html[data-theme='dark'] .cover-text-dark,
+body[data-theme='dark'] .cover-text-dark,
+:root[data-theme='dark'] .cover-text-dark {
+  color: white !important;
+}
+
+/* Ocultar el botón hamburguesa en vista de PC */
+.mobile-controls {
+  display: none;
+}
+
+/* Mostrar hamburguesa solo en móvil */
+@media (max-width: 768px) {
+  .mobile-controls {
+    display: block;
+  }
+
+  /* Ocultar navegación principal en móvil */
+  .main-navigation-surprise {
+    display: none;
+  }
+
+  /* Simplificar hamburguesa */
+  .hamburger {
+    cursor: pointer;
+  }
+
+  .hamburger svg {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.3s ease;
+  }
+
+  .hamburger .line {
+    stroke: var(--text-color);
+    stroke-width: 2;
+    transition: all 0.3s ease;
+  }
+
+  .hamburger input:checked + svg {
+    transform: rotate(45deg);
+  }
+
+  .hamburger input:checked + svg .line:nth-child(2) {
+    opacity: 0;
+  }
+
+  .hamburger input:checked + svg .line:nth-child(1),
+  .hamburger input:checked + svg .line:nth-child(3) {
+    stroke-width: 3;
+  }
+
+  .hamburger input:checked + svg .line:nth-child(1) {
+    transform: translateY(8px);
+  }
+
+  .hamburger input:checked + svg .line:nth-child(3) {
+    transform: translateY(-8px) rotate(90deg);
+  }
+
+  :root {
+    --section-spacing: 1rem;
+  }
+}
+
+/* Colores de sección */
+.section-rn {
+  background-color: #2d3142; /* Más oscuro */
+}
+.section-hello {
+  background-color: #252a41; /* Más oscuro */
+}
+.section-approach {
+  background-color: #1f253a; /* Más oscuro */
+}
+.section-work {
+  background-color: #192133; /* Más oscuro */
+}
+.section-talent {
+  background-color: #151c2c; /* Más oscuro */
+}
+.section-careers {
+  background-color: #111724; /* Más oscuro */
+}
+.section-contact {
+  background-color: #0d121e; /* Más oscuro */
+}
+
+/* ANIMACIONES PARA EL COMPONENTE CHAT */
+
+/* Animación del avión de papel */
+@keyframes planeFlight {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-40deg);
+  }
+  50% {
+    transform: rotate(10deg);
+  }
+  75% {
+    transform: rotate(-40deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+/* Animaciones de typing y cursor para el texto dinámico */
+@keyframes typing-dynamic {
+  from {
+    width: 0;
+  }
+  to {
+    width: var(--target-width);
+  }
+}
+@keyframes erase-dynamic {
+  from {
+    width: var(--target-width);
+  }
+  to {
+    width: 0;
+  }
+}
+@keyframes hide-caret {
+  from {
+    border-right-color: #007bff;
+  }
+  to {
+    border-right-color: transparent;
+  }
+}
+
+/* Animación del indicador de escribiendo */
+@keyframes typingBlink {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(1.2);
+  }
+}
+
+/* Animación shimmer */
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}

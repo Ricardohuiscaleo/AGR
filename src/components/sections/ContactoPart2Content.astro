@@ -1,0 +1,738 @@
+---
+// =====================================================================
+// ContactoPart2Content.astro - Sistema de Reservas Integrado Directo
+// =====================================================================
+
+export interface Props {
+  section: {
+    id: string;
+    number: { text: string; size: string; position: string; alignment: string };
+    title: { text: string; size: string; position: string; alignment: string };
+    subtitle: {
+      text: string;
+      size: string;
+      position: string;
+      alignment: string;
+      hasClaim: boolean;
+    };
+    bgColor: string;
+    height: string;
+  };
+}
+
+const { section } = Astro.props;
+
+// Configuración del calendario - directo como en FAQ
+const calendarConfig = {
+  calendarId: 'ricardo.huiscaleo@gmail.com',
+  title: '',
+  description: '',
+  workingHoursStart: 9,
+  workingHoursEnd: 20,
+  slotDuration: 60,
+  accentColor: '#9333EA',
+  timeZone: 'America/Santiago',
+};
+
+// Importar directamente el componente React como en FAQ
+import BookingCalendar from '../calendar/BookingCalendar.jsx';
+---
+
+<!-- Contenedor principal con estructura mínima como el ejemplo -->
+<div
+  id="contacto-part2-timeline"
+  class="w-full relative z-10"
+  style="height: 100%; position: relative; margin: 1rem;"
+>
+  <div class="timeline-wrapper">
+    <h2
+      class="text-5xl sm:text-5xl md:text-6xl lg:text-8xl xl:text-9xl font-bold text-white mb-4 md:mb-6 leading-tight"
+    >
+      Reserva tu consultoría empresarial en tiempo récord
+    </h2>
+    <div class="max-w-7xl">
+      <p
+        class="text-base sm:text-lg md:text-2xl lg:text-3xl xl:text-4xl text-gray-300 leading-relaxed"
+      >
+        Hoy{' '}
+        {
+          new Date().toLocaleDateString('es-ES', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long',
+          })
+        }{' '}
+        programar{' '}
+        <span
+          class="animated-gradient-text"
+          style="background-image: linear-gradient(45deg, #22ff6c 0%, #43ffba 25%, #65f0ff 50%, #43ffba 75%, #22ff6c 100%); -webkit-background-clip: text; background-clip: text; color: transparent; display: inline;"
+        >
+          reuniones inteligentes
+        </span>{' '}
+        con IA es{' '}
+        <span
+          class="inline-block bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-400 bg-[length:200%_100%] text-transparent bg-clip-text font-semibold italic transform -rotate-1 animate-shimmer"
+        >
+          simple y automatizado
+        </span>{' '}
+        😎.
+      </p>
+    </div>
+  </div>
+
+  <div
+    class="mx-auto py-4 md:py-6 lg:py-10 max-w-7xl"
+    style="padding-left: 0rem !important; padding-right: 0rem !important;"
+  >
+    <!-- Calendario directo integrado -->
+    <div class="calendar-widget-minimal">
+      <BookingCalendar
+        client:only="react"
+        calendarId={calendarConfig.calendarId}
+        title={calendarConfig.title}
+        description={calendarConfig.description}
+        accentColor={calendarConfig.accentColor}
+        workingHoursStart={calendarConfig.workingHoursStart}
+        workingHoursEnd={calendarConfig.workingHoursEnd}
+        slotDuration={calendarConfig.slotDuration}
+        timeZone={calendarConfig.timeZone}
+      />
+    </div>
+
+    <!-- Footer de branding -->
+    <div class="text-center mt-8 pt-4 border-t border-gray-600/30">
+      <p class="text-gray-400 text-sm">
+        Sistema de agendamiento automático potenciado con IA + Google Calendar.
+      </p>
+      <p class="text-gray-400 text-xs mt-1">⚡ Powered by agenterag.com</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* ===== ESTRUCTURA ULTRA-PLANA (2 NIVELES MÁXIMO) ===== */
+  .calendar-booking-section-full-width {
+    /* Layout principal con CSS Grid para mejor control */
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    max-width: 100rem;
+    margin: 0 auto;
+    padding: 1rem;
+    min-height: 100vh;
+    align-content: center;
+    position: relative;
+    z-index: 10;
+
+    /* Grid areas simplificadas - AÑADIDO FOOTER */
+    grid-template-areas:
+      'title'
+      'description'
+      'calendar'
+      'tech-note'
+      'cta-question'
+      'cta-primary'
+      'cta-secondary'
+      'footer';
+  }
+
+  /* Responsive Grid para desktop - Layout lado a lado */
+  @media (min-width: 768px) {
+    .calendar-booking-section-full-width {
+      gap: 3rem;
+      padding: 2rem;
+      grid-template-columns: 1fr 1fr;
+      grid-template-areas:
+        'title title'
+        'description description'
+        'calendar calendar'
+        'tech-note tech-note'
+        'cta-question cta-question'
+        'cta-primary cta-secondary'
+        'footer footer';
+    }
+  }
+
+  /* ===== ELEMENTOS DIRECTOS ===== */
+  .main-title {
+    grid-area: title;
+    @apply text-4xl md:text-6xl font-bold text-white text-center;
+  }
+
+  .main-description {
+    grid-area: description;
+    @apply text-xl md:text-2xl opacity-90 text-gray-100 text-center max-w-4xl;
+    justify-self: center;
+  }
+
+  .calendar-widget {
+    grid-area: calendar;
+    @apply bg-white/10 backdrop-blur-sm rounded-xl;
+    @apply p-4 border border-purple-400/20;
+    @apply shadow-2xl;
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.6s ease-out;
+    /* El calendario ocupa ambas filas de las cards */
+    align-self: stretch;
+    /* Responsive sizing - NO forzar 100% en móvil */
+    display: flex;
+    flex-direction: column;
+    /* Desktop: ocupa todo el espacio */
+    min-height: 500px;
+  }
+
+  .calendar-widget:hover {
+    @apply bg-white/15;
+    transform: translateY(-2px);
+  }
+
+  .tech-note {
+    grid-area: tech-note;
+    @apply p-6 bg-blue-900/30 text-blue-200 rounded-lg border border-blue-500/30;
+    @apply flex items-start text-sm shadow-lg;
+  }
+
+  .tech-icon {
+    @apply w-5 h-5 mr-3 mt-0.5 text-blue-300 flex-shrink-0;
+  }
+
+  .cta-question {
+    grid-area: cta-question;
+    @apply text-lg text-purple-200 text-center font-medium;
+  }
+
+  .btn-primary {
+    grid-area: cta-primary;
+    @apply bg-purple-600 hover:bg-purple-700 text-white;
+    @apply px-8 py-4 rounded-lg font-semibold text-center;
+    @apply transition-all duration-300 shadow-lg;
+    @apply flex items-center justify-center;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    @apply shadow-2xl;
+  }
+
+  .btn-primary-enhanced {
+    grid-area: cta-primary;
+    @apply bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white;
+    @apply px-8 py-4 rounded-lg font-semibold text-center;
+    @apply transition-all duration-300 shadow-lg;
+    @apply flex items-center justify-center;
+    /* UX/UI Mejorado */
+    position: relative;
+    overflow: hidden;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    backdrop-filter: blur(10px);
+  }
+
+  .btn-primary-enhanced:hover {
+    transform: translateY(-3px) scale(1.02);
+    @apply shadow-2xl;
+    box-shadow:
+      0 20px 40px rgba(6, 182, 212, 0.4),
+      0 10px 20px rgba(59, 130, 246, 0.3);
+  }
+
+  .btn-primary-enhanced:active {
+    transform: translateY(-1px) scale(0.98);
+    transition: all 0.1s ease;
+  }
+
+  /* Efecto de brillo interno */
+  .btn-primary-enhanced::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.6s ease;
+  }
+
+  .btn-primary-enhanced:hover::before {
+    left: 100%;
+  }
+
+  /* Animación de pulso sutil */
+  .btn-primary-enhanced::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(45deg, #06b6d4, #3b82f6, #06b6d4);
+    border-radius: inherit;
+    z-index: -1;
+    opacity: 0;
+    animation: pulse-border 2s ease-in-out infinite;
+  }
+
+  .btn-primary-enhanced:hover::after {
+    opacity: 1;
+  }
+
+  @keyframes pulse-border {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.7;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 0.3;
+    }
+  }
+
+  .btn-secondary {
+    grid-area: cta-secondary;
+    @apply bg-transparent hover:bg-purple-600/20 text-purple-300;
+    @apply border border-purple-400 px-8 py-4 rounded-lg font-semibold text-center;
+    @apply transition-all duration-300 shadow-lg;
+    @apply flex items-center justify-center;
+  }
+
+  .btn-secondary:hover {
+    transform: translateY(-2px);
+    @apply border-purple-300 shadow-2xl;
+  }
+
+  .btn-secondary-enhanced {
+    grid-area: cta-secondary;
+    @apply bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white;
+    @apply px-8 py-4 rounded-lg font-semibold text-center;
+    @apply transition-all duration-300 shadow-lg;
+    @apply flex items-center justify-center;
+    /* UX/UI Mejorado */
+    position: relative;
+    overflow: hidden;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    backdrop-filter: blur(10px);
+  }
+
+  .btn-secondary-enhanced:hover {
+    transform: translateY(-3px) scale(1.02);
+    @apply shadow-2xl;
+    box-shadow:
+      0 20px 40px rgba(6, 182, 212, 0.4),
+      0 10px 20px rgba(59, 130, 246, 0.3);
+  }
+
+  .btn-secondary-enhanced:active {
+    transform: translateY(-1px) scale(0.98);
+    transition: all 0.1s ease;
+  }
+
+  /* Efecto de brillo interno */
+  .btn-secondary-enhanced::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.6s ease;
+  }
+
+  .btn-secondary-enhanced:hover::before {
+    left: 100%;
+  }
+
+  /* Animación de pulso sutil */
+  .btn-secondary-enhanced::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: linear-gradient(45deg, #06b6d4, #3b82f6, #06b6d4);
+    border-radius: inherit;
+    z-index: -1;
+    opacity: 0;
+    animation: pulse-border 2s ease-in-out infinite;
+  }
+
+  .btn-secondary-enhanced:hover::after {
+    opacity: 1;
+  }
+
+  @keyframes pulse-border {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.7;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 0.3;
+    }
+  }
+
+  .btn-icon {
+    @apply w-5 h-5 mr-2;
+  }
+
+  /* ===== ANIMACIÓN OPTIMIZADA ===== */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Animación shimmer para efectos de texto */
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 3s ease-in-out infinite;
+  }
+
+  /* ===== RESPONSIVE ULTRA-OPTIMIZADO ===== */
+  @media (max-width: 767px) {
+    .calendar-booking-section-full-width {
+      padding: 1rem;
+      gap: 1.5rem;
+      /* En móvil eliminar min-height problemático */
+      min-height: auto;
+      /* En móvil mantiene el orden original */
+      grid-template-areas:
+        'title'
+        'description'
+        'calendar'
+        'cta-question'
+        'cta-primary'
+        'cta-secondary'
+        'footer';
+    }
+
+    .main-title {
+      @apply text-3xl;
+    }
+
+    .main-description {
+      @apply text-lg;
+    }
+
+    .calendar-widget {
+      /* En móvil: altura automática y ancho completo */
+      height: auto;
+      width: 100%;
+      min-height: 400px;
+      max-height: 70vh;
+      /* Padding más pequeño en móvil */
+      @apply p-3;
+    }
+
+    .btn-primary-enhanced,
+    .btn-secondary-enhanced {
+      @apply px-6 py-3 text-sm;
+    }
+  }
+
+  /* Desktop específico */
+  @media (min-width: 768px) {
+    .calendar-widget {
+      /* Solo en desktop usar 100% de altura */
+      height: 100%;
+      width: 100%;
+    }
+  }
+
+  /* FOOTER BRANDING */
+  .footer-branding {
+    grid-area: footer;
+    @apply mt-6 pt-4 border-t border-gray-600/30 text-center;
+    justify-self: center;
+    width: 100%;
+    max-width: 600px;
+  }
+
+  /* ===== NUEVAS CLASES CSS ===== */
+  .header-impact-full {
+    grid-area: title;
+    @apply col-span-full text-left mb-8;
+  }
+
+  .title-impact {
+    @apply text-6xl md:text-9xl font-bold text-white leading-tight text-left;
+  }
+
+  .subtitle-container {
+    @apply max-w-4xl;
+  }
+
+  .subtitle-impact {
+    @apply text-lg md:text-4xl text-gray-300 leading-relaxed text-left;
+  }
+
+  .text-highlight-green {
+    @apply relative inline-block font-semibold px-2 py-1 rounded-md;
+    background-image: linear-gradient(
+      45deg,
+      #22ff6c 0%,
+      #43ffba 25%,
+      #65f0ff 50%,
+      #43ffba 75%,
+      #22ff6c 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    display: inline-block;
+    text-shadow: none;
+    font-weight: 600;
+  }
+
+  .text-highlight-cyan {
+    @apply inline-block bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-400 bg-[length:200%_100%] text-transparent bg-clip-text font-semibold italic transform -rotate-1 animate-shimmer;
+  }
+
+  /* ===== ESTILO MÍNIMO COMO EL EJEMPLO ===== */
+  .timeline-wrapper {
+    margin-bottom: 2rem;
+  }
+
+  .timeline-wrapper h2 {
+    margin-bottom: 1.5rem;
+  }
+
+  .timeline-wrapper p {
+    max-width: 4xl;
+  }
+
+  /* Calendario con estilo mínimo */
+  .calendar-widget-minimal {
+    @apply bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-purple-400/20 shadow-2xl;
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.6s ease-out;
+    min-height: 500px;
+  }
+
+  .calendar-widget-minimal:hover {
+    @apply bg-white/15;
+    transform: translateY(-2px);
+  }
+
+  /* Botones con estilo mínimo */
+  .btn-primary-minimal {
+    @apply bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white;
+    @apply px-8 py-4 rounded-lg font-semibold text-center;
+    @apply transition-all duration-300 shadow-lg;
+    @apply flex items-center justify-center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary-minimal:hover {
+    transform: translateY(-3px) scale(1.02);
+    @apply shadow-2xl;
+    box-shadow:
+      0 20px 40px rgba(6, 182, 212, 0.4),
+      0 10px 20px rgba(59, 130, 246, 0.3);
+  }
+
+  .btn-secondary-minimal {
+    @apply bg-transparent hover:bg-purple-600/20 text-purple-300;
+    @apply border border-purple-400 px-8 py-4 rounded-lg font-semibold text-center;
+    @apply transition-all duration-300 shadow-lg;
+    @apply flex items-center justify-center;
+  }
+
+  .btn-secondary-minimal:hover {
+    transform: translateY(-2px);
+    @apply border-purple-300 shadow-2xl;
+  }
+
+  /* ===== NUEVOS ESTILOS PARA CALENDARIO HORIZONTAL ===== */
+
+  /* Contenedor principal del calendario horizontal */
+  .horizontal-booking-flow {
+    @apply space-y-6;
+  }
+
+  .horizontal-calendar-container {
+    @apply w-full;
+  }
+
+  /* Grid horizontal de fechas con scroll suave */
+  .horizontal-dates-grid {
+    /* Scroll horizontal suave en móviles */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+  }
+
+  .horizontal-dates-grid::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .horizontal-dates-grid::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .horizontal-dates-grid::-webkit-scrollbar-thumb {
+    background-color: rgba(156, 163, 175, 0.5);
+    border-radius: 3px;
+  }
+
+  .horizontal-dates-grid::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(156, 163, 175, 0.7);
+  }
+
+  /* Cards de fecha mejoradas */
+  .date-card {
+    position: relative;
+    min-width: 80px;
+    backdrop-filter: blur(10px);
+  }
+
+  .date-card:hover:not(:disabled) {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
+
+  .date-card:active:not(:disabled) {
+    transform: translateY(-1px) scale(1.01);
+    transition: all 0.1s ease;
+  }
+
+  /* Efecto de pulso para fechas seleccionadas */
+  .date-card.selected {
+    animation: pulse-selected 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-selected {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+    }
+    50% {
+      box-shadow: 0 0 0 8px rgba(59, 130, 246, 0);
+    }
+  }
+
+  /* Contenedor de slots de tiempo compacto */
+  .time-slots-container {
+    @apply space-y-4;
+  }
+
+  /* Botones de slots de tiempo mejorados */
+  .time-slot-button {
+    position: relative;
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+  }
+
+  .time-slot-button:hover:not(:disabled) {
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .time-slot-button:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+    transition: all 0.1s ease;
+  }
+
+  /* Efecto de shimmer en botones seleccionados */
+  .time-slot-button.selected::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    animation: shimmer-slot 2s ease-in-out infinite;
+  }
+
+  @keyframes shimmer-slot {
+    0% {
+      left: -100%;
+    }
+    100% {
+      left: 100%;
+    }
+  }
+
+  /* Responsive mejorado para móviles */
+  @media (max-width: 640px) {
+    .date-card {
+      min-width: 70px;
+      height: 90px;
+      padding: 8px;
+    }
+
+    .horizontal-dates-grid {
+      padding-left: 8px;
+      padding-right: 8px;
+    }
+
+    .time-slot-button {
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+  }
+
+  /* Mejoras visuales adicionales */
+  .horizontal-calendar-container h3 {
+    @apply tracking-wide;
+  }
+
+  /* Leyenda de colores */
+  .color-legend {
+    @apply flex items-center justify-center gap-4 text-xs text-gray-600;
+  }
+
+  .color-legend .legend-item {
+    @apply flex items-center gap-1;
+  }
+
+  .color-legend .legend-dot {
+    @apply w-3 h-3 rounded-full;
+  }
+
+  /* Estados de loading para el calendario horizontal */
+  .horizontal-calendar-container.loading {
+    @apply opacity-75 pointer-events-none;
+  }
+
+  .horizontal-calendar-container.loading .date-card {
+    @apply animate-pulse;
+  }
+
+  /* Transiciones suaves para cambios de estado */
+  .horizontal-calendar-container * {
+    transition-property: transform, background-color, border-color, box-shadow, opacity;
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Indicador "hoy" mejorado */
+  .date-card .today-indicator {
+    @apply absolute -top-1 -right-1 w-3 h-3 bg-orange-400 rounded-full border-2 border-white;
+    animation: pulse-today 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-today {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.8;
+    }
+  }
+</style>

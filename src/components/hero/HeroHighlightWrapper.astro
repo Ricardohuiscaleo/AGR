@@ -1,0 +1,49 @@
+---
+import { HeroHighlight } from '../ui/hero-highlight';
+
+interface Props {
+  height?: string;
+  id?: string;
+}
+
+const { height = '100vh', id } = Astro.props;
+---
+
+<div
+  class="hero-highlight-wrapper"
+  id={id}
+  style={{
+    height: height,
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+  }}
+>
+  <HeroHighlight client:load containerClassName="highlight-container">
+    <slot />
+  </HeroHighlight>
+</div>
+
+<style>
+  .hero-highlight-wrapper {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    right: 0;
+    top: var(--highlight-wrapper-top, -300px); /* Variable para controlar posición vertical */
+    overflow: visible;
+    pointer-events: auto;
+    z-index: 5; /* Mantenido para estar detrás del header */
+    height: var(--highlight-wrapper-height, 800px); /* Variable para controlar altura */
+    display: flex;
+    justify-content: center; /* Centrar horizontalmente */
+  }
+
+  /* Estilo para asegurar que el contenido hijo también esté centrado */
+  :global(.hero-highlight-wrapper .highlight-container) {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+</style>

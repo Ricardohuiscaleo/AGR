@@ -1,0 +1,46 @@
+/* Estilos específicos para el tooltip del botón de bombilla */
+.tooltip-button-container {
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.tooltip-button-container button {
+  pointer-events: auto;
+}
+
+/* Previene que los eventos del botón afecten al textarea */
+.tooltip-button-container,
+.tooltip-button-container * {
+  isolation: isolate;
+  touch-action: manipulation;
+}
+
+/* Asegura que el botón no cause efectos en otros elementos */
+.tooltip-content {
+  pointer-events: none !important;
+}
+
+/* Clase específica para tooltips instantáneos */
+.instant-tooltip {
+  animation: none !important;
+  transition: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  /* Propiedades para prevenir cualquier retraso */
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Ya no se usa pero mantenemos por compatibilidad */
+@keyframes fastTooltipFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}

@@ -1,0 +1,102 @@
+---
+// =====================================================================
+// COMPONENTE PARA 'empresa-part3' (Metodología)
+// =====================================================================
+interface Props {
+  section: any;
+}
+const { section } = Astro.props;
+
+const methodologySteps = [
+  {
+    step: '01',
+    title: 'Descubrimiento y Análisis',
+    description:
+      'Nos sumergimos en tu negocio para entender tus desafíos y objetivos. Analizamos tus procesos actuales para identificar las oportunidades de automatización más impactantes y con mayor retorno de inversión.',
+    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />`,
+  },
+  {
+    step: '02',
+    title: 'Diseño y Prototipado',
+    description:
+      'Creamos un plan de acción detallado y un prototipo funcional del Agente RAG. Validamos la solución contigo para asegurar que cumple con tus expectativas y se integra perfectamente en tu flujo de trabajo.',
+    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />`,
+  },
+  {
+    step: '03',
+    title: 'Desarrollo e Implementación',
+    description:
+      'Nuestro equipo de expertos construye y entrena a tu Agente IA a medida. Nos encargamos de la implementación completa, asegurando una transición fluida y sin interrupciones para tu operación diaria.',
+    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l-4 4-4-4-4 4" />`,
+  },
+  {
+    step: '04',
+    title: 'Soporte y Optimización',
+    description:
+      'El lanzamiento es solo el comienzo. Monitoreamos el rendimiento, proporcionamos soporte continuo y optimizamos tu agente para que evolucione y se adapte a las nuevas necesidades de tu empresa.',
+    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />`,
+  },
+];
+---
+
+<div
+  id="empresa-part3-timeline"
+  class="w-full relative z-10"
+  style="height: 100%; position: relative; margin: 2rem; margin-left: 1rem; margin-right: 1rem;"
+>
+  <div class="timeline-wrapper">
+    <h2
+      class="text-5xl sm:text-5xl md:text-6xl lg:text-8xl xl:text-9xl font-bold text-white mb-4 md:mb-6 leading-tight"
+    >
+      Nuestra metodología de desarrollo
+    </h2>
+    <div class="max-w-8xl">
+      <p
+        class="text-base sm:text-lg md:text-2xl lg:text-3xl xl:text-4xl text-gray-300 leading-relaxed"
+      >
+        Implementar{' '}
+        <span
+          class="animated-gradient-text"
+          style="background-image: linear-gradient(45deg, #00ff41 0%, #5fff78 25%, #85ff99 50%, #5fff78 75%, #00ff41 100%); -webkit-background-clip: text; background-clip: text; color: transparent; display: inline;"
+        >
+          metodologías ágiles especializadas
+        </span>{' '}
+        es{' '}
+        <span
+          class="inline-block bg-gradient-to-r from-white via-gray-100 to-white bg-[length:200%_100%] text-transparent bg-clip-text font-semibold italic transform -rotate-1 animate-shimmer"
+        >
+          garantía de éxito
+        </span>{' '}
+        🎯.
+      </p>
+    </div>
+  </div>
+
+  <!-- Contenido en Contenedor -->
+  <div class="container mx-auto px-4 pb-16 lg:pb-24 mt-16">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      {
+        methodologySteps.map((step) => (
+          <div class="bg-black/20 backdrop-blur-sm border border-green-400/20 rounded-xl p-8 hover:border-green-400/40 transition-all duration-300">
+            <div class="flex items-start gap-4">
+              <div class="flex-shrink-0 w-16 h-16 bg-green-900/50 rounded-full flex items-center justify-center border-2 border-green-500/50">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-8 w-8 text-green-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  set:html={step.icon}
+                />
+              </div>
+              <div class="flex-1">
+                <h3 class="text-2xl font-bold text-white mb-2">{step.title}</h3>
+                <p class="text-green-100/80 leading-relaxed">{step.description}</p>
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</div>

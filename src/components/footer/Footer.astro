@@ -1,0 +1,605 @@
+---
+
+---
+
+<style>
+  /* --- Variables (igual que antes) --- */
+  .footer-enhanced {
+    --main-text-color: #e0e0e0;
+    --title-color: #ffffff;
+    --border-color: rgba(255, 255, 255, 0.2);
+    --chevron-color: #c0c0c0;
+    --link-hover-color: #ffffff;
+    --active-color: #e300e3; /* Magenta */
+    --glow-color: rgba(255, 255, 255, 0.6);
+    --transition-speed: 0.3s;
+    --text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  .footer-enhanced {
+    font-family: 'Montserrat', sans-serif;
+    color: var(--main-text-color);
+    padding: 20px 10px 10px 10px;
+    box-sizing: border-box;
+    overflow: hidden;
+    background-color: transparent; /* Eliminar el fondo oscuro */
+  }
+
+  .footer-section-enhanced {
+    text-shadow: var(--text-shadow);
+  }
+
+  .footer-grid-enhanced {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px 25px;
+    max-width: 2000px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 992px) {
+    .footer-grid-enhanced {
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 40px 20px;
+    }
+  }
+
+  .footer-section-enhanced {
+    padding-bottom: 15px;
+    box-sizing: border-box;
+    text-shadow: var(--text-shadow);
+  }
+
+  .footer-section-enhanced h6 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--title-color);
+    margin: 0 0 20px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: default;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+    transition: border-bottom-color var(--transition-speed) ease;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  }
+
+  .footer-section-enhanced p,
+  .footer-section-enhanced ul,
+  .footer-section-enhanced li {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .footer-section-enhanced li {
+    margin-bottom: 10px;
+  }
+
+  .footer-section-enhanced li:last-child {
+    margin-bottom: 0;
+  }
+
+  .footer-section-enhanced p {
+    margin-bottom: 12px;
+  }
+
+  .footer-section-enhanced p strong {
+    color: var(--title-color);
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  }
+
+  .footer-section-enhanced a {
+    color: var(--main-text-color);
+    text-decoration: none;
+    transition:
+      color var(--transition-speed) ease,
+      text-shadow var(--transition-speed) ease,
+      transform var(--transition-speed) ease;
+    display: inline-block;
+    text-shadow: var(--text-shadow);
+  }
+
+  .footer-section-enhanced ul a {
+    padding: 3px 0;
+  }
+
+  @media (min-width: 769px) {
+    .footer-section-enhanced ul a:hover {
+      color: var(--link-hover-color);
+      text-shadow:
+        0 0 8px var(--glow-color),
+        0 2px 4px rgba(0, 0, 0, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .footer-social-icons a:hover {
+      transform: translateY(-2px) scale(1.05);
+    }
+
+    .footer-social-icons a:hover svg {
+      fill: var(--link-hover-color);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .footer-section-enhanced ul a:hover {
+      color: var(--link-hover-color);
+    }
+
+    .footer-social-icons a:hover svg {
+      fill: var(--link-hover-color);
+    }
+  }
+
+  .footer-location-content .footer-map-placeholder {
+    min-height: 0;
+    max-height: 0;
+    background-color: rgba(10, 0, 51, 0);
+    border-radius: 18px;
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition:
+      max-height 0.4s ease-out,
+      min-height 0.4s ease-out;
+  }
+
+  .footer-location-content .footer-map-placeholder:has(iframe) {
+    min-height: 180px;
+    max-height: 180px;
+  }
+
+  .footer-location-content .footer-map-placeholder iframe {
+    border: 0;
+    width: 100%;
+    max-width: 100%;
+    height: 180px;
+    display: block;
+    border-radius: 6px;
+    box-sizing: border-box;
+  }
+
+  .map-load-button {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 8px;
+    background: none;
+    border: 1px solid var(--main-text-color);
+    color: var(--main-text-color);
+    padding: 4px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.7em;
+    transform: scale(0.9);
+    transform-origin: left center;
+    transition:
+      background-color 0.2s,
+      color 0.2s,
+      transform 0.2s;
+  }
+
+  .map-load-button:hover {
+    background-color: var(--main-text-color);
+    color: rgb(10, 0, 51);
+    transform: scale(0.95);
+  }
+
+  .footer-social-icons .collapsible-content-enhanced {
+    line-height: 0;
+    padding-top: 5px;
+  }
+
+  .footer-social-icons a {
+    display: inline-block;
+    margin-right: 15px;
+    vertical-align: middle;
+    transition: transform var(--transition-speed) ease;
+  }
+
+  .footer-social-icons a:last-child {
+    margin-right: 0;
+  }
+
+  .footer-social-icons svg {
+    width: 22px;
+    height: 22px;
+    fill: var(--main-text-color);
+    transition: fill var(--transition-speed) ease;
+  }
+
+  .chevron-enhanced {
+    display: none;
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid var(--chevron-color);
+    border-bottom: 2px solid var(--chevron-color);
+    transform: rotate(45deg);
+    transition:
+      border-color var(--transition-speed) ease,
+      transform var(--transition-speed) ease;
+    margin-left: 10px;
+    flex-shrink: 0;
+    pointer-events: none;
+  }
+
+  .collapsible-content-enhanced {
+    max-height: 1000px;
+    overflow: hidden;
+    transition:
+      max-height 0.4s ease-out,
+      margin-top 0.4s ease-out,
+      opacity 0.4s ease-out;
+    opacity: 1;
+  }
+
+  @media (max-width: 768px) {
+    .footer-grid-enhanced {
+      grid-template-columns: 1fr;
+      text-align: center;
+      gap: 20px 0;
+    }
+
+    .footer-section-enhanced.collapsible h6 {
+      cursor: pointer;
+      justify-content: center;
+    }
+
+    .footer-section-enhanced.collapsible h6 .chevron-enhanced {
+      display: inline-block;
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%) rotate(45deg);
+    }
+
+    .footer-section-enhanced.collapsible:not(.is-open) .collapsible-content-enhanced {
+      max-height: 0;
+      margin-top: 0 !important;
+      opacity: 0;
+    }
+
+    .footer-section-enhanced.collapsible.is-open h6 {
+      border-bottom-color: var(--active-color);
+    }
+
+    .footer-section-enhanced.collapsible.is-open h6 .chevron-enhanced {
+      border-right-color: var(--active-color);
+      border-bottom-color: var(--active-color);
+      transform: translateY(-50%) rotate(-135deg);
+    }
+
+    .footer-section-enhanced.collapsible.is-open .collapsible-content-enhanced {
+      max-height: none; /* Cambiar de 600px a none para permitir altura variable */
+      margin-top: 15px;
+      opacity: 1;
+    }
+
+    .footer-map-placeholder iframe,
+    .footer-location-content .footer-map-placeholder {
+      height: 200px;
+    }
+
+    .footer-social-icons {
+      text-align: center;
+    }
+
+    .footer-social-icons .collapsible-content-enhanced {
+      text-align: center;
+    }
+  }
+
+  /* Estilos para la sección de branding del footer */
+  .footer-branding-section {
+    margin-top: 20px;
+    padding: 15px 0 5px 0;
+    text-align: center;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .footer-branding-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 10px;
+  }
+
+  .footer-value-message {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--main-text-color);
+    text-shadow: var(--text-shadow);
+  }
+
+  .footer-gradient-text {
+    background: linear-gradient(
+      45deg,
+      #06b6d4 0%,
+      #3b82f6 25%,
+      #8b5cf6 50%,
+      #3b82f6 75%,
+      #06b6d4 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 600;
+    animation: shimmer 3s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  .footer-powered-by {
+    margin: 0 0 5px 0;
+    font-size: 12px;
+    color: var(--main-text-color);
+    text-shadow: var(--text-shadow);
+  }
+
+  .footer-brand-name {
+    font-weight: 700;
+    color: var(--title-color);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  }
+</style>
+
+<footer class="footer-enhanced" id="main-footer">
+  <div class="container-footer"></div>
+  <div class="footer-grid-enhanced">
+    <!-- Sección Info (igual) -->
+    <div class="footer-section-enhanced collapsible" id="footer-rag-info">
+      <h6>Agente RAG<span class="chevron-enhanced"></span></h6>
+      <div class="collapsible-content-enhanced">
+        <p>
+          Soluciones en Inteligencia Artificial SPA <br />
+          <strong>78.109.539-7</strong>
+        </p>
+        <p>Patente Comercial: Rol N° 2-199837</p>
+      </div>
+    </div>
+
+    <!-- Sección Ubicación con CAMBIOS para Carga Diferida -->
+    <div class="footer-section-enhanced collapsible" id="footer-location">
+      <h6>Ubicación<span class="chevron-enhanced"></span></h6>
+      <div class="collapsible-content-enhanced footer-location-content">
+        <p>
+          Av. Santa Magdalena 75, Oficina 304, Providencia, Región Metropolitana <button
+            class="map-load-button"
+            id="load-map-button"
+            type="button">Mostrar Mapa</button
+          >
+        </p>
+        <!-- Contenedor donde se insertará el mapa -->
+        <div
+          class="footer-map-placeholder"
+          id="map-placeholder"
+          data-src="https://maps.google.com/maps?q=..."
+        >
+        </div>
+      </div>
+    </div>
+
+    <!-- Sección Legal (igual) -->
+    <div class="footer-section-enhanced collapsible" id="footer-legal">
+      <h6>Legal<span class="chevron-enhanced"></span></h6>
+      <ul class="collapsible-content-enhanced">
+        <li><a href="/politica-de-privacidad">Política de privacidad</a></li>
+        <li><a href="/terminos-y-condiciones">Términos y condiciones</a></li>
+      </ul>
+    </div>
+
+    <!-- Sección Empresa (igual) -->
+    <div class="footer-section-enhanced collapsible" id="footer-empresa">
+      <h6>Empresa<span class="chevron-enhanced"></span></h6>
+      <ul class="collapsible-content-enhanced">
+        <li>
+          <a href="/nosotros-solucionamos-la-automatizacion-de-tareas-administrativas">Nosotros</a>
+        </li>
+        <li>
+          <a href="/consulta-gratis-soluciones-con-inteligencia-artificial">Consulta Gratis</a>
+        </li>
+        <li><a href="/faq-agente-rag">Preguntas Frecuentes</a></li>
+      </ul>
+    </div>
+
+    <!-- Sección Social (igual) -->
+    <div class="footer-section-enhanced collapsible footer-social-icons" id="footer-social">
+      <h6>Social<span class="chevron-enhanced"></span></h6>
+      <div class="collapsible-content-enhanced">
+        <a
+          href="https://www.linkedin.com/in/rhuiscaleo/"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Ir a LinkedIn"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            role="img"
+            aria-label="LinkedIn"
+          >
+            <path
+              fill="currentColor"
+              d="M6.2 21H1.85v-14H6.2v14zM4.02 5.07c-1.39 0-2.52-1.15-2.52-2.55S2.63 0 4.02 0s2.52 1.15 2.52 2.52c0 1.4-1.13 2.55-2.52 2.55zM22.5 21h-4.35v-6.83c0-1.63-.03-3.71-2.26-3.71c-2.26 0-2.6 1.77-2.6 3.6v7H8.93V7h4.17v1.9h.06c.58-1.1 2-2.27 4.17-2.27c4.47 0 5.3 2.94 5.3 6.76V21z"
+            ></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer branding específico -->
+  <div class="footer-branding-section">
+    <div class="footer-branding-content">
+      <p class="footer-value-message">
+        Aumentamos el valor agregado de tu servicio con{' '}
+        <span class="footer-gradient-text">Inteligencia Artificial RAG</span>.
+      </p>
+      <p class="footer-powered-by">
+        ⚡ Powered by <span class="footer-brand-name">agenterag.com</span> 2025
+      </p>
+    </div>
+  </div>
+
+  <!-- Script: Original del Acordeón + NUEVA lógica para cargar mapa -->
+  <script>
+    // --- Lógica del Acordeón (Original) ---
+    function setupOriginalAccordion() {
+      const footer = document.getElementById('main-footer');
+      if (!footer) return;
+      const collapsibleSections = footer.querySelectorAll('.collapsible');
+      const firstSection = document.getElementById('footer-rag-info');
+
+      collapsibleSections.forEach((section) => {
+        const title = section.querySelector('h6');
+        if (title) {
+          const content = section.querySelector('.collapsible-content-enhanced');
+          if (!content) return;
+          const toggleAccordion = (event) => {
+            if (window.innerWidth <= 768) {
+              const isOpen = section.classList.toggle('is-open');
+              title.setAttribute('aria-expanded', isOpen.toString());
+            }
+          };
+          title.addEventListener('click', toggleAccordion);
+          title.addEventListener('keydown', function (event) {
+            if (window.innerWidth <= 768 && (event.key === 'Enter' || event.key === ' ')) {
+              event.preventDefault();
+              const isOpen = !section.classList.contains('is-open');
+              section.classList.toggle('is-open');
+              title.setAttribute('aria-expanded', isOpen.toString());
+            }
+          });
+          let initialExpandedState = window.innerWidth > 768;
+          if (section.id === 'footer-rag-info' && window.innerWidth <= 768) {
+            initialExpandedState = true;
+          }
+          if (initialExpandedState && section.id === 'footer-rag-info') {
+            section.classList.add('is-open');
+          }
+          title.setAttribute('aria-expanded', initialExpandedState.toString());
+          title.setAttribute('role', 'button');
+          title.setAttribute('tabindex', '0');
+          window.addEventListener('resize', () => {
+            const isMobile = window.innerWidth <= 768;
+            if (!isMobile) {
+              section.classList.remove('is-open');
+              title.setAttribute('aria-expanded', 'true');
+            } else {
+              title.setAttribute('aria-expanded', section.classList.contains('is-open').toString());
+            }
+            title.style.cursor = isMobile ? 'pointer' : 'default';
+          });
+        }
+      });
+
+      if (window.innerWidth <= 768 && firstSection && !firstSection.classList.contains('is-open')) {
+        firstSection.classList.add('is-open');
+        const firstTitle = firstSection.querySelector('h6');
+        if (firstTitle) firstTitle.setAttribute('aria-expanded', 'true');
+      }
+    }
+
+    // --- NUEVA Lógica para Cargar Mapa ---
+    function setupMapLoader() {
+      const mapButton = document.getElementById('load-map-button');
+      const mapPlaceholder = document.getElementById('map-placeholder');
+
+      if (!mapButton || !mapPlaceholder) {
+        return;
+      }
+
+      mapButton.addEventListener(
+        'click',
+        () => {
+          const mapIframe = document.createElement('iframe');
+          mapIframe.src =
+            'https://maps.google.com/maps?q=Sta.%20Magdalena%2075,%20Oficina%20304,%207510057%20Providencia,%20Regi%C3%B3n%20Metropolitana&t=m&z=15&ie=UTF8&output=embed';
+          mapIframe.loading = 'lazy';
+          mapIframe.referrerPolicy = 'no-referrer-when-downgrade';
+          mapIframe.title = 'Mapa de ubicación';
+          mapIframe.style.border = '0';
+          mapIframe.style.width = '100%';
+          mapIframe.style.height = '100%';
+          mapIframe.style.borderRadius = '18px';
+
+          mapPlaceholder.innerHTML = '';
+          mapPlaceholder.appendChild(mapIframe);
+
+          mapButton.style.display = 'none';
+        },
+        { once: true }
+      );
+    }
+
+    // --- Defer no crítico ---
+    const setupFooter = () => {
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setupMapLoader();
+              observer.disconnect();
+            }
+          });
+        });
+
+        const footerElement = document.querySelector('.footer-enhanced');
+        if (footerElement) {
+          observer.observe(footerElement);
+        }
+      } else {
+        setupMapLoader();
+      }
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        setupOriginalAccordion();
+        setupFooter();
+      });
+    } else {
+      setupOriginalAccordion();
+      setupFooter();
+    }
+  </script>
+
+  <style is:global>
+    .noise-container-footer {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .footer-enhanced {
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-grid-enhanced {
+      position: relative;
+      z-index: 2;
+    }
+  </style>
+</footer>

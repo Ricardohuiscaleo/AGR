@@ -1,0 +1,754 @@
+---
+import { AuroraBackground } from './aurora-background';
+interface Props {
+  sectionId: string;
+  number: string;
+  title: string;
+  bgColor: string;
+  hoverColor: string;
+}
+
+const { sectionId, number, title, bgColor, hoverColor } = Astro.props;
+---
+
+<div
+  class={`nav-item-container ${bgColor}`}
+  data-section={sectionId}
+  style={sectionId === 'rag' ? 'position: relative; overflow: hidden;' : ''}
+>
+  {
+    sectionId === 'rag' && (
+      <div class="aurora-wrapper absolute inset-0 z-0">
+        <AuroraBackground
+          className="w-full h-full"
+          showRadialGradient={false}
+          fullHeight={false}
+          mouseActivatedOnDesktop={true}
+          client:load
+        >
+          <div />
+        </AuroraBackground>
+      </div>
+    )
+  }
+  <div class="nav-content">
+    <span class="nav-number">{number}</span>
+    <div class="nav-link-container">
+      <a href={`#${sectionId}`} class="nav-link">{title}</a>
+      {
+        sectionId === 'rag' && (
+          <img
+            src="/compressed/logo-oscuro-optimizado.png"
+            alt="Logo AR"
+            class="nav-logo opacity-70 ml-2"
+          />
+        )
+      }
+    </div>
+  </div>
+  <div class="progress-indicator"></div>
+</div>
+
+<style>
+  .nav-item-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 14px; /* Reducido de 16px a 14px */
+    position: relative;
+    height: 100px; /* Reducido de 100px a 70px */
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 0.8rem;
+    margin-bottom: 0.4rem; /* Reducido de 0.5rem a 0.4rem */
+    cursor: pointer;
+    z-index: 1; /* Asegurar que tiene un z-index base */
+
+    /* Estilos sólidos para escritorio (glassmorphism desactivado) */
+    background-color: rgba(var(--bg-color-rgb, 0, 0, 0), 0.9) !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  /* Definición de variables RGB para cada color de fondo */
+  /* Colores exactamente iguales a los de tailwind */
+  .nav-item-container.bg-red-500 {
+    --bg-color-rgb: 239, 68, 68; /* Color exacto bg-red-500 */
+    --bg-pastel-rgb: 190, 90, 84; /* Versión pastel (sin cambios) */
+  }
+  .nav-item-container.bg-orange-500 {
+    --bg-color-rgb: 249, 115, 22; /* Color exacto bg-orange-500 */
+    --bg-pastel-rgb: 205, 120, 50; /* Versión pastel (sin cambios) */
+  }
+  .nav-item-container.bg-purple-600 {
+    --bg-color-rgb: 147, 51, 234; /* Color exacto bg-purple-600 */
+    --bg-pastel-rgb: 140, 120, 170; /* Versión pastel (sin cambios) */
+  }
+  .nav-item-container.bg-black {
+    --bg-color-rgb: 0, 0, 0; /* Negro original */
+    --bg-pastel-rgb: 50, 50, 50; /* Gris muy oscuro (sin cambios) */
+  }
+  .nav-item-container.bg-blue-600 {
+    --bg-color-rgb: 37, 99, 235; /* Color exacto bg-blue-600 */
+    --bg-pastel-rgb: 100, 140, 180; /* Versión pastel (sin cambios) */
+  }
+  .nav-item-container.bg-red-600 {
+    --bg-color-rgb: 220, 38, 38; /* Color exacto bg-red-600 */
+    --bg-pastel-rgb: 200, 90, 85; /* Versión pastel (sin cambios) */
+  }
+  .nav-item-container.bg-yellow-500 {
+    --bg-color-rgb: 234, 179, 8; /* Color exacto bg-yellow-500 */
+    --bg-pastel-rgb: 210, 150, 60; /* Versión pastel (sin cambios) */
+  }
+  .nav-item-container.bg-white {
+    --bg-color-rgb: 255, 255, 255; /* Blanco exacto */
+    --bg-pastel-rgb: 180, 180, 180; /* Gris más oscuro (sin cambios) */
+    background-color: rgba(255, 255, 255, 0.9) !important;
+  }
+  .nav-item-container.bg-green-500 {
+    --bg-color-rgb: 34, 197, 94; /* Color exacto bg-green-500 */
+    --bg-pastel-rgb: 140, 180, 150; /* Versión pastel (sin cambios) */
+  }
+  .nav-item-container.bg-teal-500 {
+    --bg-color-rgb: 20, 184, 166; /* Color exacto bg-teal-500 */
+    --bg-pastel-rgb: 45, 212, 191; /* Versión pastel (sin cambios) */
+    background-color: rgba(20, 184, 166, 0.9) !important;
+  }
+  .nav-item-container.bg-purple-800 {
+    --bg-color-rgb: 107, 33, 168; /* Color exacto bg-purple-800 */
+    --bg-pastel-rgb: 130, 115, 160; /* Versión pastel (sin cambios) */
+  }
+  .nav-item-container.bg-gray-500 {
+    --bg-color-rgb: 107, 114, 128; /* Color exacto bg-gray-500 */
+    --bg-pastel-rgb: 180, 180, 180; /* Versión pastel (sin cambios) */
+  }
+
+  /* Efecto de hover mejorado para todas las pantallas */
+  .nav-item-container:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    background-color: rgba(var(--bg-color-rgb, 0, 0, 0), 0.9) !important;
+    transform: translateY(-2px);
+  }
+
+  .nav-item-container.active {
+    background-color: rgba(var(--bg-color-rgb, 0, 0, 0), 0.9) !important;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25);
+    transform: translateY(-2px); /* Añadir movimiento vertical en estado activo */
+  }
+
+  .nav-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    width: 100%;
+    z-index: 3; /* Aumentar z-index para estar por encima del efecto aurora */
+    position: relative; /* Asegurar posicionamiento correcto */
+  }
+
+  .nav-number {
+    font-family: 'SF Mono', SFMono-Regular, ui-monospace, Monaco, monospace;
+    font-size: 12px; /* Reducido un 30% aproximadamente (de 14px) */
+    color: white;
+    font-weight: bold;
+    position: relative; /* Asegurar que esté por encima del background */
+    z-index: 2;
+    margin-top: 2px; /* Ajustar a 2px desde el top, igual que en desktop */
+  }
+
+  .nav-link {
+    font-size: 15px;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease-in-out;
+    position: relative; /* Asegurar que esté por encima del background */
+    z-index: 2;
+    white-space: nowrap;
+    overflow: visible; /* Cambiar de hidden a visible para mostrar todo el texto */
+    text-overflow: clip; /* Cambiar de ellipsis a clip */
+    max-width: none; /* Eliminar restricción de ancho máximo */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Especial para nav-card 00 (RAG) en móvil */
+  .nav-item-container[data-section='rag'] .nav-number,
+  .nav-item-container[data-section='rag'] .nav-link {
+    color: #ffffff !important; /* Texto blanco en móvil también */
+  }
+
+  /* Estilos específicos para fondo blanco */
+  .nav-item-container.bg-white .nav-number,
+  .nav-item-container.bg-white .nav-link {
+    color: #000000;
+  }
+
+  .nav-item-container.bg-white .progress-indicator {
+    background-color: #000000;
+  }
+
+  .progress-indicator {
+    position: absolute;
+    right: 8px;
+    width: 8px;
+    height: 8px;
+    background-color: white;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    z-index: 4; /* Asegurar que el indicador esté visible */
+  }
+
+  .nav-item-container.active .progress-indicator {
+    opacity: 1;
+  }
+
+  .aurora-wrapper {
+    pointer-events: auto;
+  }
+
+  /* Asegurar que la tarjeta RAG tenga texto blanco */
+  .nav-item-container[data-section='rag'] {
+    border: none; /* Eliminar el borde para la tarjeta RAG */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Sombra más pronunciada para mejor efecto */
+  }
+
+  .nav-item-container[data-section='rag'] .nav-number,
+  .nav-item-container[data-section='rag'] .nav-link {
+    color: #ffffff !important; /* Forzar color blanco siempre */
+    z-index: 10;
+    position: relative;
+  }
+
+  .nav-item-container[data-section='rag'] .progress-indicator {
+    background-color: #ffffff !important; /* Indicador de progreso blanco */
+    z-index: 10;
+  }
+
+  /* En modo hover también asegurar que no aparezca borde */
+  .nav-item-container[data-section='rag']:hover {
+    border: none;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Vista móvil */
+  @media (max-width: 768px) {
+    .nav-item-container {
+      flex-direction: row;
+      align-items: center;
+      padding: 12px;
+      margin-right: 0.5rem;
+      margin-bottom: 0;
+      border-radius: 0.8rem;
+      width: 100px; /* Ancho base, será modificado dinámicamente por JS */
+      min-width: 120px; /* Asegurar tamaño mínimo para scroll */
+      height: 40px; /* Altura fija en móvil */
+      transform: translateX(0);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      flex-shrink: 0; /* Evitar que se encoja durante el scroll */
+
+      /* Efecto de transparencia y blur */
+      background-color: rgba(var(--bg-pastel-rgb, 0, 0, 0), 0.7) !important;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Clase para aplicar colores personalizados según prop bgColor */
+    .nav-item-container.bg-red-500 {
+      --bg-color-rgb: 239, 68, 68; /* Color exacto bg-red-500 */
+      --bg-pastel-rgb: 190, 90, 84; /* Versión pastel (sin cambios) */
+    }
+    .nav-item-container.bg-orange-500 {
+      --bg-color-rgb: 249, 115, 22; /* Color exacto bg-orange-500 */
+      --bg-pastel-rgb: 205, 120, 50; /* Versión pastel (sin cambios) */
+    }
+    .nav-item-container.bg-purple-600 {
+      --bg-color-rgb: 147, 51, 234; /* Color exacto bg-purple-600 */
+      --bg-pastel-rgb: 140, 120, 170; /* Versión pastel (sin cambios) */
+    }
+    .nav-item-container.bg-black {
+      --bg-color-rgb: 0, 0, 0; /* Negro original */
+      --bg-pastel-rgb: 50, 50, 50; /* Gris muy oscuro (sin cambios) */
+    }
+    .nav-item-container.bg-blue-600 {
+      --bg-color-rgb: 37, 99, 235; /* Color exacto bg-blue-600 */
+      --bg-pastel-rgb: 100, 140, 180; /* Versión pastel (sin cambios) */
+    }
+    .nav-item-container.bg-red-600 {
+      --bg-color-rgb: 220, 38, 38; /* Color exacto bg-red-600 */
+      --bg-pastel-rgb: 200, 90, 85; /* Versión pastel (sin cambios) */
+    }
+    .nav-item-container.bg-yellow-500 {
+      --bg-color-rgb: 234, 179, 8; /* Color exacto bg-yellow-500 */
+      --bg-pastel-rgb: 210, 150, 60; /* Versión pastel (sin cambios) */
+    }
+    .nav-item-container.bg-white {
+      --bg-color-rgb: 255, 255, 255; /* Blanco exacto */
+      --bg-pastel-rgb: 180, 180, 180; /* Gris más oscuro (sin cambios) */
+    }
+    .nav-item-container.bg-green-500 {
+      --bg-color-rgb: 34, 197, 94; /* Color exacto bg-green-500 */
+      --bg-pastel-rgb: 140, 180, 150; /* Versión pastel (sin cambios) */
+    }
+    .nav-item-container.bg-teal-500 {
+      --bg-color-rgb: 20, 184, 166; /* Color exacto bg-teal-500 */
+      --bg-pastel-rgb: 45, 212, 191; /* Versión pastel (sin cambios) */
+      background-color: rgba(20, 184, 166, 0.9) !important;
+    }
+    .nav-item-container.bg-purple-800 {
+      --bg-color-rgb: 107, 33, 168; /* Color exacto bg-purple-800 */
+      --bg-pastel-rgb: 130, 115, 160; /* Versión pastel (sin cambios) */
+    }
+    .nav-item-container.bg-gray-500 {
+      --bg-color-rgb: 107, 114, 128; /* Color exacto bg-gray-500 */
+      --bg-pastel-rgb: 180, 180, 180; /* Versión pastel (sin cambios) */
+    }
+
+    .nav-item-container.active {
+      height: 40px;
+      transform: translateX(8px);
+      background-color: rgba(var(--bg-color-rgb, 0, 0, 0), 0.9) !important;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .nav-content {
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      height: auto;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .nav-number {
+      font-size: 12px; /* Reducido un 30% aproximadamente (de 14px) */
+      margin-right: 4px;
+      margin-bottom: 0;
+      margin-top: 2px; /* Ajustar a 2px desde el top, igual que en desktop */
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .nav-link {
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: visible; /* Cambiar de hidden a visible para mostrar todo el texto */
+      text-overflow: clip; /* Cambiar de ellipsis a clip */
+      max-width: none; /* Eliminar restricción de ancho máximo */
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Especial para nav-card 00 (RAG) en móvil */
+    .nav-item-container[data-section='rag'] .nav-number,
+    .nav-item-container[data-section='rag'] .nav-link {
+      color: #ffffff !important; /* Texto blanco en móvil también */
+    }
+
+    /* Ocultar el punto en vista móvil */
+    .progress-indicator {
+      display: none;
+    }
+
+    .nav-item-container.active .progress-indicator {
+      display: none;
+    }
+  }
+
+  /* Estilos para el logo en la nav-card */
+  .nav-link-container {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+
+  .nav-logo {
+    height: 16px;
+    width: auto;
+    margin-left: 8px;
+    transition: all 0.3s ease;
+  }
+
+  /* Vista móvil */
+  @media (max-width: 768px) {
+    .nav-link-container {
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-logo {
+      height: 14px;
+      margin-left: 4px;
+    }
+  }
+</style>
+
+<script>
+  // Obtener todos los enlaces de navegación, contenedores y secciones
+  const navItemContainers = document.querySelectorAll<HTMLElement>('.nav-item-container');
+  const navLinks = document.querySelectorAll<HTMLAnchorElement>('.nav-item-container .nav-link');
+  const sections = document.querySelectorAll<HTMLElement>('section.content-section');
+
+  // Agrupar secciones por su relación con los IDs del menú
+  const sectionGroups: Record<string, HTMLElement[]> = {};
+
+  // Primero inicializar todos los grupos para cada nav-item-container
+  navItemContainers.forEach((container) => {
+    const navSectionId = container.getAttribute('data-section');
+    if (navSectionId) {
+      sectionGroups[navSectionId] = [];
+    }
+  });
+
+  // Ahora asignar cada sección al grupo correspondiente
+  sections.forEach((section) => {
+    const sectionId = section.id;
+    // Buscar a qué grupo pertenece esta sección
+    for (const navId in sectionGroups) {
+      if (sectionId === navId || sectionId.startsWith(navId + '-')) {
+        sectionGroups[navId].push(section);
+        break;
+      }
+    }
+  });
+
+  // Función para obtener la altura total de un grupo de secciones
+  function getTotalGroupHeight(groupPrefix: string): number {
+    const groupSections = sectionGroups[groupPrefix];
+    if (!groupSections || groupSections.length === 0) return 0;
+    const firstSection = groupSections[0];
+    const lastSection = groupSections[groupSections.length - 1];
+    // Calcular la distancia desde la parte superior de la primera hasta la parte inferior de la última sección del grupo
+    return lastSection.offsetTop + lastSection.offsetHeight - firstSection.offsetTop;
+  }
+
+  // Función para sincronizar el desplazamiento horizontal con el scroll vertical
+  function syncHorizontalScroll() {
+    const isMobileView = window.innerWidth <= 768;
+    if (!isMobileView) return;
+
+    // Obtener el contenedor principal donde están las tarjetas de navegación
+    const navContainer = document.querySelector('.nav-item-container')?.parentElement;
+    if (!navContainer) return;
+
+    // Calcular el progreso total del scroll en la página
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const scrollProgress = Math.max(0, Math.min(1, scrollTop / scrollHeight));
+
+    // Calcular la posición horizontal máxima del scroll
+    const maxScrollLeft = navContainer.scrollWidth - navContainer.clientWidth;
+
+    // Aplicar el desplazamiento horizontal basado en el progreso del scroll vertical
+    const targetScrollLeft = scrollProgress * maxScrollLeft;
+
+    // Usar scrollTo sin behavior: 'smooth' para un seguimiento más preciso
+    navContainer.scrollTo({
+      left: targetScrollLeft,
+      behavior: 'auto', // Usamos 'auto' para sincronización instantánea
+    });
+  }
+
+  // Función para asegurar que la NavCard activa esté visible en vista desktop
+  function ensureActiveNavCardVisible(activeContainer: HTMLElement) {
+    const isMobileView = window.innerWidth <= 768;
+    if (isMobileView) return; // En móvil ya manejamos esto con syncHorizontalScroll
+
+    // En escritorio, necesitamos asegurar que la NavCard activa esté visible en el scroll vertical
+    const sidebar = document.querySelector('.sidebar');
+    if (!sidebar) return;
+
+    // Calcular posición de la NavCard activa relativa al sidebar
+    const containerRect = activeContainer.getBoundingClientRect();
+    const sidebarRect = sidebar.getBoundingClientRect();
+
+    // Verificar si la NavCard está fuera de la vista del sidebar
+    const isAbove = containerRect.top < sidebarRect.top;
+    const isBelow = containerRect.bottom > sidebarRect.bottom;
+
+    if (isAbove || isBelow) {
+      // Calcular la posición ideal de scroll para centrar la NavCard
+      const containerTop = activeContainer.offsetTop;
+      const sidebarHeight = sidebar.clientHeight;
+      const containerHeight = activeContainer.clientHeight;
+
+      // Scroll que pone la NavCard en el centro del sidebar
+      const targetScrollTop = containerTop - sidebarHeight / 2 + containerHeight / 2;
+
+      // Aplicar scroll suave
+      sidebar.scrollTo({
+        top: targetScrollTop,
+        behavior: 'smooth',
+      });
+    }
+  }
+
+  // Función para actualizar el estado de los elementos de navegación
+  function updateNavState(): void {
+    let currentSectionId: string | null = null;
+    let visibleSection: HTMLElement | null = null;
+    let activeNavContainer: HTMLElement | null = null;
+
+    // Encontrar la sección actualmente más visible en el viewport
+    let maxVisibleHeight = 0;
+    sections.forEach((section) => {
+      const rect = section.getBoundingClientRect();
+      const visibleHeight = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+      if (visibleHeight > maxVisibleHeight) {
+        maxVisibleHeight = visibleHeight;
+        currentSectionId = section.id;
+        visibleSection = section;
+      }
+    });
+
+    // Calcular la altura total de todos los grupos para poder normalizar
+    let totalHeightAllGroups = 0;
+    let maxSectionCount = 0;
+    const groupHeights: Record<string, number> = {};
+
+    for (const navId in sectionGroups) {
+      const totalGroupHeight = getTotalGroupHeight(navId);
+      groupHeights[navId] = totalGroupHeight;
+      totalHeightAllGroups += totalGroupHeight;
+      const sectionCount = sectionGroups[navId].length;
+      if (sectionCount > maxSectionCount) {
+        maxSectionCount = sectionCount;
+      }
+    }
+
+    // Calcular la altura mínima y máxima permitida para los elementos de navegación
+    const minNavHeight = 100; // Reducido de 100px a 60px para mostrar más navCards
+    const maxNavHeight = 450; // Reducido de 220px a 150px
+    // Valores para ancho en vista móvil
+    const minNavWidth = 120; // px
+    const maxNavWidth = 500; // px
+    // Determinar si estamos en vista móvil
+    const isMobileView = window.innerWidth <= 768;
+
+    // Llamar a la sincronización horizontal si estamos en vista móvil
+    if (isMobileView) {
+      syncHorizontalScroll();
+    }
+
+    navItemContainers.forEach((container) => {
+      const navSectionId = container.getAttribute('data-section');
+      const progressIndicator = container.querySelector<HTMLElement>('.progress-indicator');
+      const navLink = container.querySelector<HTMLElement>('.nav-link');
+
+      if (!navSectionId) return;
+
+      // Comprobar si es la sección "usage" que queremos eliminar
+      if (navSectionId === 'usage') {
+        container.style.display = 'none'; // Ocultar la sección "usage"
+        return;
+      }
+
+      // Eliminar clases activas
+      container.classList.remove('active');
+
+      // Ocultar indicador de progreso
+      if (progressIndicator) {
+        progressIndicator.style.opacity = '0';
+      }
+
+      // Restablecer dimensiones cuando no está activo
+      if (isMobileView) {
+        container.style.width = `${minNavWidth}px`;
+        container.style.height = '40px'; // Altura fija en móvil establecida por JS
+      } else {
+        container.style.height = `${minNavHeight}px`;
+        container.style.width = ''; // Usar el valor del CSS
+      }
+
+      // Determinar si esta sección del menú está activa
+      let isActive = false;
+      if (currentSectionId) {
+        isActive =
+          currentSectionId === navSectionId || currentSectionId.startsWith(navSectionId + '-');
+      }
+
+      if (isActive) {
+        container.classList.add('active');
+        activeNavContainer = container; // Guardar referencia a la NavCard activa
+
+        if (visibleSection && progressIndicator) {
+          // Obtener el grupo de secciones para este ID de menú
+          const groupSections = sectionGroups[navSectionId];
+
+          if (groupSections && groupSections.length > 0) {
+            // Calcular altura proporcional basada en:
+            // 1. La altura total del grupo en relación con todos los grupos
+            // 2. El número de secciones en el grupo
+            const groupHeight = groupHeights[navSectionId] || 0;
+            const sectionCount = groupSections.length;
+
+            // Cálculo ponderado según tipo de vista
+            const heightRatio = groupHeight / totalHeightAllGroups;
+            const countRatio = sectionCount / maxSectionCount;
+            let weightedRatio;
+
+            if (isMobileView) {
+              // En móvil priorizar el número de secciones por sobre la altura
+              weightedRatio = heightRatio * 0.2 + countRatio * 1.8;
+            } else {
+              // En desktop priorizar más la altura por sobre el número de secciones
+              weightedRatio = heightRatio * 0.9 + countRatio * 0.4;
+            }
+
+            // Calcular dimensiones finales
+            const calculatedHeight = minNavHeight + weightedRatio * (maxNavHeight - minNavHeight);
+            const calculatedWidth = minNavWidth + weightedRatio * (maxNavWidth - minNavWidth);
+
+            const containerHeight = Math.min(
+              Math.max(calculatedHeight, minNavHeight),
+              maxNavHeight
+            );
+
+            const containerWidth = Math.min(Math.max(calculatedWidth, minNavWidth), maxNavWidth);
+
+            // Aplicar dimensiones según el tipo de vista
+            if (isMobileView) {
+              // Vista móvil: ancho variable, altura fija
+              container.style.width = `${Math.round(containerWidth)}px`;
+              container.style.minWidth = `${Math.round(containerWidth)}px`; // También establecer min-width
+              container.style.height = '40px'; // Altura fija en móvil
+
+              // Para marcar la sección activa cuando se hace clic manualmente
+              if (container.hasAttribute('data-user-clicked')) {
+                // Eliminar el atributo después de procesarlo
+                container.removeAttribute('data-user-clicked');
+              }
+            } else {
+              // Vista desktop: ancho fijo, altura variable
+              container.style.height = `${Math.round(containerHeight)}px`;
+              container.style.width = ''; // Valor CSS
+              container.style.minWidth = ''; // Resetear min-width
+            }
+
+            // Mostrar el indicador de progreso
+            progressIndicator.style.opacity = '1';
+
+            // Calcular el progreso del scroll para este grupo
+            const firstSection = groupSections[0];
+            const lastSection = groupSections[groupSections.length - 1];
+            const scrollPosition = window.scrollY - firstSection.offsetTop;
+            const totalHeight =
+              lastSection.offsetTop + lastSection.offsetHeight - firstSection.offsetTop;
+            const scrollProgress = Math.max(0, Math.min(1, scrollPosition / totalHeight));
+
+            // Aplicar el progreso al indicador
+            if (isMobileView) {
+              // Ocultamos completamente el indicador en vista móvil
+              progressIndicator.style.display = 'none';
+            } else {
+              // En desktop mostramos y movemos el punto verticalmente
+              progressIndicator.style.display = '';
+              const dotPosition =
+                scrollProgress * (containerHeight - progressIndicator.offsetHeight);
+              progressIndicator.style.top = `${dotPosition}px`;
+              progressIndicator.style.transform = ''; // Limpiar cualquier transform
+            }
+          }
+        }
+      }
+    });
+
+    // Asegurar que la NavCard activa sea visible
+    if (activeNavContainer) {
+      ensureActiveNavCardVisible(activeNavContainer);
+    }
+  }
+
+  // Event listeners
+  window.addEventListener('scroll', updateNavState);
+  window.addEventListener('load', updateNavState);
+  window.addEventListener('resize', updateNavState);
+
+  // También ejecutar syncHorizontalScroll directamente cuando se detecta un scroll
+  window.addEventListener('scroll', syncHorizontalScroll);
+
+  // Configurar el contenedor padre para permitir scroll horizontal en móvil
+  function setupMobileScroll() {
+    if (window.innerWidth <= 768) {
+      const navContainer = document.querySelector('.nav-item-container')?.parentElement;
+      if (navContainer) {
+        navContainer.style.display = 'flex';
+        navContainer.style.flexWrap = 'nowrap';
+        navContainer.style.overflowX = 'auto';
+        navContainer.style.scrollbarWidth = 'none'; // Firefox
+        // Usar asignación como string indexada en lugar de la notación de punto para msOverflowStyle
+        (navContainer.style as any)['msOverflowStyle'] = 'none'; // IE/Edge
+        navContainer.style.width = '100%';
+        navContainer.style.paddingBottom = '12px'; // Espacio para scroll
+
+        // Ocultar scrollbar en WebKit (Chrome, Safari)
+        const styleEl = document.createElement('style');
+        styleEl.textContent = `
+          ${navContainer.tagName.toLowerCase()}${navContainer.id ? '#' + navContainer.id : ''} {
+            scrollbar-width: none;
+          }
+          ${navContainer.tagName.toLowerCase()}${navContainer.id ? '#' + navContainer.id : ''}::-webkit-scrollbar {
+            display: none;
+          }
+        `;
+        document.head.appendChild(styleEl);
+      }
+    }
+  }
+
+  // Llamar a esta función después de cargar la página
+  window.addEventListener('load', setupMobileScroll);
+  window.addEventListener('resize', setupMobileScroll);
+
+  // Agregar funcionalidad para hacer clickeable toda la tarjeta
+  navItemContainers.forEach((container) => {
+    container.addEventListener('click', (e) => {
+      // Prevenir navegación si el clic fue directamente en el enlace
+      if (!(e.target as Element).closest('.nav-link')) {
+        e.preventDefault();
+
+        // Marcar que esto fue un clic de usuario
+        container.setAttribute('data-user-clicked', 'true');
+
+        const link = container.querySelector<HTMLAnchorElement>('.nav-link');
+        const targetId = link?.getAttribute('href')?.substring(1);
+
+        if (targetId) {
+          // Modificado: buscar primero el -intro, luego el -part1
+          const targetElement =
+            document.getElementById(`${targetId}-intro`) ||
+            document.getElementById(`${targetId}-part1`) ||
+            document.getElementById(targetId) ||
+            document.getElementById(`${targetId}-home`);
+
+          if (targetElement) {
+            targetElement.scrollIntoView({ behavior: 'smooth' });
+            setTimeout(updateNavState, 700);
+          }
+        }
+      }
+    });
+  });
+
+  // Smooth scroll para los enlaces de navegación (mantener para compatibilidad)
+  navLinks.forEach((link) => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetId = link.getAttribute('href')?.substring(1);
+
+      if (targetId) {
+        // Modificado: buscar primero el -intro, luego el -part1
+        const targetElement =
+          document.getElementById(`${targetId}-intro`) ||
+          document.getElementById(`${targetId}-part1`) ||
+          document.getElementById(targetId) ||
+          document.getElementById(`${targetId}-home`);
+
+        if (targetElement) {
+          targetElement.scrollIntoView({ behavior: 'smooth' });
+          setTimeout(updateNavState, 700);
+        }
+      }
+    });
+  });
+</script>

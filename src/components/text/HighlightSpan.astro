@@ -1,0 +1,146 @@
+---
+// Propiedades para controlar el resaltado
+export interface Props {
+  backgroundColor?: string; // Color de fondo (único color)
+  darkBackgroundColor?: string; // Color de fondo para modo oscuro
+  textColor?: string; // Color del texto en modo light
+  darkTextColor?: string; // Color del texto en modo dark
+  className?: string;
+  animated?: boolean; // Control de animación
+  animationType?: 'flow' | 'reveal'; // Tipo de animación: flujo o revelación
+  animationDelay?: string; // Retraso de la animación
+  animationDuration?: string; // Duración de la animación
+}
+
+// Valores por defecto
+const {
+  backgroundColor = 'transparent', // Ahora transparente por defecto
+  darkBackgroundColor = 'transparent', // Ahora transparente por defecto
+  textColor = '#85E0F2', // Ahora el color azul se aplica al texto
+  darkTextColor = '#6BD4E9', // Versión oscura para el texto
+  className = '',
+  animated = true, // Por defecto, el texto será animado
+  animationType = 'reveal', // Por defecto, usamos la animación de revelación
+  animationDelay = '0.5s', // Retraso predeterminado
+  animationDuration = '2s', // Duración predeterminada
+} = Astro.props;
+
+// Crear clases dinámicas
+const animationClass = animated
+  ? animationType === 'flow'
+    ? 'flow-animation'
+    : 'reveal-animation'
+  : '';
+---
+
+<span class={`highlight-span highlight ${animationClass} ${className}`}>
+  <slot />
+</span>
+
+<style
+  define:vars={{
+    backgroundColor,
+    darkBackgroundColor,
+    textColor,
+    darkTextColor,
+    animationDelay,
+    animationDuration,
+  }}
+>
+  .highlight-span {
+    color: var(--textColor); /* El color azul se aplica directamente al texto */
+    font-weight: inherit; /* Heredar el peso de la fuente del padre */
+    padding: 0.1em 0.25em;
+    border-radius: 0.2em;
+    display: inline; /* Cambiado a inline para mantener la alineación de texto */
+    position: relative;
+    overflow: visible; /* Permitir que el contenido fluya naturalmente */
+    isolation: isolate;
+    vertical-align: baseline; /* Alineación vertical en la línea base */
+    box-sizing: border-box;
+    line-height: inherit; /* Heredar la altura de línea del padre */
+    margin: 0;
+  }
+
+  /* Estilos para la versión no animada (aplicación directa del color de texto) */
+  .highlight-span:not(.flow-animation):not(.reveal-animation) {
+    background-color: var(--backgroundColor);
+  }
+
+  /* Animación de flujo (ahora para el texto) */
+  .highlight-span.flow-animation {
+    background-color: var(--backgroundColor);
+    animation: pulseTextAnimation var(--animationDuration) ease infinite alternate;
+  }
+
+  @keyframes pulseTextAnimation {
+    0% {
+      text-shadow: 0 0 0 rgba(133, 224, 242, 0);
+    }
+    100% {
+      text-shadow: 0 0 8px rgba(133, 224, 242, 0.8);
+    }
+  }
+
+  /* Animación de revelación para el texto */
+  .highlight-span.reveal-animation {
+    color: transparent;
+    background-color: transparent;
+  }
+
+  /* Pseudo-elemento para la animación de revelación del texto */
+  .highlight-span.reveal-animation::before {
+    content: attr(data-content);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    color: var(--textColor);
+    background-color: transparent;
+    z-index: 1;
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path var(--animationDuration) ease-out;
+    transition-delay: var(--animationDelay);
+  }
+
+  /* Versión para modo oscuro */
+  html[data-theme='dark'] .highlight-span:not(.flow-animation):not(.reveal-animation) {
+    color: var(--darkTextColor);
+  }
+
+  /* Versión oscura con animación de flujo */
+  html[data-theme='dark'] .highlight-span.flow-animation {
+    color: var(--darkTextColor);
+    animation: darkPulseTextAnimation var(--animationDuration) ease infinite alternate;
+  }
+
+  @keyframes darkPulseTextAnimation {
+    0% {
+      text-shadow: 0 0 0 rgba(107, 212, 233, 0);
+    }
+    100% {
+      text-shadow: 0 0 8px rgba(107, 212, 233, 0.8);
+    }
+  }
+
+  /* Versión oscura con animación de revelación */
+  html[data-theme='dark'] .highlight-span.reveal-animation::before {
+    color: var(--darkTextColor);
+  }
+
+  /* Asegurar que el pseudo-elemento se anima correctamente en todos los navegadores */
+  html .highlight-span.reveal-animation::before {
+    animation: revealText var(--animationDuration) ease-out forwards;
+    animation-delay: var(--animationDelay);
+  }
+
+  @keyframes revealText {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+</style>

@@ -1,0 +1,23 @@
+---
+import SplashCursor from './SplashCursor.jsx';
+---
+
+<div class="splash-cursor-global-container">
+  <SplashCursor client:load />
+</div>
+
+<style>
+  .splash-cursor-global-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1000;
+    pointer-events: none; /* Permite que los clics pasen a través del contenedor */
+    overflow: hidden;
+    background-color: transparent;
+    border: none;
+    padding: 0;
+  }
+</style>

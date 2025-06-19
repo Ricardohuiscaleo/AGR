@@ -1,0 +1,169 @@
+---
+/**
+ * GlassPanel.astro - Componente reutilizable para efectos de glassmorphism
+ *
+ * Propiedades:
+ * - intensity: 'light', 'medium', 'strong' - Intensidad del efecto de vidrio/cristal
+ * - color: Color base para el panel (por defecto 'auto', que usa colores del tema)
+ * - border: Si debe mostrar borde (true/false)
+ * - rounded: Tamaño del borde redondeado ('none', 'sm', 'md', 'lg', 'full')
+ * - shadow: Intensidad de la sombra ('none', 'sm', 'md', 'lg')
+ * - class: Clases adicionales para el componente
+ */
+
+interface Props {
+  intensity?: 'light' | 'medium' | 'strong';
+  color?: string;
+  border?: boolean;
+  rounded?: 'none' | 'sm' | 'md' | 'lg' | 'full';
+  shadow?: 'none' | 'sm' | 'md' | 'lg';
+  class?: string;
+}
+
+// Valores por defecto
+const {
+  intensity = 'medium',
+  color = 'auto',
+  border = false,
+  rounded = 'md',
+  shadow = 'md',
+  class: className = '',
+} = Astro.props;
+
+// Construir clases basadas en las propiedades
+const intensityClasses = {
+  light: 'glass-light',
+  medium: 'glass-medium',
+  strong: 'glass-strong',
+};
+
+const roundedClasses = {
+  none: 'rounded-none',
+  sm: 'rounded-sm',
+  md: 'rounded-md',
+  lg: 'rounded-lg',
+  full: 'rounded-full',
+};
+
+const shadowClasses = {
+  none: 'shadow-none',
+  sm: 'glass-shadow-sm',
+  md: 'glass-shadow-md',
+  lg: 'glass-shadow-lg',
+};
+
+// Construir la clase final
+const glassClass = [
+  'glass-panel',
+  intensityClasses[intensity],
+  roundedClasses[rounded],
+  shadowClasses[shadow],
+  border ? 'glass-border' : '',
+  color !== 'auto' ? `glass-color-${color}` : '',
+  className,
+]
+  .filter(Boolean)
+  .join(' ');
+---
+
+<div class={glassClass}>
+  <slot />
+</div>
+
+<style>
+  /* Estilos base para el panel de vidrio */
+  .glass-panel {
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Intensidad del efecto */
+  .glass-light {
+    background-color: var(--glass-bg-light, rgba(20, 20, 30, 0.4));
+    backdrop-filter: saturate(180%) blur(var(--glass-blur-light, 5px));
+    -webkit-backdrop-filter: saturate(180%) blur(var(--glass-blur-light, 5px));
+  }
+
+  .glass-medium {
+    background-color: var(--glass-bg-medium, rgba(15, 15, 25, 0.6));
+    backdrop-filter: saturate(180%) blur(var(--glass-blur-medium, 10px));
+    -webkit-backdrop-filter: saturate(180%) blur(var(--glass-blur-medium, 10px));
+  }
+
+  .glass-strong {
+    background-color: var(--glass-bg-strong, rgba(10, 10, 20, 0.8));
+    backdrop-filter: saturate(180%) blur(var(--glass-blur-strong, 15px));
+    -webkit-backdrop-filter: saturate(180%) blur(var(--glass-blur-strong, 15px));
+  }
+
+  /* Bordes */
+  .glass-border {
+    border: 1px solid var(--glass-border-color, rgba(50, 50, 70, 0.2));
+  }
+
+  /* Sombras */
+  .glass-shadow-sm {
+    box-shadow: 0 2px 5px var(--glass-shadow-color, rgba(0, 0, 0, 0.08));
+  }
+
+  .glass-shadow-md {
+    box-shadow: 0 4px 10px var(--glass-shadow-color, rgba(0, 0, 0, 0.12));
+  }
+
+  .glass-shadow-lg {
+    box-shadow: 0 10px 25px var(--glass-shadow-color, rgba(0, 0, 0, 0.15));
+  }
+
+  /* Redondeados (usando Tailwind) */
+  .rounded-none {
+    border-radius: 0;
+  }
+
+  .rounded-sm {
+    border-radius: 0.125rem;
+  }
+
+  .rounded-md {
+    border-radius: 0.375rem;
+  }
+
+  .rounded-lg {
+    border-radius: 0.5rem;
+  }
+
+  .rounded-full {
+    border-radius: 9999px;
+  }
+
+  /* Soporte para tema claro/oscuro */
+  :root {
+    --glass-blur-light: 5px;
+    --glass-blur-medium: 10px;
+    --glass-blur-strong: 15px;
+  }
+
+  /* Optimización para dispositivos con problemas de rendimiento */
+  @supports not (backdrop-filter: blur(10px)) {
+    .glass-light,
+    .glass-medium,
+    .glass-strong {
+      background-color: rgba(255, 255, 255, 0.4);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    /* Para tema oscuro */
+    :global(html[data-theme='dark']) .glass-light,
+    :global(html[data-theme='dark']) .glass-medium,
+    :global(html[data-theme='dark']) .glass-strong {
+      background-color: rgba(10, 10, 15, 0.85);
+    }
+  }
+
+  /* Media query para dispositivos con características reducidas */
+  @media (prefers-reduced-motion: reduce) {
+    .glass-panel {
+      transition: none;
+    }
+  }
+</style>
