@@ -1,5 +1,5 @@
 import { parse, stringify } from 'devalue';
-import { R as REDIRECT_STATUS_CODES, A as AstroError, i as ActionsReturnedInvalidDataError, D as DEFAULT_404_COMPONENT } from './astro/server_DLpc0srX.mjs';
+import { R as REDIRECT_STATUS_CODES, A as AstroError, i as ActionsReturnedInvalidDataError, D as DEFAULT_404_COMPONENT } from './astro/server_DQ0m6GiM.mjs';
 import { escape } from 'html-escaper';
 
 const ACTION_QUERY_PARAMS$1 = {
@@ -9,21 +9,46 @@ const ACTION_RPC_ROUTE_PATTERN = "/_actions/[...path]";
 const __vite_import_meta_env__ = {"ASSETS_PREFIX": undefined, "BASE_URL": "/", "DEV": false, "MODE": "production", "PROD": true, "PUBLIC_GOOGLE_CALENDAR_API_KEY": "tu_api_key_aqui", "PUBLIC_GOOGLE_OAUTH_CLIENT_ID": "531902921465-4j3o9nhpsaqd4lkq453jfvg1so52pa2l.apps.googleusercontent.com", "PUBLIC_N8N_API_URL": "http://localhost:5678", "PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6bnZha3B1dXhucGRob2Vqcm9nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkwODg0MTAsImV4cCI6MjA2NDY2NDQxMH0.OxbLYkjlgpWFnqd28gaZSwar_NQ6_qUS3U76bqbcXVg", "PUBLIC_SUPABASE_URL": "https://uznvakpuuxnpdhoejrog.supabase.co", "SITE": undefined, "SSR": true};
 const ACTION_QUERY_PARAMS = ACTION_QUERY_PARAMS$1;
 const codeToStatusMap = {
-  // Implemented from tRPC error code table
-  // https://trpc.io/docs/server/error-handling#error-codes
+  // Implemented from IANA HTTP Status Code Registry
+  // https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
   BAD_REQUEST: 400,
   UNAUTHORIZED: 401,
+  PAYMENT_REQUIRED: 402,
   FORBIDDEN: 403,
   NOT_FOUND: 404,
-  TIMEOUT: 405,
+  METHOD_NOT_ALLOWED: 405,
+  NOT_ACCEPTABLE: 406,
+  PROXY_AUTHENTICATION_REQUIRED: 407,
+  REQUEST_TIMEOUT: 408,
   CONFLICT: 409,
+  GONE: 410,
+  LENGTH_REQUIRED: 411,
   PRECONDITION_FAILED: 412,
-  PAYLOAD_TOO_LARGE: 413,
+  CONTENT_TOO_LARGE: 413,
+  URI_TOO_LONG: 414,
   UNSUPPORTED_MEDIA_TYPE: 415,
+  RANGE_NOT_SATISFIABLE: 416,
+  EXPECTATION_FAILED: 417,
+  MISDIRECTED_REQUEST: 421,
   UNPROCESSABLE_CONTENT: 422,
+  LOCKED: 423,
+  FAILED_DEPENDENCY: 424,
+  TOO_EARLY: 425,
+  UPGRADE_REQUIRED: 426,
+  PRECONDITION_REQUIRED: 428,
   TOO_MANY_REQUESTS: 429,
-  CLIENT_CLOSED_REQUEST: 499,
-  INTERNAL_SERVER_ERROR: 500
+  REQUEST_HEADER_FIELDS_TOO_LARGE: 431,
+  UNAVAILABLE_FOR_LEGAL_REASONS: 451,
+  INTERNAL_SERVER_ERROR: 500,
+  NOT_IMPLEMENTED: 501,
+  BAD_GATEWAY: 502,
+  SERVICE_UNAVAILABLE: 503,
+  GATEWAY_TIMEOUT: 504,
+  HTTP_VERSION_NOT_SUPPORTED: 505,
+  VARIANT_ALSO_NEGOTIATES: 506,
+  INSUFFICIENT_STORAGE: 507,
+  LOOP_DETECTED: 508,
+  NETWORK_AUTHENTICATION_REQUIRED: 511
 };
 const statusToCodeMap = Object.entries(codeToStatusMap).reduce(
   // reverse the key-value pairs

@@ -1,15 +1,15 @@
-import { u as ROUTE_TYPE_HEADER, v as REROUTE_DIRECTIVE_HEADER, D as DEFAULT_404_COMPONENT, A as AstroError, w as ActionNotFoundError, x as clientAddressSymbol, y as LocalsNotAnObject, z as REROUTABLE_STATUS_CODES, B as responseSentSymbol } from './astro/server_DLpc0srX.mjs';
+import { x as ROUTE_TYPE_HEADER, y as REROUTE_DIRECTIVE_HEADER, D as DEFAULT_404_COMPONENT, A as AstroError, z as ActionNotFoundError, B as clientAddressSymbol, C as LocalsNotAnObject, G as REROUTABLE_STATUS_CODES, H as responseSentSymbol } from './astro/server_DQ0m6GiM.mjs';
 import { bold, red, yellow, dim, blue } from 'kleur/colors';
 import 'clsx';
 import 'cookie';
-import { D as DEFAULT_404_ROUTE, d as default404Instance, e as ensure404Route } from './astro-designed-error-pages_BZOxOS4q.mjs';
+import { D as DEFAULT_404_ROUTE, d as default404Instance, e as ensure404Route } from './astro-designed-error-pages_zLg3HgTj.mjs';
 import 'es-module-lexer';
 import buffer from 'node:buffer';
 import crypto$1 from 'node:crypto';
 import { Http2ServerResponse } from 'node:http2';
 import { f as fileExtension, j as joinPaths, s as slash, p as prependForwardSlash, r as removeTrailingForwardSlash, a as appendForwardSlash, c as collapseDuplicateTrailingSlashes, h as hasFileExtension } from './path_BuZodYwm.mjs';
-import { r as requestIs404Or500, i as isRequestServerIsland, n as notFound, a as redirectToFallback, b as redirectToDefaultLocale, c as requestHasLocale, d as normalizeTheLocale, e as defineMiddleware, S as SERVER_ISLAND_COMPONENT, f as SERVER_ISLAND_ROUTE, g as createEndpoint, R as RouteCache, s as sequence, h as findRouteToRewrite, m as matchRoute, j as RenderContext, P as PERSIST_SYMBOL, k as getSetCookiesFromResponse } from './index_CQy6cGLV.mjs';
-import { N as NOOP_MIDDLEWARE_FN } from './noop-middleware_DOlFTl3b.mjs';
+import { r as requestIs404Or500, i as isRequestServerIsland, n as notFound, a as redirectToFallback, b as redirectToDefaultLocale, c as requestHasLocale, d as normalizeTheLocale, e as defineMiddleware, S as SERVER_ISLAND_COMPONENT, f as SERVER_ISLAND_ROUTE, g as createEndpoint, R as RouteCache, s as sequence, h as findRouteToRewrite, m as matchRoute, j as RenderContext, P as PERSIST_SYMBOL, k as getSetCookiesFromResponse } from './index_BadUw_sG.mjs';
+import { N as NOOP_MIDDLEWARE_FN } from './noop-middleware_IY82JHhK.mjs';
 import nodePath, { posix } from 'node:path';
 import '@vercel/routing-utils';
 import './index_DfOMS8cV.mjs';
@@ -240,11 +240,11 @@ class Pipeline {
     } else if (this.middleware) {
       const middlewareInstance = await this.middleware();
       const onRequest = middlewareInstance.onRequest ?? NOOP_MIDDLEWARE_FN;
+      const internalMiddlewares = [onRequest];
       if (this.manifest.checkOrigin) {
-        this.resolvedMiddleware = sequence(createOriginCheckMiddleware(), onRequest);
-      } else {
-        this.resolvedMiddleware = onRequest;
+        internalMiddlewares.unshift(createOriginCheckMiddleware());
       }
+      this.resolvedMiddleware = sequence(...internalMiddlewares);
       return this.resolvedMiddleware;
     } else {
       this.resolvedMiddleware = NOOP_MIDDLEWARE_FN;
@@ -513,8 +513,7 @@ function redirectTemplate({
 }
 
 class AppPipeline extends Pipeline {
-  #manifestData;
-  static create(manifestData, {
+  static create({
     logger,
     manifest,
     runtimeMode,
@@ -542,7 +541,6 @@ class AppPipeline extends Pipeline {
       void 0,
       defaultRoutes
     );
-    pipeline.#manifestData = manifestData;
     return pipeline;
   }
   headElements(routeData) {
@@ -577,7 +575,8 @@ class AppPipeline extends Pipeline {
       routes: this.manifest?.routes.map((r) => r.routeData),
       trailingSlash: this.manifest.trailingSlash,
       buildFormat: this.manifest.buildFormat,
-      base: this.manifest.base
+      base: this.manifest.base,
+      outDir: this.manifest.outDir
     });
     const componentInstance = await this.getComponentByRoute(routeData);
     return { newUrl, pathname, componentInstance, routeData };
@@ -629,7 +628,7 @@ class App {
     };
     ensure404Route(this.#manifestData);
     this.#baseWithoutTrailingSlash = removeTrailingForwardSlash(this.#manifest.base);
-    this.#pipeline = this.#createPipeline(this.#manifestData, streaming);
+    this.#pipeline = this.#createPipeline(streaming);
     this.#adapterLogger = new AstroIntegrationLogger(
       this.#logger.options,
       this.#manifest.adapterName
@@ -641,12 +640,11 @@ class App {
   /**
    * Creates a pipeline by reading the stored manifest
    *
-   * @param manifestData
    * @param streaming
    * @private
    */
-  #createPipeline(manifestData, streaming = false) {
-    return AppPipeline.create(manifestData, {
+  #createPipeline(streaming = false) {
+    return AppPipeline.create({
       logger: this.#logger,
       manifest: this.#manifest,
       runtimeMode: "production",
@@ -932,7 +930,7 @@ class App {
         );
         if (statusURL.toString() !== request.url) {
           const response2 = await prerenderedErrorPageFetch(statusURL.toString());
-          const override = { status };
+          const override = { status, removeContentEncodingHeaders: true };
           return this.#mergeResponses(response2, originalResponse, override);
         }
       }
@@ -973,12 +971,18 @@ class App {
     return response;
   }
   #mergeResponses(newResponse, originalResponse, override) {
+    let newResponseHeaders = newResponse.headers;
+    if (override?.removeContentEncodingHeaders) {
+      newResponseHeaders = new Headers(newResponseHeaders);
+      newResponseHeaders.delete("Content-Encoding");
+      newResponseHeaders.delete("Content-Length");
+    }
     if (!originalResponse) {
       if (override !== void 0) {
         return new Response(newResponse.body, {
           status: override.status,
           statusText: newResponse.statusText,
-          headers: newResponse.headers
+          headers: newResponseHeaders
         });
       }
       return newResponse;
@@ -989,7 +993,7 @@ class App {
     } catch {
     }
     const mergedHeaders = new Map([
-      ...Array.from(newResponse.headers),
+      ...Array.from(newResponseHeaders),
       ...Array.from(originalResponse.headers)
     ]);
     const newHeaders = new Headers();

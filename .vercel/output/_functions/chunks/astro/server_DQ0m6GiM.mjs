@@ -2,9 +2,10 @@ import { bold } from 'kleur/colors';
 import { clsx } from 'clsx';
 import { escape } from 'html-escaper';
 import { decodeBase64, encodeHexUpperCase, encodeBase64, decodeHex } from '@oslojs/encoding';
+import { z } from 'zod';
 import 'cssesc';
 
-const ASTRO_VERSION = "5.6.1";
+const ASTRO_VERSION = "5.10.0";
 const REROUTE_DIRECTIVE_HEADER = "X-Astro-Reroute";
 const REWRITE_DIRECTIVE_HEADER_KEY = "X-Astro-Rewrite";
 const REWRITE_DIRECTIVE_HEADER_VALUE = "yes";
@@ -277,6 +278,23 @@ The static route '${to}' is rendered by the component
 HTML file, which can't be retrieved at runtime by Astro.`,
   hint: (component) => `Add \`export const prerender = false\` to the component '${component}', or use a Astro.redirect().`
 };
+const ExperimentalFontsNotEnabled = {
+  name: "ExperimentalFontsNotEnabled",
+  title: "Experimental fonts are not enabled",
+  message: "The Font component is used but experimental fonts have not been registered in the config.",
+  hint: "Check that you have enabled experimental fonts and also configured your preferred fonts."
+};
+const FontFamilyNotFound = {
+  name: "FontFamilyNotFound",
+  title: "Font family not found",
+  message: (family) => `No data was found for the \`"${family}"\` family passed to the \`<Font>\` component.`,
+  hint: "This is often caused by a typo. Check that your Font component is using a `cssVariable` specified in your config."
+};
+const CspNotEnabled = {
+  name: "CspNotEnabled",
+  title: "CSP feature isn't enabled",
+  message: "The `experimental.csp` configuration isn't enabled."
+};
 const ActionsReturnedInvalidDataError = {
   name: "ActionsReturnedInvalidDataError",
   title: "Action handler returned invalid data.",
@@ -293,13 +311,13 @@ const SessionStorageInitError = {
   name: "SessionStorageInitError",
   title: "Session storage could not be initialized.",
   message: (error, driver) => `Error when initializing session storage${driver ? ` with driver \`${driver}\`` : ""}. \`${error ?? ""}\``,
-  hint: "For more information, see https://docs.astro.build/en/reference/experimental-flags/sessions/"
+  hint: "For more information, see https://docs.astro.build/en/guides/sessions/"
 };
 const SessionStorageSaveError = {
   name: "SessionStorageSaveError",
   title: "Session data could not be saved.",
   message: (error, driver) => `Error when saving session data${driver ? ` with driver \`${driver}\`` : ""}. \`${error ?? ""}\``,
-  hint: "For more information, see https://docs.astro.build/en/reference/experimental-flags/sessions/"
+  hint: "For more information, see https://docs.astro.build/en/guides/sessions/"
 };
 
 function normalizeLF(code) {
@@ -579,6 +597,21 @@ function unescapeHTML(str) {
 const AstroJSX = "astro:jsx";
 function isVNode(vnode) {
   return vnode && typeof vnode === "object" && vnode[AstroJSX];
+}
+
+function isAstroComponentFactory(obj) {
+  return obj == null ? false : obj.isAstroComponentFactory === true;
+}
+function isAPropagatingComponent(result, factory) {
+  const hint = getPropagationHint(result, factory);
+  return hint === "in-tree" || hint === "self";
+}
+function getPropagationHint(result, factory) {
+  let hint = factory.propagation || "none";
+  if (factory.moduleId && result.componentMetadata.has(factory.moduleId) && hint === "none") {
+    hint = result.componentMetadata.get(factory.moduleId).propagation;
+  }
+  return hint;
 }
 
 const RenderInstructionSymbol = Symbol.for("astro:render");
@@ -869,27 +902,22 @@ function shorthash(text) {
   return sign + result;
 }
 
-function isAstroComponentFactory(obj) {
-  return obj == null ? false : obj.isAstroComponentFactory === true;
-}
-function isAPropagatingComponent(result, factory) {
-  let hint = factory.propagation || "none";
-  if (factory.moduleId && result.componentMetadata.has(factory.moduleId) && hint === "none") {
-    hint = result.componentMetadata.get(factory.moduleId).propagation;
-  }
-  return hint === "in-tree" || hint === "self";
-}
-
 const headAndContentSym = Symbol.for("astro.headAndContent");
 function isHeadAndContent(obj) {
   return typeof obj === "object" && obj !== null && !!obj[headAndContentSym];
 }
+function createThinHead() {
+  return {
+    [headAndContentSym]: true
+  };
+}
+
+const ISLAND_STYLES = "astro-island,astro-slot,astro-static-slot{display:contents}";
 
 var astro_island_prebuilt_dev_default = `(()=>{var A=Object.defineProperty;var g=(i,o,a)=>o in i?A(i,o,{enumerable:!0,configurable:!0,writable:!0,value:a}):i[o]=a;var l=(i,o,a)=>g(i,typeof o!="symbol"?o+"":o,a);{let i={0:t=>y(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},o=t=>{let[h,e]=t;return h in i?i[h](e):void 0},a=t=>t.map(o),y=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([h,e])=>[h,o(e)]));class f extends HTMLElement{constructor(){super(...arguments);l(this,"Component");l(this,"hydrator");l(this,"hydrate",async()=>{var b;if(!this.hydrator||!this.isConnected)return;let e=(b=this.parentElement)==null?void 0:b.closest("astro-island[ssr]");if(e){e.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let c=this.querySelectorAll("astro-slot"),n={},p=this.querySelectorAll("template[data-astro-template]");for(let r of p){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("data-astro-template")||"default"]=r.innerHTML,r.remove())}for(let r of c){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("name")||"default"]=r.innerHTML)}let u;try{u=this.hasAttribute("props")?y(JSON.parse(this.getAttribute("props"))):{}}catch(r){let s=this.getAttribute("component-url")||"<unknown>",v=this.getAttribute("component-export");throw v&&(s+=\` (export \${v})\`),console.error(\`[hydrate] Error parsing props for component \${s}\`,this.getAttribute("props"),r),r}let d,m=this.hydrator(this);d=performance.now(),await m(this.Component,u,n,{client:this.getAttribute("client")}),d&&this.setAttribute("client-render-time",(performance.now()-d).toString()),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))});l(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),c.disconnect(),this.childrenConnectedCallback()},c=new MutationObserver(()=>{var n;((n=this.lastChild)==null?void 0:n.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});c.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),c=this.getAttribute("client");if(Astro[c]===void 0){window.addEventListener(\`astro:\${c}\`,()=>this.start(),{once:!0});return}try{await Astro[c](async()=>{let n=this.getAttribute("renderer-url"),[p,{default:u}]=await Promise.all([import(this.getAttribute("component-url")),n?import(n):()=>()=>{}]),d=this.getAttribute("component-export")||"default";if(!d.includes("."))this.Component=p[d];else{this.Component=p;for(let m of d.split("."))this.Component=this.Component[m]}return this.hydrator=u,this.hydrate},e,this)}catch(n){console.error(\`[astro-island] Error hydrating \${this.getAttribute("component-url")}\`,n)}}attributeChangedCallback(){this.hydrate()}}l(f,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",f)}})();`;
 
 var astro_island_prebuilt_default = `(()=>{var A=Object.defineProperty;var g=(i,o,a)=>o in i?A(i,o,{enumerable:!0,configurable:!0,writable:!0,value:a}):i[o]=a;var d=(i,o,a)=>g(i,typeof o!="symbol"?o+"":o,a);{let i={0:t=>m(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},o=t=>{let[l,e]=t;return l in i?i[l](e):void 0},a=t=>t.map(o),m=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([l,e])=>[l,o(e)]));class y extends HTMLElement{constructor(){super(...arguments);d(this,"Component");d(this,"hydrator");d(this,"hydrate",async()=>{var b;if(!this.hydrator||!this.isConnected)return;let e=(b=this.parentElement)==null?void 0:b.closest("astro-island[ssr]");if(e){e.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let c=this.querySelectorAll("astro-slot"),n={},h=this.querySelectorAll("template[data-astro-template]");for(let r of h){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("data-astro-template")||"default"]=r.innerHTML,r.remove())}for(let r of c){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("name")||"default"]=r.innerHTML)}let p;try{p=this.hasAttribute("props")?m(JSON.parse(this.getAttribute("props"))):{}}catch(r){let s=this.getAttribute("component-url")||"<unknown>",v=this.getAttribute("component-export");throw v&&(s+=\` (export \${v})\`),console.error(\`[hydrate] Error parsing props for component \${s}\`,this.getAttribute("props"),r),r}let u;await this.hydrator(this)(this.Component,p,n,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))});d(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),c.disconnect(),this.childrenConnectedCallback()},c=new MutationObserver(()=>{var n;((n=this.lastChild)==null?void 0:n.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});c.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),c=this.getAttribute("client");if(Astro[c]===void 0){window.addEventListener(\`astro:\${c}\`,()=>this.start(),{once:!0});return}try{await Astro[c](async()=>{let n=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),n?import(n):()=>()=>{}]),u=this.getAttribute("component-export")||"default";if(!u.includes("."))this.Component=h[u];else{this.Component=h;for(let f of u.split("."))this.Component=this.Component[f]}return this.hydrator=p,this.hydrate},e,this)}catch(n){console.error(\`[astro-island] Error hydrating \${this.getAttribute("component-url")}\`,n)}}attributeChangedCallback(){this.hydrate()}}d(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();`;
 
-const ISLAND_STYLES = `<style>astro-island,astro-slot,astro-static-slot{display:contents}</style>`;
 function determineIfNeedsHydrationScript(result) {
   if (result._metadata.hasHydrationScript) {
     return false;
@@ -914,11 +942,43 @@ function getDirectiveScriptText(result, directive) {
 function getPrescripts(result, type, directive) {
   switch (type) {
     case "both":
-      return `${ISLAND_STYLES}<script>${getDirectiveScriptText(result, directive)};${process.env.NODE_ENV === "development" ? astro_island_prebuilt_dev_default : astro_island_prebuilt_default}</script>`;
+      return `<style>${ISLAND_STYLES}</style><script>${getDirectiveScriptText(result, directive)}</script><script>${process.env.NODE_ENV === "development" ? astro_island_prebuilt_dev_default : astro_island_prebuilt_default}</script>`;
     case "directive":
       return `<script>${getDirectiveScriptText(result, directive)}</script>`;
   }
-  return "";
+}
+
+function renderCspContent(result) {
+  const finalScriptHashes = /* @__PURE__ */ new Set();
+  const finalStyleHashes = /* @__PURE__ */ new Set();
+  for (const scriptHash of result.scriptHashes) {
+    finalScriptHashes.add(`'${scriptHash}'`);
+  }
+  for (const styleHash of result.styleHashes) {
+    finalStyleHashes.add(`'${styleHash}'`);
+  }
+  for (const styleHash of result._metadata.extraStyleHashes) {
+    finalStyleHashes.add(`'${styleHash}'`);
+  }
+  for (const scriptHash of result._metadata.extraScriptHashes) {
+    finalScriptHashes.add(`'${scriptHash}'`);
+  }
+  let directives = "";
+  if (result.directives.length > 0) {
+    directives = result.directives.join(";") + ";";
+  }
+  let scriptResources = "'self'";
+  if (result.scriptResources.length > 0) {
+    scriptResources = result.scriptResources.map((r) => `${r}`).join(" ");
+  }
+  let styleResources = "'self'";
+  if (result.styleResources.length > 0) {
+    styleResources = result.styleResources.map((r) => `${r}`).join(" ");
+  }
+  const strictDynamic = result.isStrictDynamic ? ` 'strict-dynamic'` : "";
+  const scriptSrc = `script-src ${scriptResources} ${Array.from(finalScriptHashes).join(" ")}${strictDynamic};`;
+  const styleSrc = `style-src ${styleResources} ${Array.from(finalStyleHashes).join(" ")};`;
+  return `${directives} ${scriptSrc} ${styleSrc}`;
 }
 
 const voidElementNames = /^(area|base|br|col|command|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)$/i;
@@ -991,6 +1051,12 @@ Make sure to use the static attribute syntax (\`${key}={value}\`) instead of the
   }
   if (value === "") {
     return markHTMLString(` ${key}`);
+  }
+  if (key === "popover" && typeof value === "boolean") {
+    return markHTMLString(value ? ` popover` : "");
+  }
+  if (key === "download" && typeof value === "boolean") {
+    return markHTMLString(value ? ` download` : "");
   }
   return markHTMLString(` ${key}="${toAttributeString(value, shouldEscape)}"`);
 }
@@ -1088,6 +1154,20 @@ const uniqueElements = (item, index, all) => {
 };
 function renderAllHeadContent(result) {
   result._metadata.hasRenderedHead = true;
+  let content = "";
+  if (result.shouldInjectCspMetaTags && result.cspDestination === "meta") {
+    content += renderElement$1(
+      "meta",
+      {
+        props: {
+          "http-equiv": "content-security-policy",
+          content: renderCspContent(result)
+        },
+        children: ""
+      },
+      false
+    );
+  }
   const styles = Array.from(result.styles).filter(uniqueElements).map(
     (style) => style.props.rel === "stylesheet" ? renderElement$1("link", style) : renderElement$1("style", style)
   );
@@ -1099,7 +1179,7 @@ function renderAllHeadContent(result) {
     return renderElement$1("script", script, false);
   });
   const links = Array.from(result.links).filter(uniqueElements).map((link) => renderElement$1("link", link, false));
-  let content = styles.join("\n") + links.join("\n") + scripts.join("\n");
+  content += styles.join("\n") + links.join("\n") + scripts.join("\n");
   if (result._metadata.extraHead.length > 0) {
     for (const part of result._metadata.extraHead) {
       content += part;
@@ -1112,6 +1192,94 @@ function renderHead() {
 }
 function maybeRenderHead() {
   return createRenderInstruction({ type: "maybe-head" });
+}
+
+const ALGORITHMS = {
+  "SHA-256": "sha256-",
+  "SHA-384": "sha384-",
+  "SHA-512": "sha512-"
+};
+const ALGORITHM_VALUES = Object.values(ALGORITHMS);
+z.enum(Object.keys(ALGORITHMS)).optional().default("SHA-256");
+z.custom((value) => {
+  if (typeof value !== "string") {
+    return false;
+  }
+  return ALGORITHM_VALUES.some((allowedValue) => {
+    return value.startsWith(allowedValue);
+  });
+});
+const ALLOWED_DIRECTIVES = [
+  "base-uri",
+  "child-src",
+  "connect-src",
+  "default-src",
+  "fenced-frame-src",
+  "font-src",
+  "form-action",
+  "frame-ancestors",
+  "frame-src",
+  "img-src",
+  "manifest-src",
+  "media-src",
+  "object-src",
+  "referrer",
+  "report-to",
+  "report-uri",
+  "require-trusted-types-for",
+  "sandbox",
+  "trusted-types",
+  "upgrade-insecure-requests",
+  "worker-src"
+];
+z.custom((value) => {
+  if (typeof value !== "string") {
+    return false;
+  }
+  return ALLOWED_DIRECTIVES.some((allowedValue) => {
+    return value.startsWith(allowedValue);
+  });
+});
+
+const ALGORITHM = "AES-GCM";
+async function decodeKey(encoded) {
+  const bytes = decodeBase64(encoded);
+  return crypto.subtle.importKey("raw", bytes, ALGORITHM, true, ["encrypt", "decrypt"]);
+}
+const encoder$1 = new TextEncoder();
+const decoder$1 = new TextDecoder();
+const IV_LENGTH = 24;
+async function encryptString(key, raw) {
+  const iv = crypto.getRandomValues(new Uint8Array(IV_LENGTH / 2));
+  const data = encoder$1.encode(raw);
+  const buffer = await crypto.subtle.encrypt(
+    {
+      name: ALGORITHM,
+      iv
+    },
+    key,
+    data
+  );
+  return encodeHexUpperCase(iv) + encodeBase64(new Uint8Array(buffer));
+}
+async function decryptString(key, encoded) {
+  const iv = decodeHex(encoded.slice(0, IV_LENGTH));
+  const dataArray = decodeBase64(encoded.slice(IV_LENGTH));
+  const decryptedBuffer = await crypto.subtle.decrypt(
+    {
+      name: ALGORITHM,
+      iv
+    },
+    key,
+    dataArray
+  );
+  const decryptedString = decoder$1.decode(decryptedBuffer);
+  return decryptedString;
+}
+async function generateCspDigest(data, algorithm) {
+  const hashBuffer = await crypto.subtle.digest(algorithm, encoder$1.encode(data));
+  const hash = encodeBase64(new Uint8Array(hashBuffer));
+  return `${ALGORITHMS[algorithm]}${hash}`;
 }
 
 const renderTemplateResultSym = Symbol.for("astro.renderTemplateResult");
@@ -1245,10 +1413,150 @@ function createSlotValueFromString(content) {
   };
 }
 
+const internalProps = /* @__PURE__ */ new Set([
+  "server:component-path",
+  "server:component-export",
+  "server:component-directive",
+  "server:defer"
+]);
+function containsServerDirective(props) {
+  return "server:component-directive" in props;
+}
+const SCRIPT_RE = /<\/script/giu;
+const COMMENT_RE = /<!--/gu;
+const SCRIPT_REPLACER = "<\\/script";
+const COMMENT_REPLACER = "\\u003C!--";
+function safeJsonStringify(obj) {
+  return JSON.stringify(obj).replace(SCRIPT_RE, SCRIPT_REPLACER).replace(COMMENT_RE, COMMENT_REPLACER);
+}
+function createSearchParams(componentExport, encryptedProps, slots) {
+  const params = new URLSearchParams();
+  params.set("e", componentExport);
+  params.set("p", encryptedProps);
+  params.set("s", slots);
+  return params;
+}
+function isWithinURLLimit(pathname, params) {
+  const url = pathname + "?" + params.toString();
+  const chars = url.length;
+  return chars < 2048;
+}
+class ServerIslandComponent {
+  result;
+  props;
+  slots;
+  displayName;
+  hostId;
+  islandContent;
+  constructor(result, props, slots, displayName) {
+    this.result = result;
+    this.props = props;
+    this.slots = slots;
+    this.displayName = displayName;
+  }
+  async init() {
+    const componentPath = this.props["server:component-path"];
+    const componentExport = this.props["server:component-export"];
+    const componentId = this.result.serverIslandNameMap.get(componentPath);
+    if (!componentId) {
+      throw new Error(`Could not find server component name`);
+    }
+    for (const key2 of Object.keys(this.props)) {
+      if (internalProps.has(key2)) {
+        delete this.props[key2];
+      }
+    }
+    const renderedSlots = {};
+    for (const name in this.slots) {
+      if (name !== "fallback") {
+        const content2 = await renderSlotToString(this.result, this.slots[name]);
+        renderedSlots[name] = content2.toString();
+      }
+    }
+    const key = await this.result.key;
+    const propsEncrypted = Object.keys(this.props).length === 0 ? "" : await encryptString(key, JSON.stringify(this.props));
+    const hostId = crypto.randomUUID();
+    const slash = this.result.base.endsWith("/") ? "" : "/";
+    let serverIslandUrl = `${this.result.base}${slash}_server-islands/${componentId}${this.result.trailingSlash === "always" ? "/" : ""}`;
+    const potentialSearchParams = createSearchParams(
+      componentExport,
+      propsEncrypted,
+      safeJsonStringify(renderedSlots)
+    );
+    const useGETRequest = isWithinURLLimit(serverIslandUrl, potentialSearchParams);
+    if (useGETRequest) {
+      serverIslandUrl += "?" + potentialSearchParams.toString();
+      this.result._metadata.extraHead.push(
+        markHTMLString(
+          `<link rel="preload" as="fetch" href="${serverIslandUrl}" crossorigin="anonymous">`
+        )
+      );
+    }
+    const method = useGETRequest ? (
+      // GET request
+      `let response = await fetch('${serverIslandUrl}');`
+    ) : (
+      // POST request
+      `let data = {
+	componentExport: ${safeJsonStringify(componentExport)},
+	encryptedProps: ${safeJsonStringify(propsEncrypted)},
+	slots: ${safeJsonStringify(renderedSlots)},
+};
+let response = await fetch('${serverIslandUrl}', {
+	method: 'POST',
+	body: JSON.stringify(data),
+});`
+    );
+    const content = `${method}replaceServerIsland('${hostId}', response);`;
+    if (this.result.cspDestination) {
+      this.result._metadata.extraScriptHashes.push(
+        await generateCspDigest(SERVER_ISLAND_REPLACER, this.result.cspAlgorithm)
+      );
+      const contentDigest = await generateCspDigest(content, this.result.cspAlgorithm);
+      this.result._metadata.extraScriptHashes.push(contentDigest);
+    }
+    this.islandContent = content;
+    this.hostId = hostId;
+    return createThinHead();
+  }
+  async render(destination) {
+    destination.write(createRenderInstruction({ type: "server-island-runtime" }));
+    destination.write("<!--[if astro]>server-island-start<![endif]-->");
+    for (const name in this.slots) {
+      if (name === "fallback") {
+        await renderChild(destination, this.slots.fallback(this.result));
+      }
+    }
+    destination.write(
+      `<script type="module" data-astro-rerun data-island-id="${this.hostId}">${this.islandContent}</script>`
+    );
+  }
+}
+const renderServerIslandRuntime = () => {
+  return `<script>${SERVER_ISLAND_REPLACER}</script>`;
+};
+const SERVER_ISLAND_REPLACER = markHTMLString(
+  `async function replaceServerIsland(id, r) {
+	let s = document.querySelector(\`script[data-island-id="\${id}"]\`);
+	// If there's no matching script, or the request fails then return
+	if (!s || r.status !== 200 || r.headers.get('content-type')?.split(';')[0].trim() !== 'text/html') return;
+	// Load the HTML before modifying the DOM in case of errors
+	let html = await r.text();
+	// Remove any placeholder content before the island script
+	while (s.previousSibling && s.previousSibling.nodeType !== 8 && s.previousSibling.data !== '[if astro]>server-island-start<![endif]')
+		s.previousSibling.remove();
+	s.previousSibling?.remove();
+	// Insert the new HTML
+	s.before(document.createRange().createContextualFragment(html));
+	// Remove the script. Prior to v5.4.2, this was the trick to force rerun of scripts.  Keeping it to minimize change to the existing behavior.
+	s.remove();
+}`.split("\n").map((line) => line.trim()).filter((line) => line && !line.startsWith("//")).join(" ")
+);
+
 const Fragment = Symbol.for("astro:fragment");
 const Renderer = Symbol.for("astro:renderer");
-const encoder$1 = new TextEncoder();
-const decoder$1 = new TextDecoder();
+const encoder = new TextEncoder();
+const decoder = new TextDecoder();
 function stringifyChunk(result, chunk) {
   if (isRenderInstruction(chunk)) {
     const instruction = chunk;
@@ -1257,9 +1565,11 @@ function stringifyChunk(result, chunk) {
         const { hydration } = instruction;
         let needsHydrationScript = hydration && determineIfNeedsHydrationScript(result);
         let needsDirectiveScript = hydration && determinesIfNeedsDirectiveScript(result, hydration.directive);
-        let prescriptType = needsHydrationScript ? "both" : needsDirectiveScript ? "directive" : null;
-        if (prescriptType) {
-          let prescripts = getPrescripts(result, prescriptType, hydration.directive);
+        if (needsHydrationScript) {
+          let prescripts = getPrescripts(result, "both", hydration.directive);
+          return markHTMLString(prescripts);
+        } else if (needsDirectiveScript) {
+          let prescripts = getPrescripts(result, "directive", hydration.directive);
           return markHTMLString(prescripts);
         } else {
           return "";
@@ -1286,6 +1596,13 @@ function stringifyChunk(result, chunk) {
         }
         return "";
       }
+      case "server-island-runtime": {
+        if (result._metadata.hasRenderedServerIslandRuntime) {
+          return "";
+        }
+        result._metadata.hasRenderedServerIslandRuntime = true;
+        return renderServerIslandRuntime();
+      }
       default: {
         throw new Error(`Unknown chunk type: ${chunk.type}`);
       }
@@ -1307,7 +1624,7 @@ function stringifyChunk(result, chunk) {
 }
 function chunkToString(result, chunk) {
   if (ArrayBuffer.isView(chunk)) {
-    return decoder$1.decode(chunk);
+    return decoder.decode(chunk);
   } else {
     return stringifyChunk(result, chunk);
   }
@@ -1317,7 +1634,7 @@ function chunkToByteArray(result, chunk) {
     return chunk;
   } else {
     const stringified = stringifyChunk(result, chunk);
-    return encoder$1.encode(stringified.toString());
+    return encoder.encode(stringified.toString());
   }
 }
 function isRenderInstance(obj) {
@@ -1466,10 +1783,11 @@ class AstroComponentInstance {
     }
   }
 }
-function validateComponentProps(props, displayName) {
+function validateComponentProps(props, clientDirectives, displayName) {
   if (props != null) {
+    const directives = [...clientDirectives.keys()].map((directive) => `client:${directive}`);
     for (const prop of Object.keys(props)) {
-      if (prop.startsWith("client:")) {
+      if (directives.includes(prop)) {
         console.warn(
           `You are attempting to render <${displayName} ${prop} />, but ${displayName} is an Astro component. Astro components do not render in the client and should not have a hydration directive. Please use a framework component for client rendering.`
         );
@@ -1478,7 +1796,7 @@ function validateComponentProps(props, displayName) {
   }
 }
 function createAstroComponentInstance(result, displayName, factory, props, slots = {}) {
-  validateComponentProps(props, displayName);
+  validateComponentProps(props, result.clientDirectives, displayName);
   const instance = new AstroComponentInstance(result, props, slots, factory);
   if (isAPropagatingComponent(result, factory)) {
     result._metadata.propagators.add(instance);
@@ -1541,7 +1859,7 @@ async function renderToReadableStream(result, componentFactory, props, children,
             renderedFirstPageChunk = true;
             if (!result.partial && !DOCTYPE_EXP.test(String(chunk))) {
               const doctype = result.compressHTML ? "<!DOCTYPE html>" : "<!DOCTYPE html>\n";
-              controller.enqueue(encoder$1.encode(doctype));
+              controller.enqueue(encoder.encode(doctype));
             }
           }
           if (chunk instanceof Response) {
@@ -1609,7 +1927,7 @@ async function bufferHeadContent(result) {
       break;
     }
     const returnValue = await value.init(result);
-    if (isHeadAndContent(returnValue)) {
+    if (isHeadAndContent(returnValue) && returnValue.head) {
       result._metadata.extraHead.push(returnValue.head);
     }
   }
@@ -1677,7 +1995,7 @@ async function renderToAsyncIterable(result, componentFactory, props, children, 
         renderedFirstPageChunk = true;
         if (!result.partial && !DOCTYPE_EXP.test(String(chunk))) {
           const doctype = result.compressHTML ? "<!DOCTYPE html>" : "<!DOCTYPE html>\n";
-          buffer.push(encoder$1.encode(doctype));
+          buffer.push(encoder.encode(doctype));
         }
       }
       if (chunk instanceof Response) {
@@ -1732,157 +2050,6 @@ function getHTMLElementName(constructor) {
   if (definedName) return definedName;
   const assignedName = constructor.name.replace(/^HTML|Element$/g, "").replace(/[A-Z]/g, "-$&").toLowerCase().replace(/^-/, "html-");
   return assignedName;
-}
-
-const ALGORITHM = "AES-GCM";
-async function decodeKey(encoded) {
-  const bytes = decodeBase64(encoded);
-  return crypto.subtle.importKey("raw", bytes, ALGORITHM, true, ["encrypt", "decrypt"]);
-}
-const encoder = new TextEncoder();
-const decoder = new TextDecoder();
-const IV_LENGTH = 24;
-async function encryptString(key, raw) {
-  const iv = crypto.getRandomValues(new Uint8Array(IV_LENGTH / 2));
-  const data = encoder.encode(raw);
-  const buffer = await crypto.subtle.encrypt(
-    {
-      name: ALGORITHM,
-      iv
-    },
-    key,
-    data
-  );
-  return encodeHexUpperCase(iv) + encodeBase64(new Uint8Array(buffer));
-}
-async function decryptString(key, encoded) {
-  const iv = decodeHex(encoded.slice(0, IV_LENGTH));
-  const dataArray = decodeBase64(encoded.slice(IV_LENGTH));
-  const decryptedBuffer = await crypto.subtle.decrypt(
-    {
-      name: ALGORITHM,
-      iv
-    },
-    key,
-    dataArray
-  );
-  const decryptedString = decoder.decode(decryptedBuffer);
-  return decryptedString;
-}
-
-const internalProps = /* @__PURE__ */ new Set([
-  "server:component-path",
-  "server:component-export",
-  "server:component-directive",
-  "server:defer"
-]);
-function containsServerDirective(props) {
-  return "server:component-directive" in props;
-}
-const SCRIPT_RE = /<\/script/giu;
-const COMMENT_RE = /<!--/gu;
-const SCRIPT_REPLACER = "<\\/script";
-const COMMENT_REPLACER = "\\u003C!--";
-function safeJsonStringify(obj) {
-  return JSON.stringify(obj).replace(SCRIPT_RE, SCRIPT_REPLACER).replace(COMMENT_RE, COMMENT_REPLACER);
-}
-function createSearchParams(componentExport, encryptedProps, slots) {
-  const params = new URLSearchParams();
-  params.set("e", componentExport);
-  params.set("p", encryptedProps);
-  params.set("s", slots);
-  return params;
-}
-function isWithinURLLimit(pathname, params) {
-  const url = pathname + "?" + params.toString();
-  const chars = url.length;
-  return chars < 2048;
-}
-function renderServerIsland(result, _displayName, props, slots) {
-  return {
-    async render(destination) {
-      const componentPath = props["server:component-path"];
-      const componentExport = props["server:component-export"];
-      const componentId = result.serverIslandNameMap.get(componentPath);
-      if (!componentId) {
-        throw new Error(`Could not find server component name`);
-      }
-      for (const key2 of Object.keys(props)) {
-        if (internalProps.has(key2)) {
-          delete props[key2];
-        }
-      }
-      destination.write("<!--[if astro]>server-island-start<![endif]-->");
-      const renderedSlots = {};
-      for (const name in slots) {
-        if (name !== "fallback") {
-          const content = await renderSlotToString(result, slots[name]);
-          renderedSlots[name] = content.toString();
-        } else {
-          await renderChild(destination, slots.fallback(result));
-        }
-      }
-      const key = await result.key;
-      const propsEncrypted = Object.keys(props).length === 0 ? "" : await encryptString(key, JSON.stringify(props));
-      const hostId = crypto.randomUUID();
-      const slash = result.base.endsWith("/") ? "" : "/";
-      let serverIslandUrl = `${result.base}${slash}_server-islands/${componentId}${result.trailingSlash === "always" ? "/" : ""}`;
-      const potentialSearchParams = createSearchParams(
-        componentExport,
-        propsEncrypted,
-        safeJsonStringify(renderedSlots)
-      );
-      const useGETRequest = isWithinURLLimit(serverIslandUrl, potentialSearchParams);
-      if (useGETRequest) {
-        serverIslandUrl += "?" + potentialSearchParams.toString();
-        destination.write(
-          `<link rel="preload" as="fetch" href="${serverIslandUrl}" crossorigin="anonymous">`
-        );
-      }
-      destination.write(`<script async type="module" data-astro-rerun data-island-id="${hostId}">
-let script = document.querySelector('script[data-island-id="${hostId}"]');
-
-${useGETRequest ? (
-        // GET request
-        `let response = await fetch('${serverIslandUrl}');
-`
-      ) : (
-        // POST request
-        `let data = {
-	componentExport: ${safeJsonStringify(componentExport)},
-	encryptedProps: ${safeJsonStringify(propsEncrypted)},
-	slots: ${safeJsonStringify(renderedSlots)},
-};
-
-let response = await fetch('${serverIslandUrl}', {
-	method: 'POST',
-	body: JSON.stringify(data),
-});
-`
-      )}
-if (script) {
-	if(
-		response.status === 200
-		&& response.headers.has('content-type')
-		&& response.headers.get('content-type').split(";")[0].trim() === 'text/html') {
-		let html = await response.text();
-
-		// Swap!
-		while(script.previousSibling &&
-			script.previousSibling.nodeType !== 8 &&
-			script.previousSibling.data !== '[if astro]>server-island-start<![endif]') {
-			script.previousSibling.remove();
-		}
-		script.previousSibling?.remove();
-
-		let frag = document.createRange().createContextualFragment(html);
-		script.before(frag);
-	}
-	script.remove(); // Prior to v5.4.2, this was the trick to force rerun of scripts.  Keeping it to minimize change to the existing behavior.
-}
-</script>`);
-    }
-  };
 }
 
 const needsHeadRenderingSymbol = Symbol.for("astro.needsHeadRendering");
@@ -2208,7 +2375,9 @@ async function renderHTMLComponent(result, Component, _props, slots = {}) {
 }
 function renderAstroComponent(result, displayName, Component, props, slots = {}) {
   if (containsServerDirective(props)) {
-    return renderServerIsland(result, displayName, props, slots);
+    const serverIslandComponent = new ServerIslandComponent(result, props, slots, displayName);
+    result._metadata.propagators.add(serverIslandComponent);
+    return serverIslandComponent;
   }
   const instance = createAstroComponentInstance(result, displayName, Component, props, slots);
   return {
@@ -2278,6 +2447,9 @@ async function renderComponentToString(result, displayName, Component, props, sl
       }
     };
     const renderInstance = await renderComponent(result, displayName, Component, props, slots);
+    if (containsServerDirective(props)) {
+      await bufferHeadContent(result);
+    }
     await renderInstance.render(destination);
   } catch (e) {
     if (AstroError.is(e) && !e.loc) {
@@ -2324,7 +2496,7 @@ Did you forget to import the component or is it possible there is a typo?`);
       }
       case vnode.type === Symbol.for("astro:fragment"):
         return renderJSX(result, vnode.props.children);
-      case vnode.type.isAstroComponentFactory: {
+      case isAstroComponentFactory(vnode.type): {
         let props = {};
         let slots = {};
         for (const [key, value] of Object.entries(vnode.props ?? {})) {
@@ -2334,10 +2506,13 @@ Did you forget to import the component or is it possible there is a typo?`);
             props[key] = value;
           }
         }
-        const str = await renderToString(result, vnode.type, props, slots);
-        if (str instanceof Response) {
-          throw str;
-        }
+        const str = await renderComponentToString(
+          result,
+          vnode.type.name,
+          vnode.type,
+          props,
+          slots
+        );
         const html = markHTMLString(str);
         return html;
       }
@@ -2469,12 +2644,16 @@ async function renderPage(result, componentFactory, props, children, streaming, 
       true,
       route
     );
-    const bytes = encoder$1.encode(str);
+    const bytes = encoder.encode(str);
+    const headers2 = new Headers([
+      ["Content-Type", "text/html"],
+      ["Content-Length", bytes.byteLength.toString()]
+    ]);
+    if (result.cspDestination === "header" || result.cspDestination === "adapter") {
+      headers2.set("content-security-policy", renderCspContent(result));
+    }
     return new Response(bytes, {
-      headers: new Headers([
-        ["Content-Type", "text/html"],
-        ["Content-Length", bytes.byteLength.toString()]
-      ])
+      headers: headers2
     });
   }
   result._metadata.headInTree = result.componentMetadata.get(componentFactory.moduleId)?.containsHead ?? false;
@@ -2499,8 +2678,11 @@ async function renderPage(result, componentFactory, props, children, streaming, 
   if (body instanceof Response) return body;
   const init = result.response;
   const headers = new Headers(init.headers);
+  if (result.shouldInjectCspMetaTags && result.cspDestination === "header" || result.cspDestination === "adapter") {
+    headers.set("content-security-policy", renderCspContent(result));
+  }
   if (!streaming && typeof body === "string") {
-    body = encoder$1.encode(body);
+    body = encoder.encode(body);
     headers.set("Content-Length", body.byteLength.toString());
   }
   let status = init.status;
@@ -2543,4 +2725,4 @@ function spreadAttributes(values = {}, _name, { class: scopedClassName } = {}) {
   return markHTMLString(output);
 }
 
-export { PrerenderDynamicEndpointPathCollide as $, AstroError as A, responseSentSymbol as B, decryptString as C, DEFAULT_404_COMPONENT as D, ExpectedImage as E, FailedToFetchRemoteImageDimensions as F, createSlotValueFromString as G, isAstroComponentFactory as H, IncompatibleDescriptorOptions as I, i18nNoLocaleFoundInPath as J, ResponseSentError as K, LocalImageUsedWrongly as L, MissingSharp as M, NOOP_MIDDLEWARE_HEADER as N, originPathnameSymbol as O, RewriteWithBodyUsed as P, MiddlewareNoDataOrNextCalled as Q, REDIRECT_STATUS_CODES as R, MiddlewareNotAResponse as S, GetStaticPathsRequired as T, UnsupportedImageFormat as U, InvalidGetStaticPathsReturn as V, InvalidGetStaticPathsEntry as W, GetStaticPathsExpectedParams as X, GetStaticPathsInvalidRouteParam as Y, PageNumberParamNotFound as Z, NoMatchingStaticPathFound as _, createAstro as a, ReservedSlotName as a0, renderSlotToString as a1, renderJSX as a2, chunkToString as a3, isRenderInstruction as a4, SessionStorageSaveError as a5, SessionStorageInitError as a6, ForbiddenRewrite as a7, ASTRO_VERSION as a8, LocalsReassigned as a9, PrerenderClientAddressNotAvailable as aa, ClientAddressNotAvailable as ab, StaticClientAddressNotAvailable as ac, AstroResponseHeadersReassigned as ad, renderPage as ae, REWRITE_DIRECTIVE_HEADER_KEY as af, REWRITE_DIRECTIVE_HEADER_VALUE as ag, renderEndpoint as ah, defineScriptVars as ai, unescapeHTML as aj, Fragment as ak, addAttribute as b, createComponent as c, renderHead as d, renderSlot as e, renderTemplate as f, renderComponent as g, decodeKey as h, ActionsReturnedInvalidDataError as i, MissingImageDimension as j, UnsupportedImageConversion as k, NoImageMetadata as l, maybeRenderHead as m, ExpectedImageOptions as n, ExpectedNotESMImage as o, InvalidImageService as p, ImageMissingAlt as q, renderScript as r, spreadAttributes as s, toStyleString as t, ROUTE_TYPE_HEADER as u, REROUTE_DIRECTIVE_HEADER as v, ActionNotFoundError as w, clientAddressSymbol as x, LocalsNotAnObject as y, REROUTABLE_STATUS_CODES as z };
+export { GetStaticPathsInvalidRouteParam as $, AstroError as A, clientAddressSymbol as B, LocalsNotAnObject as C, DEFAULT_404_COMPONENT as D, ExpectedImage as E, FailedToFetchRemoteImageDimensions as F, REROUTABLE_STATUS_CODES as G, responseSentSymbol as H, IncompatibleDescriptorOptions as I, decryptString as J, createSlotValueFromString as K, LocalImageUsedWrongly as L, MissingSharp as M, NOOP_MIDDLEWARE_HEADER as N, isAstroComponentFactory as O, i18nNoLocaleFoundInPath as P, ResponseSentError as Q, REDIRECT_STATUS_CODES as R, originPathnameSymbol as S, RewriteWithBodyUsed as T, UnsupportedImageFormat as U, MiddlewareNoDataOrNextCalled as V, MiddlewareNotAResponse as W, GetStaticPathsRequired as X, InvalidGetStaticPathsReturn as Y, InvalidGetStaticPathsEntry as Z, GetStaticPathsExpectedParams as _, createAstro as a, PageNumberParamNotFound as a0, NoMatchingStaticPathFound as a1, PrerenderDynamicEndpointPathCollide as a2, ReservedSlotName as a3, renderSlotToString as a4, renderJSX as a5, chunkToString as a6, isRenderInstruction as a7, SessionStorageInitError as a8, SessionStorageSaveError as a9, ForbiddenRewrite as aa, ASTRO_VERSION as ab, CspNotEnabled as ac, LocalsReassigned as ad, PrerenderClientAddressNotAvailable as ae, ClientAddressNotAvailable as af, StaticClientAddressNotAvailable as ag, AstroResponseHeadersReassigned as ah, renderPage as ai, REWRITE_DIRECTIVE_HEADER_KEY as aj, REWRITE_DIRECTIVE_HEADER_VALUE as ak, renderEndpoint as al, defineScriptVars as am, Fragment as an, addAttribute as b, createComponent as c, renderHead as d, renderSlot as e, renderTemplate as f, renderComponent as g, decodeKey as h, ActionsReturnedInvalidDataError as i, MissingImageDimension as j, UnsupportedImageConversion as k, NoImageMetadata as l, maybeRenderHead as m, ExpectedImageOptions as n, ExpectedNotESMImage as o, InvalidImageService as p, ImageMissingAlt as q, renderScript as r, spreadAttributes as s, toStyleString as t, ExperimentalFontsNotEnabled as u, FontFamilyNotFound as v, unescapeHTML as w, ROUTE_TYPE_HEADER as x, REROUTE_DIRECTIVE_HEADER as y, ActionNotFoundError as z };

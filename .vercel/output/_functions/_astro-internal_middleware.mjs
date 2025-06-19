@@ -1,11 +1,11 @@
 import { g as getSupabaseServerClient } from './chunks/supabase_CFQDLbVX.mjs';
 import 'es-module-lexer';
-import './chunks/astro-designed-error-pages_BZOxOS4q.mjs';
+import './chunks/astro-designed-error-pages_zLg3HgTj.mjs';
 import 'kleur/colors';
-import './chunks/astro/server_DLpc0srX.mjs';
+import './chunks/astro/server_DQ0m6GiM.mjs';
 import 'clsx';
 import 'cookie';
-import { s as sequence } from './chunks/index_CQy6cGLV.mjs';
+import { s as sequence } from './chunks/index_BadUw_sG.mjs';
 
 const onRequest$1 = async ({ cookies, request, redirect }, next) => {
   const supabaseUrl = "https://uznvakpuuxnpdhoejrog.supabase.co";

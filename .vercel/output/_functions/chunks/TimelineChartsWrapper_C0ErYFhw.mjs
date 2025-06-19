@@ -1,4 +1,4 @@
-import { c as createComponent, g as renderComponent, f as renderTemplate } from './astro/server_DLpc0srX.mjs';
+import { c as createComponent, g as renderComponent, f as renderTemplate } from './astro/server_DQ0m6GiM.mjs';
 import 'kleur/colors';
 import { useRef, useEffect } from 'react';
 import Chart from 'chart.js/auto';

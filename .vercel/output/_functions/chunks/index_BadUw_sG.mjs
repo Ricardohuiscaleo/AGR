@@ -1,9 +1,9 @@
 import { serialize, parse } from 'cookie';
-import { C as decryptString, G as createSlotValueFromString, H as isAstroComponentFactory, g as renderComponent, f as renderTemplate, v as REROUTE_DIRECTIVE_HEADER, A as AstroError, J as i18nNoLocaleFoundInPath, K as ResponseSentError, O as originPathnameSymbol, P as RewriteWithBodyUsed, Q as MiddlewareNoDataOrNextCalled, S as MiddlewareNotAResponse, T as GetStaticPathsRequired, V as InvalidGetStaticPathsReturn, W as InvalidGetStaticPathsEntry, X as GetStaticPathsExpectedParams, Y as GetStaticPathsInvalidRouteParam, Z as PageNumberParamNotFound, D as DEFAULT_404_COMPONENT, _ as NoMatchingStaticPathFound, $ as PrerenderDynamicEndpointPathCollide, a0 as ReservedSlotName, a1 as renderSlotToString, a2 as renderJSX, a3 as chunkToString, a4 as isRenderInstruction, a5 as SessionStorageSaveError, a6 as SessionStorageInitError, u as ROUTE_TYPE_HEADER, a7 as ForbiddenRewrite, a8 as ASTRO_VERSION, a9 as LocalsReassigned, aa as PrerenderClientAddressNotAvailable, x as clientAddressSymbol, ab as ClientAddressNotAvailable, ac as StaticClientAddressNotAvailable, ad as AstroResponseHeadersReassigned, B as responseSentSymbol$1, ae as renderPage, af as REWRITE_DIRECTIVE_HEADER_KEY, ag as REWRITE_DIRECTIVE_HEADER_VALUE, ah as renderEndpoint } from './astro/server_DLpc0srX.mjs';
+import { J as decryptString, K as createSlotValueFromString, O as isAstroComponentFactory, g as renderComponent, f as renderTemplate, y as REROUTE_DIRECTIVE_HEADER, A as AstroError, P as i18nNoLocaleFoundInPath, Q as ResponseSentError, S as originPathnameSymbol, T as RewriteWithBodyUsed, V as MiddlewareNoDataOrNextCalled, W as MiddlewareNotAResponse, X as GetStaticPathsRequired, Y as InvalidGetStaticPathsReturn, Z as InvalidGetStaticPathsEntry, _ as GetStaticPathsExpectedParams, $ as GetStaticPathsInvalidRouteParam, a0 as PageNumberParamNotFound, D as DEFAULT_404_COMPONENT, a1 as NoMatchingStaticPathFound, a2 as PrerenderDynamicEndpointPathCollide, a3 as ReservedSlotName, a4 as renderSlotToString, a5 as renderJSX, a6 as chunkToString, a7 as isRenderInstruction, a8 as SessionStorageInitError, a9 as SessionStorageSaveError, x as ROUTE_TYPE_HEADER, aa as ForbiddenRewrite, ab as ASTRO_VERSION, ac as CspNotEnabled, ad as LocalsReassigned, ae as PrerenderClientAddressNotAvailable, B as clientAddressSymbol, af as ClientAddressNotAvailable, ag as StaticClientAddressNotAvailable, ah as AstroResponseHeadersReassigned, H as responseSentSymbol$1, ai as renderPage, aj as REWRITE_DIRECTIVE_HEADER_KEY, ak as REWRITE_DIRECTIVE_HEADER_VALUE, al as renderEndpoint } from './astro/server_DQ0m6GiM.mjs';
+import { green } from 'kleur/colors';
 import { a as appendForwardSlash, j as joinPaths, r as removeTrailingForwardSlash, p as prependForwardSlash, t as trimSlashes } from './path_BuZodYwm.mjs';
-import { g as getActionQueryString, a as deserializeActionResult, D as DEFAULT_404_ROUTE, A as ActionError, s as serializeActionResult, b as ACTION_RPC_ROUTE_PATTERN, c as ACTION_QUERY_PARAMS } from './astro-designed-error-pages_BZOxOS4q.mjs';
+import { g as getActionQueryString, a as deserializeActionResult, D as DEFAULT_404_ROUTE, A as ActionError, s as serializeActionResult, b as ACTION_RPC_ROUTE_PATTERN, c as ACTION_QUERY_PARAMS } from './astro-designed-error-pages_zLg3HgTj.mjs';
 import 'es-module-lexer';
-import 'kleur/colors';
 import 'clsx';
 import { unflatten as unflatten$1, stringify as stringify$1 } from 'devalue';
 import { createStorage, builtinDrivers } from 'unstorage';
@@ -773,7 +773,8 @@ function findRouteToRewrite({
   request,
   trailingSlash,
   buildFormat,
-  base
+  base,
+  outDir
 }) {
   let newUrl = void 0;
   if (payload instanceof URL) {
@@ -785,9 +786,14 @@ function findRouteToRewrite({
   }
   let pathname = newUrl.pathname;
   const shouldAppendSlash = shouldAppendForwardSlash(trailingSlash, buildFormat);
-  if (base !== "/" && newUrl.pathname.startsWith(base)) {
-    pathname = shouldAppendSlash ? appendForwardSlash(newUrl.pathname) : removeTrailingForwardSlash(newUrl.pathname);
-    pathname = pathname.slice(base.length);
+  if (base !== "/") {
+    const isBasePathRequest = newUrl.pathname === base || newUrl.pathname === removeTrailingForwardSlash(base);
+    if (isBasePathRequest) {
+      pathname = shouldAppendSlash ? "/" : "";
+    } else if (newUrl.pathname.startsWith(base)) {
+      pathname = shouldAppendSlash ? appendForwardSlash(newUrl.pathname) : removeTrailingForwardSlash(newUrl.pathname);
+      pathname = pathname.slice(base.length);
+    }
   }
   if (!pathname.startsWith("/") && shouldAppendSlash && newUrl.pathname.endsWith("/")) {
     pathname = prependForwardSlash(pathname);
@@ -795,11 +801,25 @@ function findRouteToRewrite({
   if (pathname === "/" && base !== "/" && !shouldAppendSlash) {
     pathname = "";
   }
-  newUrl.pathname = joinPaths(...[base, pathname].filter(Boolean));
+  if (buildFormat === "file") {
+    pathname = pathname.replace(/\.html$/, "");
+  }
+  if (base !== "/" && (pathname === "" || pathname === "/") && !shouldAppendSlash) {
+    newUrl.pathname = removeTrailingForwardSlash(base);
+  } else {
+    newUrl.pathname = joinPaths(...[base, pathname].filter(Boolean));
+  }
   const decodedPathname = decodeURI(pathname);
   let foundRoute;
   for (const route of routes) {
     if (route.pattern.test(decodedPathname)) {
+      if (route.params && route.params.length !== 0 && route.distURL && route.distURL.length !== 0) {
+        if (!route.distURL.find(
+          (url) => url.href.replace(outDir.toString(), "").replace(/(?:\/index\.html|\.html)$/, "") == trimSlashes(decodedPathname)
+        )) {
+          continue;
+        }
+      }
       foundRoute = route;
       break;
     }
@@ -882,13 +902,15 @@ function getActionContext(context) {
           }
           throw e;
         }
-        const {
-          props: _props,
-          getActionResult: _getActionResult,
-          callAction: _callAction,
-          redirect: _redirect,
-          ...actionAPIContext
-        } = context;
+        const omitKeys = ["props", "getActionResult", "callAction", "redirect"];
+        const actionAPIContext = Object.create(
+          Object.getPrototypeOf(context),
+          Object.fromEntries(
+            Object.entries(Object.getOwnPropertyDescriptors(context)).filter(
+              ([key]) => !omitKeys.includes(key)
+            )
+          )
+        );
         Reflect.set(actionAPIContext, ACTION_API_CONTEXT_SYMBOL, true);
         const handler = baseAction.bind(actionAPIContext);
         return handler(input);
@@ -1371,7 +1393,16 @@ class AstroSession {
   constructor(cookies, {
     cookie: cookieConfig = DEFAULT_COOKIE_NAME,
     ...config
-  }) {
+  }, runtimeMode) {
+    const { driver } = config;
+    if (!driver) {
+      throw new AstroError({
+        ...SessionStorageInitError,
+        message: SessionStorageInitError.message(
+          "No driver was defined in the session configuration and the adapter did not provide a default driver."
+        )
+      });
+    }
     this.#cookies = cookies;
     let cookieConfigObject;
     if (typeof cookieConfig === "object") {
@@ -1383,12 +1414,12 @@ class AstroSession {
     }
     this.#cookieConfig = {
       sameSite: "lax",
-      secure: true,
+      secure: runtimeMode === "production",
       path: "/",
       ...cookieConfigObject,
       httpOnly: true
     };
-    this.#config = config;
+    this.#config = { ...config, driver };
   }
   /**
    * Gets a session value. Returns `undefined` if the session or value does not exist.
@@ -1655,21 +1686,15 @@ class AstroSession {
       this.#config.driver = "fs-lite";
       this.#config.options.base ??= ".astro/session";
     }
-    if (!this.#config?.driver) {
-      throw new AstroError({
-        ...SessionStorageInitError,
-        message: SessionStorageInitError.message(
-          "No driver was defined in the session configuration and the adapter did not provide a default driver."
-        )
-      });
-    }
     let driver = null;
-    const driverPackage = await resolveSessionDriver(this.#config.driver);
     try {
       if (this.#config.driverModule) {
         driver = (await this.#config.driverModule()).default;
-      } else if (driverPackage) {
-        driver = (await import(driverPackage)).default;
+      } else if (this.#config.driver) {
+        const driverName = resolveSessionDriverName(this.#config.driver);
+        if (driverName) {
+          driver = (await import(driverName)).default;
+        }
       }
     } catch (err) {
       if (err.code === "ERR_MODULE_NOT_FOUND") {
@@ -1677,7 +1702,7 @@ class AstroSession {
           {
             ...SessionStorageInitError,
             message: SessionStorageInitError.message(
-              err.message.includes(`Cannot find package '${driverPackage}'`) ? "The driver module could not be found." : err.message,
+              err.message.includes(`Cannot find package`) ? "The driver module could not be found." : err.message,
               this.#config.driver
             )
           },
@@ -1712,16 +1737,16 @@ class AstroSession {
     }
   }
 }
-async function resolveSessionDriver(driver) {
+function resolveSessionDriverName(driver) {
   if (!driver) {
     return null;
   }
   try {
     if (driver === "fs") {
-      return await import.meta.resolve(builtinDrivers.fsLite);
+      return builtinDrivers.fsLite;
     }
     if (driver in builtinDrivers) {
-      return await import.meta.resolve(builtinDrivers[driver]);
+      return builtinDrivers[driver];
     }
   } catch {
     return null;
@@ -1731,7 +1756,7 @@ async function resolveSessionDriver(driver) {
 
 const apiContextRoutesSymbol = Symbol.for("context.routes");
 class RenderContext {
-  constructor(pipeline, locals, middleware, actions, pathname, request, routeData, status, clientAddress, cookies = new AstroCookies(request), params = getParams(routeData, pathname), url = new URL(request.url), props = {}, partial = void 0, session = pipeline.manifest.sessionConfig ? new AstroSession(cookies, pipeline.manifest.sessionConfig) : void 0) {
+  constructor(pipeline, locals, middleware, actions, pathname, request, routeData, status, clientAddress, cookies = new AstroCookies(request), params = getParams(routeData, pathname), url = new URL(request.url), props = {}, partial = void 0, session = pipeline.manifest.sessionConfig ? new AstroSession(cookies, pipeline.manifest.sessionConfig, pipeline.runtimeMode) : void 0) {
     this.pipeline = pipeline;
     this.locals = locals;
     this.middleware = middleware;
@@ -1756,6 +1781,7 @@ class RenderContext {
    * A safety net in case of loops
    */
   counter = 0;
+  result = void 0;
   static async create({
     locals = {},
     middleware,
@@ -1824,6 +1850,7 @@ class RenderContext {
     }
     const lastNext = async (ctx, payload) => {
       if (payload) {
+        const oldPathname = this.pathname;
         pipeline.logger.debug("router", "Called rewriting to:", payload);
         const {
           routeData,
@@ -1854,10 +1881,10 @@ class RenderContext {
         }
         this.isRewriting = true;
         this.url = new URL(this.request.url);
-        this.cookies = new AstroCookies(this.request);
         this.params = getParams(routeData, pathname);
         this.pathname = pathname;
         this.status = 200;
+        setOriginPathname(this.request, oldPathname);
       }
       let response2;
       if (!ctx.isPrerendered) {
@@ -1880,10 +1907,10 @@ class RenderContext {
         case "redirect":
           return renderRedirect(this);
         case "page": {
-          const result = await this.createResult(componentInstance, actionApiContext);
+          this.result = await this.createResult(componentInstance, actionApiContext);
           try {
             response2 = await renderPage(
-              result,
+              this.result,
               componentInstance?.default,
               props,
               slots,
@@ -1891,7 +1918,7 @@ class RenderContext {
               this.routeData
             );
           } catch (e) {
-            result.cancelled = true;
+            this.result.cancelled = true;
             throw e;
           }
           response2.headers.set(ROUTE_TYPE_HEADER, "page");
@@ -1935,6 +1962,7 @@ class RenderContext {
   }
   async #executeRewrite(reroutePayload) {
     this.pipeline.logger.debug("router", "Calling rewrite: ", reroutePayload);
+    const oldPathname = this.pathname;
     const { routeData, componentInstance, newUrl, pathname } = await this.pipeline.tryRewrite(
       reroutePayload,
       this.request
@@ -1965,11 +1993,12 @@ class RenderContext {
     this.pathname = pathname;
     this.isRewriting = true;
     this.status = 200;
+    setOriginPathname(this.request, oldPathname);
     return await this.render(componentInstance);
   }
   createActionAPIContext() {
     const renderContext = this;
-    const { cookies, params, pipeline, url, session } = this;
+    const { cookies, params, pipeline, url } = this;
     const generator = `Astro v${ASTRO_VERSION}`;
     const rewrite = async (reroutePayload) => {
       return await this.#executeRewrite(reroutePayload);
@@ -2005,7 +2034,53 @@ class RenderContext {
       get originPathname() {
         return getOriginPathname(renderContext.request);
       },
-      session
+      get session() {
+        if (this.isPrerendered) {
+          pipeline.logger.warn(
+            "session",
+            `context.session was used when rendering the route ${green(this.routePattern)}, but it is not available on prerendered routes. If you need access to sessions, make sure that the route is server-rendered using \`export const prerender = false;\` or by setting \`output\` to \`"server"\` in your Astro config to make all your routes server-rendered by default. For more information, see https://docs.astro.build/en/guides/sessions/`
+          );
+          return void 0;
+        }
+        if (!renderContext.session) {
+          pipeline.logger.warn(
+            "session",
+            `context.session was used when rendering the route ${green(this.routePattern)}, but no storage configuration was provided. Either configure the storage manually or use an adapter that provides session storage. For more information, see https://docs.astro.build/en/guides/sessions/`
+          );
+          return void 0;
+        }
+        return renderContext.session;
+      },
+      insertDirective(payload) {
+        if (!pipeline.manifest.csp) {
+          throw new AstroError(CspNotEnabled);
+        }
+        renderContext.result?.directives.push(payload);
+      },
+      insertScriptResource(resource) {
+        if (!pipeline.manifest.csp) {
+          throw new AstroError(CspNotEnabled);
+        }
+        renderContext.result?.scriptResources.push(resource);
+      },
+      insertStyleResource(resource) {
+        if (!pipeline.manifest.csp) {
+          throw new AstroError(CspNotEnabled);
+        }
+        renderContext.result?.styleResources.push(resource);
+      },
+      insertStyleHash(hash) {
+        if (!pipeline.manifest.csp) {
+          throw new AstroError(CspNotEnabled);
+        }
+        renderContext.result?.styleHashes.push(hash);
+      },
+      insertScriptHash(hash) {
+        if (!!pipeline.manifest.csp === false) {
+          throw new AstroError(CspNotEnabled);
+        }
+        renderContext.result?.scriptHashes.push(hash);
+      }
     };
   }
   async createResult(mod, ctx) {
@@ -2058,10 +2133,23 @@ class RenderContext {
         hasRenderedHead: false,
         renderedScripts: /* @__PURE__ */ new Set(),
         hasDirectives: /* @__PURE__ */ new Set(),
+        hasRenderedServerIslandRuntime: false,
         headInTree: false,
         extraHead: [],
+        extraStyleHashes: [],
+        extraScriptHashes: [],
         propagators: /* @__PURE__ */ new Set()
-      }
+      },
+      cspDestination: manifest.csp?.cspDestination ?? (routeData.prerender ? "meta" : "header"),
+      shouldInjectCspMetaTags: !!manifest.csp,
+      cspAlgorithm: manifest.csp?.algorithm ?? "SHA-256",
+      // The following arrays must be cloned, otherwise they become mutable across routes.
+      scriptHashes: manifest.csp?.scriptHashes ? [...manifest.csp.scriptHashes] : [],
+      scriptResources: manifest.csp?.scriptResources ? [...manifest.csp.scriptResources] : [],
+      styleHashes: manifest.csp?.styleHashes ? [...manifest.csp.styleHashes] : [],
+      styleResources: manifest.csp?.styleResources ? [...manifest.csp.styleResources] : [],
+      directives: manifest.csp?.directives ? [...manifest.csp.directives] : [],
+      isStrictDynamic: manifest.csp?.isStrictDynamic ?? false
     };
     return result;
   }
@@ -2111,7 +2199,7 @@ class RenderContext {
   }
   createAstroPagePartial(result, astroStaticPartial, apiContext) {
     const renderContext = this;
-    const { cookies, locals, params, pipeline, url, session } = this;
+    const { cookies, locals, params, pipeline, url } = this;
     const { response } = result;
     const redirect = (path, status = 302) => {
       if (this.request[responseSentSymbol$1]) {
@@ -2131,7 +2219,23 @@ class RenderContext {
       routePattern: this.routeData.route,
       isPrerendered: this.routeData.prerender,
       cookies,
-      session,
+      get session() {
+        if (this.isPrerendered) {
+          pipeline.logger.warn(
+            "session",
+            `Astro.session was used when rendering the route ${green(this.routePattern)}, but it is not available on prerendered pages. If you need access to sessions, make sure that the page is server-rendered using \`export const prerender = false;\` or by setting \`output\` to \`"server"\` in your Astro config to make all your pages server-rendered by default. For more information, see https://docs.astro.build/en/guides/sessions/`
+          );
+          return void 0;
+        }
+        if (!renderContext.session) {
+          pipeline.logger.warn(
+            "session",
+            `Astro.session was used when rendering the route ${green(this.routePattern)}, but no storage configuration was provided. Either configure the storage manually or use an adapter that provides session storage. For more information, see https://docs.astro.build/en/guides/sessions/`
+          );
+          return void 0;
+        }
+        return renderContext.session;
+      },
       get clientAddress() {
         return renderContext.getClientAddress();
       },
@@ -2158,6 +2262,36 @@ class RenderContext {
       url,
       get originPathname() {
         return getOriginPathname(renderContext.request);
+      },
+      insertDirective(payload) {
+        if (!pipeline.manifest.csp) {
+          throw new AstroError(CspNotEnabled);
+        }
+        renderContext.result?.directives.push(payload);
+      },
+      insertScriptResource(resource) {
+        if (!pipeline.manifest.csp) {
+          throw new AstroError(CspNotEnabled);
+        }
+        renderContext.result?.scriptResources.push(resource);
+      },
+      insertStyleResource(resource) {
+        if (!pipeline.manifest.csp) {
+          throw new AstroError(CspNotEnabled);
+        }
+        renderContext.result?.styleResources.push(resource);
+      },
+      insertStyleHash(hash) {
+        if (!pipeline.manifest.csp) {
+          throw new AstroError(CspNotEnabled);
+        }
+        renderContext.result?.styleHashes.push(hash);
+      },
+      insertScriptHash(hash) {
+        if (!!pipeline.manifest.csp === false) {
+          throw new AstroError(CspNotEnabled);
+        }
+        renderContext.result?.scriptHashes.push(hash);
       }
     };
   }
@@ -2265,13 +2399,14 @@ function sequence(...handlers) {
             if (payload instanceof Request) {
               newRequest = payload;
             } else if (payload instanceof URL) {
-              newRequest = new Request(payload, handleContext.request);
+              newRequest = new Request(payload, handleContext.request.clone());
             } else {
               newRequest = new Request(
                 new URL(payload, handleContext.url.origin),
-                handleContext.request
+                handleContext.request.clone()
               );
             }
+            const oldPathname = handleContext.url.pathname;
             const pipeline = Reflect.get(handleContext, apiContextRoutesSymbol);
             const { routeData, pathname } = await pipeline.tryRewrite(
               payload,
@@ -2293,6 +2428,7 @@ function sequence(...handlers) {
             handleContext.url = new URL(newRequest.url);
             handleContext.cookies = new AstroCookies(newRequest);
             handleContext.params = getParams(routeData, pathname);
+            setOriginPathname(handleContext.request, oldPathname);
           }
           return applyHandle(i + 1, handleContext);
         } else {
