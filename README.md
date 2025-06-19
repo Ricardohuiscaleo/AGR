@@ -25,6 +25,7 @@ Sitio web completo con sistema de autenticación, generación de blogs con IA, y
 Este proyecto está configurado para desplegarse en Railway con dominio personalizado.
 
 ### Variables de entorno requeridas:
+
 ```
 PUBLIC_SUPABASE_URL=your-supabase-url
 PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
