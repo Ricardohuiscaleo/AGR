@@ -1,9 +1,0 @@
-const __vite__mapDeps=(i,m=__vite__mapDeps,d=(m.f||(m.f=["_astro/index.Bd8wGOW-.js","_astro/_commonjsHelpers.D6-XlEtG.js","_astro/index.c0qeY2gs.js","_astro/client.Ctic5FTx.js","_astro/ChatInterface.I6GYUsOq.js","_astro/jsx-runtime.D_zvdyIk.js","_astro/animated-tooltip.C9LK3Wtw.js"])))=>i.map(i=>d[i]);
-import{_ as o}from"./preload-helper.BlTxHScW.js";async function n(){try{const[{default:r},{createRoot:t}]=await Promise.all([o(()=>import("./index.Bd8wGOW-.js").then(e=>e.i),__vite__mapDeps([0,1,2])),o(()=>import("./client.Ctic5FTx.js").then(e=>e.c),__vite__mapDeps([3,1,2]))]),{default:d}=await o(async()=>{const{default:e}=await import("./ChatInterface.I6GYUsOq.js");return{default:e}},__vite__mapDeps([4,5,0,1,2,6])),i={theme:"light",primaryColor:"#dc2626",secondaryColor:"#ffffff",accentColor:"#ef4444",backgroundColor:"#ffffff",textColor:"#1f2937",borderColor:"#e5e7eb",containerStyles:{background:"#ffffff",border:"1px solid #e2e8f0",borderRadius:"1rem",boxShadow:"0 2px 8px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.06)",backdropFilter:"none"},messageStyles:{userMessage:{background:"linear-gradient(135deg, #dc2626, #ef4444)",color:"#ffffff"},botMessage:{background:"#f9fafb",color:"#1f2937",border:"1px solid #e5e7eb"}}},a=document.getElementById("chat-interface-wrapper");if(a){const e=t(a),c=r.createElement(d,i);e.render(c)}}catch(r){console.error("Error inicializando ChatInterface:",r);const t=document.getElementById("chat-interface-wrapper");t&&(t.innerHTML=`
-          <div class="flex items-center justify-center h-64 bg-white rounded-xl border border-gray-200">
-            <div class="text-center">
-              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-400 mx-auto mb-4"></div>
-              <p class="text-gray-600">Cargando chat inteligente...</p>
-            </div>
-          </div>
-        `)}}typeof window<"u"&&(document.readyState==="loading"?document.addEventListener("DOMContentLoaded",n):n());
