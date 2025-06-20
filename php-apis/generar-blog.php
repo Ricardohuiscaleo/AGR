@@ -23,15 +23,78 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-// Cargar variables de entorno (cuando esté en Hostinguer)
-// require_once '../vendor/autoload.php';
-// $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
-// $dotenv->load();
+// 🔐 FUNCIÓN SEGURA para cargar variables de entorno
+function loadEnvSafe($path) {
+    if (!file_exists($path)) {
+        return false;
+    }
+    
+    $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    if ($lines === false) {
+        return false;
+    }
+    
+    foreach ($lines as $line) {
+        $line = trim($line);
+        if (empty($line) || strpos($line, '#') === 0) {
+            continue;
+        }
+        
+        if (strpos($line, '=') === false) {
+            continue;
+        }
+        
+        $parts = explode('=', $line, 2);
+        if (count($parts) !== 2) {
+            continue;
+        }
+        
+        $name = trim($parts[0]);
+        $value = trim($parts[1]);
+        
+        if ((substr($value, 0, 1) === '"' && substr($value, -1) === '"') ||
+            (substr($value, 0, 1) === "'" && substr($value, -1) === "'")) {
+            $value = substr($value, 1, -1);
+        }
+        
+        if (!array_key_exists($name, $_ENV)) {
+            $_ENV[$name] = $value;
+        }
+    }
+    
+    return true;
+}
 
-// Por ahora, configuración temporal para desarrollo
+// Variables por defecto (fallback)
 $GEMINI_API_KEY = 'AIzaSyCc1bdkzVLHXxxKOBndV3poK2KQikLJ6DI';
 $SUPABASE_URL = 'https://uznvakpuuxnpdhoejrog.supabase.co';
-$SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6bnZha3B1dXhucGRob2Vqcm9nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkwODg0MTAsImV4cCI6MjA2NDY2NDQxMH0.OxbLYkjlgpWFnqd28gaZSwar_NQ6_qUS3U76bqbcXVg';
+$SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6bnZha3B1dHhucGRob2Vqcm9nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkwODg0MTAsImV4cCI6MjA2NDY2NDQxMH0.OxbLYkjlgpWFnqd28gaZSwar_NQ6_qUS3U76bqbcXVg';
+
+// 🔒 UBICACIÓN SEGURA: Buscar .env FUERA de public_html
+$env_paths = [
+    __DIR__ . '/../../.env',
+    __DIR__ . '/../.env',
+    $_SERVER['DOCUMENT_ROOT'] . '/../.env'
+];
+
+$env_loaded = false;
+foreach ($env_paths as $env_path) {
+    if (loadEnvSafe($env_path)) {
+        $env_loaded = true;
+        break;
+    }
+}
+
+if ($env_loaded) {
+    $GEMINI_API_KEY = $_ENV['GOOGLE_GEMINI_API_KEY'] ?? $_ENV['GEMINI_API_KEY'] ?? $GEMINI_API_KEY;
+    $SUPABASE_URL = $_ENV['PUBLIC_SUPABASE_URL'] ?? $SUPABASE_URL;
+    $SUPABASE_ANON_KEY = $_ENV['PUBLIC_SUPABASE_ANON_KEY'] ?? $SUPABASE_ANON_KEY;
+}
+
+// Obtener variables de entorno
+$GEMINI_API_KEY = $_ENV['GOOGLE_GEMINI_API_KEY'] ?? $_ENV['GEMINI_API_KEY'];
+$SUPABASE_URL = $_ENV['PUBLIC_SUPABASE_URL'];
+$SUPABASE_ANON_KEY = $_ENV['PUBLIC_SUPABASE_ANON_KEY'];
 
 try {
     // Obtener datos del request

@@ -1,0 +1,16 @@
+# Redirects para compatibilidad con rutas de frontend
+RewriteEngine On
+
+# Redirect /api/blog/obtener-generados a PHP API
+RewriteRule ^api/blog/obtener-generados/?$ /php-apis/obtener-blogs.php [L,QSA]
+
+# Redirect /api/blog/buscar-por-tema a PHP API (POST request)
+RewriteRule ^api/blog/buscar-por-tema/?$ /php-apis/buscar-blogs.php [L,QSA]
+
+# Redirect /api/blog/estadisticas a PHP API
+RewriteRule ^api/blog/estadisticas/?$ /php-apis/estadisticas.php [L,QSA]
+
+# Redirect /api/blog/generar a PHP API
+RewriteRule ^api/blog/generar/?$ /php-apis/generar-blog.php [L,QSA]
+
+# ...existing htaccess rules...

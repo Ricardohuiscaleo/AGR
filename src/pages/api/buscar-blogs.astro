@@ -1,0 +1,53 @@
+---
+/**
+ * API Proxy para buscar-blogs.php
+ */
+export const prerender = false;
+
+export async function GET({ request, url }) {
+  try {
+    // Obtener parámetros de query
+    const searchParams = url.searchParams;
+    const tema = searchParams.get('tema');
+
+    // Crear la URL hacia el archivo PHP con parámetros
+    const phpUrl = new URL('/php-apis/buscar-blogs.php', request.url);
+    if (tema) {
+      phpUrl.searchParams.set('tema', tema);
+    }
+
+    const response = await fetch(phpUrl.toString(), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = await response.text();
+
+    return new Response(data, {
+      status: response.status,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
+  } catch (error) {
+    console.error('Error en proxy hacia buscar-blogs.php:', error);
+
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: 'Error interno del servidor proxy',
+        blogs: [],
+      }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+  }
+}
+---

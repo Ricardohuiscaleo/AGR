@@ -264,25 +264,31 @@ export default function GeneradorBlogIA() {
       const temaInfo = TEMAS_PREDEFINIDOS.find((t) => t.id === temaId);
       const esBusquedaPorTema = temaId && temaInfo;
 
+      // 🔧 CORREGIDO: Usar las rutas correctas de las APIs PHP
       const blogsUrl = esBusquedaPorTema
-        ? '/api/blog/buscar-por-tema'
-        : '/api/blog/obtener-generados';
-      const blogsMethod = esBusquedaPorTema ? 'POST' : 'GET';
-      const blogsBody = esBusquedaPorTema ? JSON.stringify({ keywords: temaInfo.keywords }) : null;
+        ? '/api/buscar-blogs' // ✅ Cambiado de '/api/blog/buscar-por-tema'
+        : '/api/obtener-blogs'; // ✅ Cambiado de '/api/blog/obtener-generados'
+
+      const blogsMethod = esBusquedaPorTema ? 'GET' : 'GET'; // ✅ Ambos son GET ahora
+
+      // 🔧 CORREGIDO: buscar-blogs.php espera parámetro 'tema' en URL, no keywords en body
+      const blogsUrlFinal = esBusquedaPorTema
+        ? `${blogsUrl}?tema=${encodeURIComponent(temaInfo.nombre)}`
+        : blogsUrl;
 
       const [blogsRes, statsRes] = await Promise.all([
-        fetch(blogsUrl, {
+        fetch(blogsUrlFinal, {
           method: blogsMethod,
           headers: { 'Content-Type': 'application/json' },
-          body: blogsBody,
         }),
-        fetch('/api/blog/estadisticas'),
+        fetch('/api/estadisticas'), // ✅ Cambiado de '/api/blog/estadisticas'
       ]);
 
       const blogsData = await blogsRes.json();
       const statsData = await statsRes.json();
 
-      setBlogs(blogsData.blogs || []);
+      // 🔧 CORREGIDO: Adaptar a la respuesta de las APIs PHP
+      setBlogs(blogsData.blogs || blogsData.resultados || []);
       setEstadisticas(
         statsData.estadisticas || {
           total_published: 0,
@@ -308,7 +314,9 @@ export default function GeneradorBlogIA() {
     }
     setEstadoGeneracion({ estado: 'generando' });
     try {
-      const response = await fetch('/api/blog/generar', {
+      // 🔧 CORREGIDO: Usar la ruta correcta de la API PHP
+      const response = await fetch('/api/generar-blog', {
+        // ✅ Cambiado de '/api/blog/generar'
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ temaId: temaSeleccionado }),
@@ -329,16 +337,23 @@ export default function GeneradorBlogIA() {
 
   const abrirBlog = async (blogId: string) => {
     try {
-      await fetch('/api/blog/incrementar-vistas', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ postId: blogId }),
-      });
-      const response = await fetch(`/api/blog/obtener-completo/${blogId}`);
-      const data = await response.json();
-      if (data.success) {
-        setBlogSeleccionado(data.blog);
-        cargarDatos(temaSeleccionado);
+      // 🚧 TEMPORALMENTE COMENTADO: Estas APIs no existen aún en PHP
+      // await fetch('/api/blog/incrementar-vistas', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ postId: blogId }),
+      // });
+      // const response = await fetch(`/api/blog/obtener-completo/${blogId}`);
+      // const data = await response.json();
+      // if (data.success) {
+      //   setBlogSeleccionado(data.blog);
+      //   cargarDatos(temaSeleccionado);
+      // }
+
+      // 🔧 SOLUCIÓN TEMPORAL: Buscar el blog en los datos ya cargados
+      const blog = blogs.find((b) => b.id === blogId);
+      if (blog) {
+        setBlogSeleccionado(blog);
       }
     } catch (error) {
       console.error('Error abriendo blog:', error);
@@ -347,11 +362,14 @@ export default function GeneradorBlogIA() {
 
   const darLike = async (blogId: string) => {
     try {
-      await fetch('/api/blog/incrementar-likes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ postId: blogId }),
-      });
+      // 🚧 TEMPORALMENTE COMENTADO: Esta API no existe aún en PHP
+      // await fetch('/api/blog/incrementar-likes', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ postId: blogId }),
+      // });
+
+      // 🔧 SOLUCIÓN TEMPORAL: Actualizar likes localmente
       if (blogSeleccionado && blogSeleccionado.id === blogId) {
         setBlogSeleccionado((prev) => (prev ? { ...prev, likes: (prev.likes || 0) + 1 } : null));
       }
@@ -361,7 +379,7 @@ export default function GeneradorBlogIA() {
         newBlogs[blogIndex].likes = (newBlogs[blogIndex].likes || 0) + 1;
         setBlogs(newBlogs);
       }
-      cargarDatos(temaSeleccionado);
+      // cargarDatos(temaSeleccionado); // Comentado para evitar resetear el like
     } catch (error) {
       console.error('Error dando like:', error);
     }

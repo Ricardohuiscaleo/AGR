@@ -1,0 +1,45 @@
+---
+/**
+ * API Proxy para obtener-blogs.php
+ */
+export const prerender = false;
+
+export async function GET({ request }) {
+  try {
+    const phpUrl = new URL('/php-apis/obtener-blogs.php', request.url);
+
+    const response = await fetch(phpUrl.toString(), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = await response.text();
+
+    return new Response(data, {
+      status: response.status,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
+  } catch (error) {
+    console.error('Error en proxy hacia obtener-blogs.php:', error);
+
+    return new Response(
+      JSON.stringify({
+        success: false,
+        error: 'Error interno del servidor proxy',
+        blogs: [],
+      }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+  }
+}
+---
