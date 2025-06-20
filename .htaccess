@@ -1,10 +1,79 @@
 RewriteEngine On
 
-# Configurar rutas amigables para las APIs
-RewriteRule ^api/generar-blog/?$ php-apis/generar-blog.php [L]
-RewriteRule ^api/obtener-blogs/?$ php-apis/obtener-blogs.php [L]
-RewriteRule ^api/buscar-blogs/?$ php-apis/buscar-blogs.php [L]
-RewriteRule ^api/estadisticas/?$ php-apis/estadisticas.php [L]
+# =====================================================
+# 🚀 RUTAS PRINCIPALES DE API (compatibilidad frontend)
+# =====================================================
+
+# Configurar rutas amigables para las APIs originales con preservación de método POST
+RewriteRule ^api/generar-blog/?$ php-apis/generar-blog.php [L,QSA,P]
+RewriteRule ^api/obtener-blogs/?$ php-apis/obtener-blogs.php [L,QSA]
+RewriteRule ^api/buscar-blogs/?$ php-apis/buscar-blogs.php [L,QSA]
+RewriteRule ^api/estadisticas/?$ php-apis/estadisticas.php [L,QSA]
+
+# =====================================================
+# 🔥 NUEVAS REDIRECCIONES DIRECTAS PARA php-apis (SIN CAMBIO DE MÉTODO)
+# =====================================================
+
+# Permitir acceso directo a php-apis preservando métodos POST
+RewriteCond %{REQUEST_URI} ^/php-apis/generar-blog\.php
+RewriteRule ^(.*)$ $1 [L,QSA]
+
+RewriteCond %{REQUEST_URI} ^/php-apis/incrementar-likes\.php
+RewriteRule ^(.*)$ $1 [L,QSA]
+
+RewriteCond %{REQUEST_URI} ^/php-apis/incrementar-vistas\.php
+RewriteRule ^(.*)$ $1 [L,QSA]
+
+RewriteCond %{REQUEST_URI} ^/php-apis/obtener-completo-blog\.php
+RewriteRule ^(.*)$ $1 [L,QSA]
+
+RewriteCond %{REQUEST_URI} ^/php-apis/estadisticas\.php
+RewriteRule ^(.*)$ $1 [L,QSA]
+
+RewriteCond %{REQUEST_URI} ^/php-apis/obtener-blogs\.php
+RewriteRule ^(.*)$ $1 [L,QSA]
+
+RewriteCond %{REQUEST_URI} ^/php-apis/buscar-blogs\.php
+RewriteRule ^(.*)$ $1 [L,QSA]
+
+# =====================================================
+# 🆕 NUEVAS APIS PHP (agregadas para funcionalidad completa)
+# =====================================================
+
+# API para obtener blog completo por ID
+RewriteRule ^api/obtener-completo-blog/?$ php-apis/obtener-completo-blog.php [L,QSA]
+
+# API para incrementar likes
+RewriteRule ^api/incrementar-likes/?$ php-apis/incrementar-likes.php [L,QSA]
+
+# API para incrementar vistas
+RewriteRule ^api/incrementar-vistas/?$ php-apis/incrementar-vistas.php [L,QSA]
+
+# =====================================================
+# 🔄 COMPATIBILIDAD CON RUTAS FRONTEND ASTRO/TYPESCRIPT
+# =====================================================
+
+# Redirect /api/blog/obtener-generados a PHP API
+RewriteRule ^api/blog/obtener-generados/?$ php-apis/obtener-blogs.php [L,QSA]
+
+# Redirect /api/blog/buscar-por-tema a PHP API
+RewriteRule ^api/blog/buscar-por-tema/?$ php-apis/buscar-blogs.php [L,QSA]
+
+# Redirect /api/blog/estadisticas a PHP API
+RewriteRule ^api/blog/estadisticas/?$ php-apis/estadisticas.php [L,QSA]
+
+# Redirect /api/blog/generar a PHP API con preservación de POST
+RewriteRule ^api/blog/generar/?$ php-apis/generar-blog.php [L,QSA,P]
+
+# Nuevas rutas de compatibilidad para APIs adicionales
+RewriteRule ^api/blog/obtener-completo/([^/]+)/?$ php-apis/obtener-completo-blog.php?id=$1 [L,QSA]
+RewriteRule ^api/blog/incrementar-likes/?$ php-apis/incrementar-likes.php [L,QSA]
+RewriteRule ^api/blog/incrementar-vistas/?$ php-apis/incrementar-vistas.php [L,QSA]
+
+# =====================================================
+# 🚫 BLOQUEAR ACCESO DIRECTO A ARCHIVOS DEBUG
+# =====================================================
+RewriteRule ^php-apis/.*-debug\.php$ - [F,L]
 
 # Configuración de seguridad
 <Files ".env">
