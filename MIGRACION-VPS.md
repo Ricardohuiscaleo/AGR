@@ -98,28 +98,84 @@ EXIT;
 3. Selecciona las bases de datos
 4. Click "Crear"
 
-### 3.4 Script de Migración Automática
+### 3.4 Migración de Bases de Datos
+
+#### Opción A: Bases de datos pequeñas (<2MB) - phpMyAdmin
+
+1. **Exportar desde Hostinger:**
+   - phpMyAdmin Hostinger → Selecciona base de datos
+   - Exportar → Formato SQL → Estructura y datos
+   - Descargar archivo
+
+2. **Importar en VPS:**
+   - phpMyAdmin VPS (https://phpmyadmin.tu-dominio.com)
+   - Nueva → Crear base de datos
+   - Seleccionar base de datos → Importar
+   - Seleccionar archivo SQL → Continuar
+
+#### Opción B: Bases de datos grandes (>2MB) - Terminal
+
+**1. Configurar SSH Key (solo primera vez):**
+
+```bash
+# En tu Mac, genera clave SSH
+ssh-keygen -t ed25519 -C "tu-email@example.com"
+# Presiona Enter 3 veces (sin password)
+
+# Copia la clave pública
+cat ~/.ssh/id_ed25519.pub | pbcopy
+
+# Pega en Easypanel → SSH Keys → Agregar clave SSH
+```
+
+**2. Transferir archivo SQL grande:**
+
+```bash
+# Desde tu Mac
+scp ~/Downloads/nombre_db.sql root@TU_VPS_IP:/tmp/
+```
+
+**3. Crear base de datos e importar:**
+
+```bash
+# En el VPS
+mysql -u agenterag -p'TU_PASSWORD' -e "CREATE DATABASE nombre_db;"
+mysql -u agenterag -p'TU_PASSWORD' nombre_db < /tmp/nombre_db.sql
+```
+
+**4. Verificar importación:**
+
+```bash
+mysql -u agenterag -p'TU_PASSWORD' nombre_db -e "SHOW TABLES;"
+```
+
+#### Opción C: Script Automático (múltiples DBs)
 
 Crea `migrate-to-vps.sh` en el VPS:
 
 ```bash
 #!/bin/bash
-HOSTINGER_HOST="srv1438.hstgr.io"  # Tu host de Hostinger
+HOSTINGER_HOST="srv1438.hstgr.io"
+HOSTINGER_USER="usuario_db"
+HOSTINGER_PASS="password"
+VPS_USER="agenterag"
+VPS_PASS="TU_PASSWORD"
 
 mkdir -p /tmp/db_migration
 
-# Exportar desde Hostinger
-mysqldump -h "$HOSTINGER_HOST" -u usuario_db -p'password' nombre_db > /tmp/db_migration/db.sql
+echo "Exportando desde Hostinger..."
+mysqldump -h "$HOSTINGER_HOST" \
+  -u "$HOSTINGER_USER" \
+  -p"$HOSTINGER_PASS" \
+  --skip-column-statistics \
+  --no-tablespaces \
+  nombre_db > /tmp/db_migration/db.sql
 
-# Crear DB en VPS
-mysql -u root <<EOF
-CREATE DATABASE IF NOT EXISTS nombre_db;
-GRANT ALL PRIVILEGES ON nombre_db.* TO 'usuario'@'%';
-FLUSH PRIVILEGES;
-EOF
+echo "Creando base de datos en VPS..."
+mysql -u "$VPS_USER" -p"$VPS_PASS" -e "CREATE DATABASE IF NOT EXISTS nombre_db;"
 
-# Importar datos
-mysql -u root nombre_db < /tmp/db_migration/db.sql
+echo "Importando datos..."
+mysql -u "$VPS_USER" -p"$VPS_PASS" nombre_db < /tmp/db_migration/db.sql
 
 rm -rf /tmp/db_migration
 echo "✅ Migración completada"
@@ -129,6 +185,41 @@ Ejecutar:
 ```bash
 chmod +x migrate-to-vps.sh
 ./migrate-to-vps.sh
+```
+
+### 3.5 Solución de Problemas Comunes
+
+#### Error: Unknown collation 'utf8mb4_uca1400_ai_ci'
+
+Esto ocurre cuando el SQL viene de MariaDB 10.10+ y el VPS tiene MySQL 8.0:
+
+```bash
+# Reemplazar collation incompatible
+sed -i 's/utf8mb4_uca1400_ai_ci/utf8mb4_unicode_ci/g' /tmp/nombre_db.sql
+mysql -u agenterag -p'TU_PASSWORD' nombre_db < /tmp/nombre_db.sql
+```
+
+#### Error: Table already exists
+
+Limpia y vuelve a importar:
+
+```bash
+mysql -u agenterag -p'TU_PASSWORD' -e "DROP DATABASE nombre_db; CREATE DATABASE nombre_db;"
+mysql -u agenterag -p'TU_PASSWORD' nombre_db < /tmp/nombre_db.sql
+```
+
+#### Archivo SQL muy grande (>100MB)
+
+Usa compresión:
+
+```bash
+# Comprimir antes de transferir
+gzip nombre_db.sql
+scp nombre_db.sql.gz root@TU_VPS_IP:/tmp/
+
+# En el VPS, descomprimir e importar
+gunzip /tmp/nombre_db.sql.gz
+mysql -u agenterag -p'TU_PASSWORD' nombre_db < /tmp/nombre_db.sql
 ```
 
 ## 🔗 Paso 4: Configurar Deploy Automático
@@ -270,7 +361,21 @@ NODE_ENV=production
 
 3. **Acceder:** `https://phpmyadmin.tu-dominio.com`
 
-**Nota:** Este phpMyAdmin sirve para gestionar TODAS las bases de datos de TODOS tus proyectos en el VPS.  
+**Nota:** Este phpMyAdmin sirve para gestionar TODAS las bases de datos de TODOS tus proyectos en el VPS.
+
+### Bases de Datos Migradas (Ejemplo Real)
+
+**Proyecto agenterag.com:**
+- `u958525313_booking` (3 tablas: bookings, booking_sessions, temp_bookings)
+- `u958525313_rag_database` (9 tablas: gaby_contacts, gaby_email_log, gaby_meetings, etc.)
+- `u958525313_app` (538,586 líneas SQL - 75MB)
+
+**Ventajas de MySQL centralizado:**
+- ✅ Un solo phpMyAdmin para todos los proyectos
+- ✅ Un solo servidor MySQL (172.17.0.1:3306)
+- ✅ Un solo usuario con acceso a todo
+- ✅ Backups centralizados
+- ✅ Mejor rendimiento que hosting compartido  
 
 ## 💰 Ahorro
 
