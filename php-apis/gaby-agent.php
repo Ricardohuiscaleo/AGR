@@ -869,7 +869,7 @@ REGLAS:
     private function extractUserName($history) {
         foreach ($history as $msg) {
             if ($msg['role'] === 'user') {
-                $content = $msg['content'];
+                $content = trim($msg['content']);
                 
                 // Patrón 1: "soy [nombre]", "me llamo [nombre]", "mi nombre es [nombre]"
                 if (preg_match('/(?:soy|me llamo|mi nombre es|nombre es:?)\s+([a-záéíóúñü\s]+)/i', $content, $matches)) {
@@ -884,7 +884,14 @@ REGLAS:
                     return trim($matches[2]);
                 }
                 
-                // Patrón 3: Detectar cuando Gaby ya usó el nombre en respuestas anteriores
+                // Patrón 3: Solo nombre (después de que Gaby preguntó)
+                if (preg_match('/^[A-ZÁÉÍÓÚÑÜ][a-záéíóúñü]{2,}(\s+[A-ZÁÉÍÓÚÑÜ][a-záéíóúñü]+)*$/u', $content)) {
+                    if (!preg_match('/^(si|no|ok|bien|mal|hola|gracias|claro|perfecto)$/i', $content)) {
+                        return $content;
+                    }
+                }
+                
+                // Patrón 4: Detectar cuando Gaby ya usó el nombre en respuestas anteriores
                 foreach ($history as $botMsg) {
                     if ($botMsg['role'] === 'assistant' && preg_match('/Hola\s+\*\*([a-záéíóúñü\s]+)\*\*/i', $botMsg['content'], $matches)) {
                         return trim($matches[1]);
