@@ -20,34 +20,25 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' && $_SERVER['REQUEST_METHOD'] !== 'GET
     exit();
 }
 
-// --- Carga de Configuración Segura (LÓGICA CLONADA DEL TEST EXITOSO) ---
-$config_path = __DIR__ . '/../../config.php'; 
+$config_path = __DIR__ . '/../../config.php';
+$config = file_exists($config_path) ? require $config_path : [];
 
-if (!file_exists($config_path) || !is_readable($config_path)) {
-    http_response_code(500);
-    echo json_encode(['success' => false, 'error' => 'Error Crítico: No se pudo cargar config.php desde la ruta verificada.']);
-    exit;
-}
-
-$config = require $config_path;
-
-if (empty($config['PUBLIC_SUPABASE_URL']) || empty($config['PUBLIC_SUPABASE_ANON_KEY'])) {
-    http_response_code(500);
-    echo json_encode(['success' => false, 'error' => 'Error Crítico: Faltan claves de Supabase en el config.php cargado.']);
-    exit;
-}
-
-// Definir variables globales para compatibilidad con el código existente
-$SUPABASE_URL = $config['PUBLIC_SUPABASE_URL'];
-$SUPABASE_ANON_KEY = $config['PUBLIC_SUPABASE_ANON_KEY'];
+$SUPABASE_URL = $config['PUBLIC_SUPABASE_URL'] ?? getenv('PUBLIC_SUPABASE_URL');
+$SUPABASE_ANON_KEY = $config['PUBLIC_SUPABASE_ANON_KEY'] ?? getenv('PUBLIC_SUPABASE_ANON_KEY');
 $OLLAMA_URL = $config['ollama_url'] ?? getenv('OLLAMA_URL') ?: 'http://agenterag-com_ollama:11434';
 $OLLAMA_MODEL = $config['ollama_model'] ?? getenv('OLLAMA_MODEL') ?: 'llama3.2:3b';
 $DB_CONFIG = [
-    'host' => $config['rag_db_host'] ?? 'localhost',
-    'database' => $config['rag_db_name'] ?? 'agenterag',
-    'username' => $config['rag_db_user'] ?? 'root',
-    'password' => $config['rag_db_pass'] ?? ''
+    'host' => $config['rag_db_host'] ?? getenv('RAG_DB_HOST') ?: 'localhost',
+    'database' => $config['rag_db_name'] ?? getenv('RAG_DB_NAME') ?: 'agenterag',
+    'username' => $config['rag_db_user'] ?? getenv('RAG_DB_USER') ?: 'root',
+    'password' => $config['rag_db_pass'] ?? getenv('RAG_DB_PASS') ?: ''
 ];
+
+if (empty($SUPABASE_URL) || empty($SUPABASE_ANON_KEY)) {
+    http_response_code(500);
+    echo json_encode(['success' => false, 'error' => 'Error: Faltan variables de entorno SUPABASE']);
+    exit;
+}
 
 require_once 'gaby-tools-fixed.php';
 
