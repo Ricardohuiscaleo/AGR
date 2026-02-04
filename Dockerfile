@@ -43,7 +43,7 @@ RUN echo '[supervisord]' > /etc/supervisord.conf && \
     echo 'nodaemon=true' >> /etc/supervisord.conf && \
     echo '' >> /etc/supervisord.conf && \
     echo '[program:php-fpm]' >> /etc/supervisord.conf && \
-    echo 'command=php-fpm8 -F' >> /etc/supervisord.conf && \
+    echo 'command=php-fpm -F' >> /etc/supervisord.conf && \
     echo 'autostart=true' >> /etc/supervisord.conf && \
     echo 'autorestart=true' >> /etc/supervisord.conf && \
     echo '' >> /etc/supervisord.conf && \
