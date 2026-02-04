@@ -62,3 +62,4 @@ build/
 # Sensitive files
 api/calendar/service-account.json
 config.php
+!api/calendar/config.php
