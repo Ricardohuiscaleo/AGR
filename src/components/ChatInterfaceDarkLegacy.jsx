@@ -364,12 +364,9 @@ const ChatInterfaceDark = ({ onShowConfetti }) => {
       });
 
       console.log('Request sent:', {
-        url: `${apiUrl}?${queryParams}`,
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-session-id': sessionId,
-        }
+        url: apiUrl,
+        method: 'POST',
+        body: { message: text, session: sessionId }
       });
 
       console.log('API Response status:', response.status, response.ok);
