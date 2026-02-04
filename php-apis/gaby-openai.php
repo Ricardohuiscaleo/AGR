@@ -9,31 +9,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-// Cargar gaby-agent.php
+// Cargar configuración
+$config_path = __DIR__ . '/../../config.php';
+$config = file_exists($config_path) ? require $config_path : [];
+
+// Configurar OpenAI en lugar de Gemini
+$OPENAI_API_KEY = $config['OPENAI_API_KEY'] ?? getenv('OPENAI_API_KEY');
+if (empty($OPENAI_API_KEY)) {
+    http_response_code(500);
+    echo json_encode(['error' => 'OPENAI_API_KEY no configurada']);
+    exit;
+}
+
+// Sobrescribir la variable global de Gemini con OpenAI
+$GEMINI_API_KEY = $OPENAI_API_KEY; // Hack temporal
+
+// Cargar gaby-agent.php (solo clases, no se ejecuta)
 $agentPath = __DIR__ . '/gaby-agent.php';
 if (!file_exists($agentPath)) {
     echo json_encode(['error' => 'gaby-agent.php no encontrado']);
     exit;
 }
-
-// Cargar gaby-agent.php sin ejecutar
-ob_start();
 require_once $agentPath;
-ob_end_clean();
 
 // Extender GabyAgent para usar OpenAI
 class GabyAgentOpenAI extends GabyAgent {
     private $openaiKey;
     
     public function __construct() {
-        $this->openaiKey = getenv('OPENAI_API_KEY');
-        if (empty($this->openaiKey)) {
-            throw new Exception('OPENAI_API_KEY no configurada');
-        }
+        global $OPENAI_API_KEY;
+        $this->openaiKey = $OPENAI_API_KEY;
+        
+        // Llamar constructor padre (usará las variables globales)
         parent::__construct();
     }
     
+    // Sobrescribir el método que llama a Gemini para usar OpenAI
     protected function callGeminiAPI($prompt) {
+        error_log("[OpenAI] Llamando a OpenAI API con prompt: " . substr($prompt, 0, 100));
+        
         $ch = curl_init('https://api.openai.com/v1/chat/completions');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
@@ -51,17 +65,32 @@ class GabyAgentOpenAI extends GabyAgent {
             'Authorization: Bearer ' . $this->openaiKey
         ]);
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
         curl_close($ch);
         
+        if ($response === false) {
+            error_log("[OpenAI] Error cURL: " . $curlError);
+            return $this->generateFallbackResponse();
+        }
+        
         if ($httpCode !== 200) {
+            error_log("[OpenAI] Error HTTP {$httpCode}: " . $response);
             return $this->generateFallbackResponse();
         }
         
         $result = json_decode($response, true);
-        return $result['choices'][0]['message']['content'] ?? $this->generateFallbackResponse();
+        
+        if (isset($result['choices'][0]['message']['content'])) {
+            error_log("[OpenAI] Respuesta exitosa");
+            return $result['choices'][0]['message']['content'];
+        }
+        
+        error_log("[OpenAI] Respuesta sin contenido: " . $response);
+        return $this->generateFallbackResponse();
     }
 }
 
