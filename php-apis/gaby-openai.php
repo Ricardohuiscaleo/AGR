@@ -15,8 +15,10 @@ if (!$apiKey) {
     exit;
 }
 
-$message = $_GET['message'] ?? $_POST['message'] ?? '';
-$session = $_GET['session'] ?? $_POST['session'] ?? '';
+// Leer body JSON
+$input = json_decode(file_get_contents('php://input'), true);
+$message = $input['message'] ?? $_GET['message'] ?? '';
+$session = $input['session'] ?? $_GET['session'] ?? '';
 
 if (empty($message)) {
     echo json_encode(['error' => 'Mensaje requerido']);
