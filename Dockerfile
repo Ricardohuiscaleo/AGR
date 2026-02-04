@@ -21,7 +21,6 @@ COPY --from=build /app/dist /usr/share/nginx/html
 
 # Copiar archivos PHP (API)
 COPY api /usr/share/nginx/html/api
-COPY config.php /usr/share/nginx/html/config.php
 
 # Configurar Nginx para PHP
 RUN echo 'server { \n\
