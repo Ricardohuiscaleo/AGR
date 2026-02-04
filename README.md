@@ -54,3 +54,4 @@ npm run dev
 npm run build
 npm start
 ```
+# Auto-deploy test
