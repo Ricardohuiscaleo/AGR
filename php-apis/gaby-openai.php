@@ -20,8 +20,19 @@ $input = json_decode(file_get_contents('php://input'), true);
 $message = $input['message'] ?? $_GET['message'] ?? '';
 $session = $input['session'] ?? $_GET['session'] ?? '';
 
+// Debug
+error_log('Input: ' . print_r($input, true));
+error_log('Message: ' . $message);
+
 if (empty($message)) {
-    echo json_encode(['error' => 'Mensaje requerido']);
+    echo json_encode([
+        'error' => 'Mensaje requerido',
+        'debug' => [
+            'input' => $input,
+            'get' => $_GET,
+            'raw' => file_get_contents('php://input')
+        ]
+    ]);
     exit;
 }
 
