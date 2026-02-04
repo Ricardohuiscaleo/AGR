@@ -2,6 +2,7 @@ FROM node:18-alpine AS base
 WORKDIR /app
 COPY package*.json ./
 
+# Build v2 - Force rebuild
 FROM base AS deps
 RUN npm ci
 
