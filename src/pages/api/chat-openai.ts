@@ -1,9 +1,13 @@
 import type { APIRoute } from 'astro';
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: import.meta.env.OPENAI_API_KEY
-});
+const getOpenAI = () => {
+  const apiKey = import.meta.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY;
+  if (!apiKey || apiKey === 'sk-proj-REEMPLAZA_CON_TU_KEY_NUEVA') {
+    throw new Error('OPENAI_API_KEY no configurada');
+  }
+  return new OpenAI({ apiKey });
+};
 
 export const GET: APIRoute = async ({ request }) => {
   const url = new URL(request.url);
@@ -18,6 +22,7 @@ export const GET: APIRoute = async ({ request }) => {
   }
 
   try {
+    const openai = getOpenAI();
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
@@ -75,6 +80,7 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   try {
+    const openai = getOpenAI();
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
