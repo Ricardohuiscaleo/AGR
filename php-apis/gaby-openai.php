@@ -16,7 +16,10 @@ if (!file_exists($agentPath)) {
     exit;
 }
 
+// Cargar gaby-agent.php sin ejecutar
+ob_start();
 require_once $agentPath;
+ob_end_clean();
 
 // Extender GabyAgent para usar OpenAI
 class GabyAgentOpenAI extends GabyAgent {
