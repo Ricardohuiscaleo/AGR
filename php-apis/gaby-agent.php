@@ -738,7 +738,7 @@ REGLAS:
                 'Content-Type: application/json',
                 'Content-Length: ' . strlen(json_encode($data))
             ],
-            CURLOPT_TIMEOUT => 30, // 30 segundos
+            CURLOPT_TIMEOUT => 90, // 90 segundos para Ollama
             CURLOPT_CONNECTTIMEOUT => 10, // 10 segundos para conectar
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_FOLLOWLOCATION => true,
