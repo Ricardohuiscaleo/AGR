@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 
 // URLs de los agentes
-const GABY_API_URL = '/api/chat-openai';
+const GABY_API_URL = 'https://api.agenterag.com/php-apis/gaby-openai.php';
 
 // Componente de Tooltip Animado Simple
 const SimpleAnimatedTooltip = ({ children, content }) => {
