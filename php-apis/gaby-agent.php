@@ -25,8 +25,7 @@ $config = file_exists($config_path) ? require $config_path : [];
 
 $SUPABASE_URL = $config['PUBLIC_SUPABASE_URL'] ?? getenv('PUBLIC_SUPABASE_URL');
 $SUPABASE_ANON_KEY = $config['PUBLIC_SUPABASE_ANON_KEY'] ?? getenv('PUBLIC_SUPABASE_ANON_KEY');
-$OLLAMA_URL = $config['ollama_url'] ?? getenv('OLLAMA_URL') ?: 'http://agenterag-com_ollama:11434';
-$OLLAMA_MODEL = $config['ollama_model'] ?? getenv('OLLAMA_MODEL') ?: 'llama3.2:3b';
+$GEMINI_API_KEY = $config['GOOGLE_GEMINI_API_KEY'] ?? getenv('GOOGLE_GEMINI_API_KEY');
 $DB_CONFIG = [
     'host' => $config['rag_db_host'] ?? getenv('RAG_DB_HOST') ?: 'localhost',
     'database' => $config['rag_db_name'] ?? getenv('RAG_DB_NAME') ?: 'agenterag',
@@ -119,8 +118,7 @@ function generateSessionId() {
 
 class GabyAgent {
     private $db;
-    private $ollamaUrl;
-    private $ollamaModel;
+    private $geminiApiKey;
     private $supabaseUrl;
     private $supabaseKey;
     private $conversationState;
@@ -128,16 +126,14 @@ class GabyAgent {
     
     public function __construct() {
         global $DB_CONFIG, $GEMINI_API_KEY, $SUPABASE_URL, $SUPABASE_ANON_KEY;
-        global $OLLAMA_URL, $OLLAMA_MODEL;
-        $this->ollamaUrl = $OLLAMA_URL;
-        $this->ollamaModel = $OLLAMA_MODEL;
+        $this->geminiApiKey = $GEMINI_API_KEY;
         $this->supabaseUrl = $SUPABASE_URL;
         $this->supabaseKey = $SUPABASE_ANON_KEY;
         $this->tools = new GabyTools();
         $this->initDatabase();
         
         // Registrar información de depuración
-        error_log("GabyAgent inicializado con: SUPABASE_URL=" . substr($this->supabaseUrl, 0, 10) . "..., OLLAMA_URL=" . $this->ollamaUrl);
+        error_log("GabyAgent inicializado con: SUPABASE_URL=" . substr($this->supabaseUrl, 0, 10) . "..., GEMINI_API_KEY=" . (empty($this->geminiApiKey) ? 'NOT SET' : 'SET'));
     }
     
     private function initDatabase() {
@@ -714,95 +710,48 @@ REGLAS:
     }
     
     private function callGeminiAPI($prompt) {
-        $url = rtrim($this->ollamaUrl, '/') . '/api/generate';
-        
-        // Prompt optimizado para tinyllama
-        $optimizedPrompt = "Responde SOLO como Gaby, sin explicaciones adicionales.\n\n" . $prompt . "\n\nRespuesta directa:";
+        $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=' . $this->geminiApiKey;
         
         $data = [
-            'model' => $this->ollamaModel,
-            'prompt' => $optimizedPrompt,
-            'stream' => false,
-            'options' => [
-                'temperature' => 0.3,
-                'top_k' => 20,
-                'top_p' => 0.9,
-                'num_predict' => 150,
-                'stop' => ['\n\n', 'Usuario:', 'Gaby:', 'Conversación']
+            'contents' => [[
+                'parts' => [['text' => $prompt]]
+            ]],
+            'generationConfig' => [
+                'temperature' => 0.7,
+                'topK' => 40,
+                'topP' => 0.95,
+                'maxOutputTokens' => 1024
             ]
         ];
         
-        // CONFIGURACIÓN MEJORADA CON MÁS TIEMPO Y REINTENTOS
         $ch = curl_init($url);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => json_encode($data),
-            CURLOPT_HTTPHEADER => [
-                'Content-Type: application/json',
-                'Content-Length: ' . strlen(json_encode($data))
-            ],
-            CURLOPT_TIMEOUT => 90, // 90 segundos para Ollama
-            CURLOPT_CONNECTTIMEOUT => 10, // 10 segundos para conectar
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_MAXREDIRS => 3
+            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_SSL_VERIFYPEER => true
         ]);
         
-        // SISTEMA DE REINTENTOS CON DETECCIÓN DE ERRORES ESPECÍFICOS
-        $maxRetries = 2;
-        $retryCount = 0;
-        $lastError = null;
-        $lastHttpCode = null;
-        
-        while ($retryCount <= $maxRetries) {
-            $response = curl_exec($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            $curlError = curl_error($ch);
-            
-            // Guardar información del último error
-            $lastError = $curlError;
-            $lastHttpCode = $httpCode;
-            
-            // Si la respuesta es exitosa, procesarla
-            if ($response !== false && $httpCode === 200) {
-                curl_close($ch);
-                
-                $result = json_decode($response, true);
-                
-                if (isset($result['response'])) {
-                    return $result['response'];
-                }
-                
-                // Si el JSON es válido pero no tiene contenido
-                error_log("Gemini API respuesta sin contenido: " . $response);
-                curl_close($ch);
-                return $this->generateSpecificFallback('json_error', $response);
-            }
-            
-            // Log del error para debugging
-            error_log("Gemini API intento {$retryCount}: HTTP {$httpCode}, Error: {$curlError}");
-            
-            $retryCount++;
-            
-            // Esperar antes del siguiente intento (backoff exponencial)
-            if ($retryCount <= $maxRetries) {
-                sleep($retryCount * 2); // 2, 4 segundos
-            }
-        }
-        
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
         
-        // Determinar tipo de error y generar fallback específico
-        if (strpos($lastError, 'timeout') !== false || $lastHttpCode === 0) {
-            return $this->generateSpecificFallback('timeout', $lastError);
-        } elseif ($lastHttpCode >= 500) {
-            return $this->generateSpecificFallback('server_error', "HTTP {$lastHttpCode}");
-        } elseif ($lastHttpCode >= 400) {
-            return $this->generateSpecificFallback('client_error', "HTTP {$lastHttpCode}");
-        } else {
-            return $this->generateSpecificFallback('unknown_error', $lastError);
+        if ($response === false || $httpCode !== 200) {
+            error_log("Gemini API error: HTTP {$httpCode}");
+            return $this->generateFallbackResponse();
         }
+        
+        $result = json_decode($response, true);
+        
+        if (isset($result['candidates'][0]['content']['parts'][0]['text'])) {
+            return $result['candidates'][0]['content']['parts'][0]['text'];
+        }
+        
+        error_log("Gemini API respuesta sin contenido: " . $response);
+        return $this->generateFallbackResponse();
     }
     
     private function generateSpecificFallback($errorType, $errorDetails) {
