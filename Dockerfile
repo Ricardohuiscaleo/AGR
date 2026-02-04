@@ -16,7 +16,6 @@ RUN npm run build
 FROM php-base AS runtime
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY php-apis /var/www/html/php-apis
-COPY config.php /var/www/html/
 
 # Configurar Nginx
 RUN echo 'server { listen 80; root /usr/share/nginx/html; index index.html; location / { try_files \$uri \$uri/ =404; } location ~ \.php\$ { fastcgi_pass 127.0.0.1:9000; fastcgi_index index.php; include fastcgi_params; fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name; } }' > /etc/nginx/http.d/default.conf
