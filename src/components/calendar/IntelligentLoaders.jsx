@@ -59,9 +59,9 @@ export const IntelligentLoader = ({ step, loadingState, progress = 0 }) => {
   };
 
   const stepDescriptions = {
-    1: 'Nuestro asistente IA está analizando tu calendario para encontrar los mejores horarios disponibles',
-    2: 'La IA está validando y procesando tu información personal de forma segura',
-    3: 'Finalizando tu reserva con la máxima seguridad y confirmación automática',
+    1: 'Analizando calendario',
+    2: 'Procesando información personal de forma segura',
+    3: 'Finalizando reserva',
   };
 
   useEffect(() => {

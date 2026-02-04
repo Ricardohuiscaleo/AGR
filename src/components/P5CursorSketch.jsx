@@ -189,20 +189,18 @@ const P5CursorSketch = ({ width = '100%', height = '100%', isFixed = false, sect
       // <<-------------------- INICIO CONTENIDO ACTUALIZADO -------------------->>
       const thoughts = [
         // ---- RAG / IA ---- (Más cortos y al grano)
-        'Consultando la base... ¿o la lista del super? 🛒',
+        'Consultando la base de datos o la lista del super? 🛒',
         '¡Embedding encontrado!',
-        'RAG con datos propios. ¡No copies! 😉',
         'Vectorizando... ¡velocidad luz (casi)! ⚡',
         '¿Alucinando? ¡Es RAG! (O casi ✨)',
         'Chunking... como cortar quesito. 🧀',
         'Grounding... ¡pies en el `div`! 🎈',
         'Prompt engineering... ¡suena pro! 😎',
-        '¿LLM? ¿Llama Grande y Lanuda? 🦙',
         'Fine-tuning... ¡a afinar! 🎸',
 
         // ---- Empresas / Oficina (Humor) ----
         'Optimizando... (o no) ✨',
-        '¿Bajar costos? ¡La cafetera NO! ☕🚫',
+        'CAFEINA! ☕',
         'Webhook recibido. ¡Pescando datos! 🎣',
         'Más eficiencia = más reuniones 🤦',
         'Deadline: Ayer. Status: Pánico chic 💅',
@@ -214,7 +212,7 @@ const P5CursorSketch = ({ width = '100%', height = '100%', isFixed = false, sect
         '¡Deploy en viernes! 😬',
         'Stack Overflow... mi hogar ❤️',
         'No es bug, es feature 🎉',
-        '¿API Key? En un post-it... creo 📝',
+        'Heeey, y la API Key???!! En un post-it... creo 📝',
 
         // ---- Existenciales / Autoreferencia / Varios ----
         '¿Cursor o pez evolucionado? 🐠➡️🖱️',

@@ -1,28 +1,29 @@
-// @ts-check
 import { defineConfig } from 'astro/config';
-import tailwind from '@astrojs/tailwind';
 import react from '@astrojs/react';
+import tailwind from '@astrojs/tailwind';
+import node from '@astrojs/node';
 
-// https://astro.build/config
 export default defineConfig({
-  output: 'static',
-  prefetch: {
-    prefetchAll: false,
-    defaultStrategy: 'hover',
-  },
-  server: {
-    port: 4335,
-    host: '0.0.0.0',
-  },
+  integrations: [
+    react(),
+    tailwind()
+  ],
+  output: 'static', // Cambiar a static para estructura tradicional
   vite: {
-    optimizeDeps: {
-      include: ['framer-motion'],
-    },
-    server: {
-      fs: {
-        allow: ['..'],
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            // Separar React en su propio chunk
+            'react-vendor': ['react', 'react-dom'],
+            // Separar componentes grandes
+            'chat-components': ['./src/components/ChatInterfaceDark.jsx'],
+            // Separar utilidades
+            'utils': ['./src/utils/']
+          }
+        }
       },
-    },
-  },
-  integrations: [tailwind(), react()],
+      chunkSizeWarningLimit: 2000 // Aumentar límite a 2MB para evitar warnings
+    }
+  }
 });

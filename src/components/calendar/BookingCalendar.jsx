@@ -6,7 +6,7 @@ import { EmailValidator, PhoneValidator } from '../../lib/n8nClient';
 
 /**
  * Componente avanzado de calendario para reservas
- * Utiliza webhooks de n8n para comunicarse con Google Calendar
+ * Utiliza API PHP propia para comunicarse con Google Calendar
  */
 export default function BookingCalendar({
   calendarId = 'ricardo.huiscaleo@gmail.com',
@@ -88,15 +88,15 @@ export default function BookingCalendar({
     },
   };
 
-  // URLs de webhooks
-  const WEBHOOK_GET_AVAILABILITY =
-    'https://primary-production-33e8.up.railway.app/webhook/156b71d9-9b89-4c39-9f45-3f098923054f';
-  const WEBHOOK_CREATE_BOOKING =
-    'https://primary-production-33e8.up.railway.app/webhook/20eb2a0b-10c6-44ca-9269-3e0597d40216';
-  const WEBHOOK_CREATE_TEMP_BLOCK =
-    'https://primary-production-33e8.up.railway.app/webhook/415c2a5f-3613-4a5f-9743-6746714a9f63';
-  const WEBHOOK_REMOVE_TEMP_BLOCK =
-    'https://primary-production-33e8.up.railway.app/webhook/6f5614ee-d92b-4b9a-aec0-231ae6b0defd';
+  // URLs de la API PHP - detecta automáticamente el entorno
+  const API_BASE_URL =
+    window.location.hostname === 'localhost'
+      ? 'http://localhost:4335/api/calendar'
+      : 'https://agenterag.com/api/calendar';
+  const WEBHOOK_GET_AVAILABILITY = `${API_BASE_URL}/get-availability.php`;
+  const WEBHOOK_CREATE_BOOKING = `${API_BASE_URL}/create-booking-service.php`;
+  const WEBHOOK_CREATE_TEMP_BLOCK = `${API_BASE_URL}/temp-block-db.php?action=create`;
+  const WEBHOOK_REMOVE_TEMP_BLOCK = `${API_BASE_URL}/temp-block-db.php?action=remove`;
 
   const TEMP_BLOCK_DURATION_MS = 10 * 60 * 1000; // 10 minutos
 
@@ -206,29 +206,78 @@ export default function BookingCalendar({
       const blockData = {
         start: slot.start.toISOString(),
         end: new Date(slot.start.getTime() + sessionDuration * 60000).toISOString(),
-        summary: `Reserva Temporal - ${formData.email || 'Usuario Pendiente'}`,
+        summary: `Reserva Temporal - ${formData.email || formData.nombre || 'Usuario Pendiente'}`,
         calendarId: calendarId,
         timeZone: timeZone,
+        client_email: formData.email || null,
+        client_phone: formData.telefono ? `${selectedCountry.code} ${formData.telefono}` : null,
+        notes: formData.notas || null,
       };
 
       const response = await fetch(WEBHOOK_CREATE_TEMP_BLOCK, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Incluir cookies de sesión
         body: JSON.stringify(blockData),
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({
-          message: 'Error en la respuesta del servidor',
-          error: 'Respuesta no JSON',
-        }));
+        const responseText = await response.text();
+        console.error('Error response:', response.status, responseText);
+
+        let errorData;
+        try {
+          // Extraer JSON de la respuesta de error
+          const jsonMatch = responseText.match(/\{.*\}/);
+          const jsonString = jsonMatch ? jsonMatch[0] : responseText;
+          errorData = JSON.parse(jsonString);
+        } catch (e) {
+          errorData = {
+            message: `Error ${response.status}: ${responseText.substring(0, 200)}`,
+            error: 'Respuesta no JSON',
+          };
+        }
+
         throw new Error(
           errorData.message || errorData.error || `Error ${response.status} creando bloqueo`
         );
       }
-      const responseData = await response.json();
+
+      const responseText = await response.text();
+      console.log('Success response (raw):', responseText);
+      console.log('Response headers:', [...response.headers.entries()]);
+      console.log('Response status:', response.status);
+      console.log('Response URL:', response.url);
+
+      let responseData;
+      try {
+        // Extraer JSON de la respuesta (puede tener HTML antes)
+        const jsonMatch = responseText.match(/\{.*\}/);
+        const jsonString = jsonMatch ? jsonMatch[0] : responseText;
+        responseData = JSON.parse(jsonString);
+      } catch (e) {
+        console.error('JSON parse error:', e, 'Response:', responseText);
+        throw new Error(`Respuesta inválida del servidor: ${responseText.substring(0, 100)}`);
+      }
       if (responseData.id) {
         setTempBlockId(responseData.id);
+        
+        // DEBUG: Verificar inmediatamente si se guardó en MySQL
+        setTimeout(async () => {
+          try {
+            const checkResponse = await fetch(`${API_BASE_URL}/verify-immediate.php?id=${responseData.id}`);
+            const checkResult = await checkResponse.json();
+            if (checkResult.status === 'FOUND') {
+              console.log('✅ CONFIRMADO: Registro encontrado inmediatamente:', responseData.id);
+              console.log('Datos:', checkResult.data);
+            } else {
+              console.log('❌ ERROR: Registro NO encontrado inmediatamente:', responseData.id);
+              console.log('Verificación:', checkResult);
+            }
+          } catch (e) {
+            console.log('Error verificando inmediatamente:', e);
+          }
+        }, 100); // Solo 100ms de delay
 
         startBlockTimer(TEMP_BLOCK_DURATION_MS / 1000);
         setBlockExpired(false);
@@ -263,6 +312,7 @@ export default function BookingCalendar({
       const response = await fetch(WEBHOOK_REMOVE_TEMP_BLOCK, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Incluir cookies de sesión
         body: JSON.stringify({ eventId: blockIdToRemove, calendarId: calendarId }),
       });
       if (!response.ok) {
@@ -568,6 +618,35 @@ export default function BookingCalendar({
     }
   };
 
+  // Función para actualizar bloqueo temporal con datos del formulario
+  const updateTempBlock = async (updatedFormData) => {
+    if (!tempBlockId) return;
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/temp-block-db.php?action=update`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          id: tempBlockId,
+          client_name: updatedFormData.nombre || null,
+          client_email: updatedFormData.email || null,
+          client_phone: updatedFormData.telefono ? `${selectedCountry.code} ${updatedFormData.telefono}` : null,
+          notes: updatedFormData.notas || null
+        })
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.log('Error actualizando bloqueo temporal:', response.status, errorText);
+      } else {
+        console.log('✅ Bloqueo temporal actualizado correctamente');
+      }
+    } catch (error) {
+      console.log('Error actualizando bloqueo temporal:', error);
+    }
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
@@ -625,6 +704,12 @@ export default function BookingCalendar({
 
     if (formErrors[name] && name !== 'email') {
       setFormErrors((prev) => ({ ...prev, [name]: null }));
+    }
+    
+    // Actualizar bloqueo temporal con los nuevos datos (solo si hay cambios significativos)
+    if (tempBlockId && value.trim().length > 0) {
+      const updatedFormData = { ...formData, [name]: value };
+      updateTempBlock(updatedFormData);
     }
   };
 
@@ -730,6 +815,7 @@ export default function BookingCalendar({
       const createResponse = await fetch(WEBHOOK_CREATE_BOOKING, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Incluir cookies de sesión
         body: JSON.stringify(bookingDataFinal),
       });
 
@@ -802,7 +888,151 @@ export default function BookingCalendar({
     }
   };
 
-  // Nuevo sistema de renderizado con pasos deslizables
+  // Renderizado optimizado solo de fechas
+  const renderHorizontalDates = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const availableDays = [];
+    for (let i = 0; i < 14; i++) {
+      const date = new Date(currentWeekStart);
+      date.setDate(currentWeekStart.getDate() + i);
+      date.setHours(0, 0, 0, 0);
+
+      const isPast = date < today;
+      const isWeekend = [0, 6].includes(date.getDay());
+      const isSelectable = !isPast && !isWeekend;
+      const slots = isSelectable ? calculateAvailableSlots(date) : [];
+      const slotsCount = slots.length;
+
+      availableDays.push({
+        date,
+        isPast,
+        isWeekend,
+        isSelectable,
+        slotsCount,
+        isToday: date.toDateString() === today.toDateString(),
+      });
+    }
+
+    return (
+      <div className="overflow-x-auto pb-2">
+        <div className="flex gap-2 min-w-max px-1 justify-center">
+          {availableDays.map((day, index) => {
+            const isSelected = selectedDate && day.date.getTime() === selectedDate.getTime();
+
+            return (
+              <button
+                key={index}
+                onClick={() => day.isSelectable && handleDateSelection(day.date)}
+                disabled={!day.isSelectable}
+                className={`
+                  flex-shrink-0 w-16 h-20 p-2 rounded-lg border-2 transition-all duration-200
+                  flex flex-col items-center justify-center text-center
+                  ${
+                    isSelected
+                      ? 'border-blue-500 bg-blue-50 shadow-md transform scale-105'
+                      : day.isSelectable
+                        ? day.slotsCount > 0
+                          ? 'border-green-300 bg-green-50 hover:border-green-400 hover:bg-green-100 hover:scale-105'
+                          : 'border-red-300 bg-red-50'
+                        : 'border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed'
+                  }
+                `}
+              >
+                <div className={`text-lg font-bold mb-1 ${
+                  isSelected ? 'text-blue-700' : day.isSelectable ? (day.slotsCount > 0 ? 'text-green-700' : 'text-red-600') : 'text-gray-400'
+                }`}>
+                  {day.date.getDate()}
+                </div>
+                <div className={`text-xs font-medium mb-1 ${
+                  isSelected ? 'text-blue-600' : day.isSelectable ? 'text-gray-600' : 'text-gray-400'
+                }`}>
+                  {day.date.toLocaleDateString('es-CL', { weekday: 'short' }).toUpperCase()}
+                </div>
+                <div className={`text-xs font-semibold ${
+                  isSelected ? 'text-blue-600' : day.isSelectable ? (day.slotsCount > 0 ? 'text-green-600' : 'text-red-500') : 'text-gray-400'
+                }`}>
+                  {day.isSelectable ? day.slotsCount : '—'}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  // Slots de tiempo integrados sin header redundante
+  const renderIntegratedTimeSlots = () => {
+    const slots = calculateAvailableSlots(selectedDate);
+    if (slots.length === 0) {
+      return (
+        <div className="text-center py-6 text-gray-500 border-t mt-4 pt-4">
+          <p className="text-sm">No hay horarios disponibles para esta fecha</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="border-t mt-4 pt-4">
+        <div className="mb-3">
+          <h4 className="font-semibold text-gray-800 text-sm">
+            {selectedDate.toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' })}
+          </h4>
+          <p className="text-xs text-gray-600">{slots.length} horarios disponibles</p>
+        </div>
+
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 mb-4">
+          {slots.map((slot, index) => {
+            const isSelected = selectedSlot && selectedSlot.start.getTime() === slot.start.getTime();
+            return (
+              <button
+                key={index}
+                onClick={() => handleSlotSelection(slot)}
+                disabled={loading}
+                className={`
+                  p-2 rounded-md border-2 transition-all duration-200 text-sm font-medium
+                  ${
+                    isSelected
+                      ? 'border-blue-500 bg-blue-500 text-white shadow-md transform scale-105'
+                      : 'border-gray-300 bg-white text-gray-700 hover:border-blue-400 hover:bg-blue-50'
+                  }
+                  ${loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                `}
+              >
+                {slot.start.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', hour12: false })}
+              </button>
+            );
+          })}
+        </div>
+
+        {selectedSlot && (
+          <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <h5 className="font-medium text-blue-900 text-sm">✓ Horario reservado</h5>
+                <p className="text-xs text-blue-700">
+                  {selectedSlot.start.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' })} • {sessionDuration} min
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setSelectedSlot(null);
+                  if (tempBlockId) removeTemporaryBlock();
+                }}
+                className="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 rounded hover:bg-blue-100"
+              >
+                Cambiar
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Sistema anterior mantenido para compatibilidad
   const renderHorizontalSteps = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -875,8 +1105,8 @@ export default function BookingCalendar({
         </div>
 
         {/* Grid horizontal de fechas con scroll */}
-        <div className="horizontal-dates-grid overflow-x-auto pb-4">
-          <div className="flex gap-3 min-w-max px-2">
+        <div className="horizontal-dates-grid overflow-x-auto pb-4 overflow-y-visible">
+          <div className="flex gap-3 min-w-max px-2 justify-center py-2">
             {availableDays.map((day, index) => {
               const isSelected = selectedDate && day.date.getTime() === selectedDate.getTime();
 
@@ -893,7 +1123,7 @@ export default function BookingCalendar({
                         ? 'border-blue-500 bg-blue-50 shadow-lg transform scale-105'
                         : day.isSelectable
                           ? day.slotsCount > 0
-                            ? 'border-green-300 bg-green-50 hover:border-green-400 hover:bg-green-100 hover:scale-102'
+                            ? 'border-green-300 bg-green-50 hover:border-green-400 hover:bg-green-100 hover:scale-105 hover:shadow-md hover:-translate-y-1'
                             : 'border-red-300 bg-red-50'
                           : 'border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed'
                     }
@@ -950,11 +1180,6 @@ export default function BookingCalendar({
                   >
                     {day.isSelectable ? `${day.slotsCount}` : '—'}
                   </div>
-
-                  {/* Indicador "hoy" */}
-                  {day.isToday && (
-                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-400 rounded-full border-2 border-white"></div>
-                  )}
                 </button>
               );
             })}
@@ -1113,54 +1338,66 @@ export default function BookingCalendar({
                 </button>
               </div>
             ) : (
-              <div className="space-y-8">
+              <div className="space-y-6">
                 {/* Header compacto */}
                 <div className="text-center">
-                  <h2 className="text-2xl font-bold text-blue-300 mb-2">Selecciona fecha y hora</h2>
-                  <p className="text-blue-200">Elige tu horario preferido para la consultoría</p>
+                  <h2 className="text-xl font-bold text-gray-800 mb-1">Selecciona fecha y hora</h2>
+                  <p className="text-sm text-gray-600">Elige tu horario preferido para la consultoría</p>
                 </div>
 
-                {/* Sistema horizontal de fechas */}
-                <div className="bg-white rounded-xl border shadow-sm p-6">
-                  {renderHorizontalSteps()}
-                </div>
-
-                {/* Slots de tiempo cuando hay fecha seleccionada */}
-                {selectedDate && (
-                  <div className="bg-white rounded-xl border shadow-sm p-6">
-                    {renderCompactTimeSlots()}
-
-                    {/* Botones de navegación integrados en la tarjeta de horarios */}
-                    <div className="flex justify-between mt-6 pt-4 border-t border-gray-200">
-                      <button
-                        onClick={handleBack}
-                        disabled={currentStep === 1 || formLoading}
-                        className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
-                      >
-                        ← Atrás
-                      </button>
-
-                      {currentStep < 3 && (
-                        <button
-                          onClick={handleContinue}
-                          disabled={formLoading || loading || (currentStep === 1 && !selectedSlot)}
-                          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
-                        >
-                          {formLoading ? 'Procesando...' : 'Continuar →'}
-                        </button>
-                      )}
-                    </div>
+                {/* Tarjeta unificada de calendario */}
+                <div className="bg-white rounded-xl border shadow-sm p-4">
+                  {/* Header de mes */}
+                  <div className="flex items-center justify-between mb-4">
+                    <button
+                      onClick={() => navigateWeek(-1)}
+                      disabled={loading}
+                      className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 disabled:opacity-50 transition-colors"
+                    >
+                      <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </button>
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      {currentWeekStart.toLocaleDateString('es-CL', { month: 'long', year: 'numeric' })}
+                    </h3>
+                    <button
+                      onClick={() => navigateWeek(1)}
+                      disabled={loading}
+                      className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 disabled:opacity-50 transition-colors"
+                    >
+                      <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
                   </div>
-                )}
+                  
+                  {/* Grid de fechas */}
+                  {renderHorizontalDates()}
+                  
+                  {/* Slots de tiempo integrados */}
+                  {selectedDate && renderIntegratedTimeSlots()}
 
-                {/* Información discreta de la consultoría */}
-                <div className="text-center text-sm text-cyan-300 space-y-1">
-                  <p>
-                    💻 Sesión virtual de {sessionDuration} min por Google Meet • {sessionPrice}
-                  </p>
-                  <p className="text-xs text-blue-200">
-                    Consultoría personalizada con análisis y propuesta técnica
-                  </p>
+                  {/* Botones de navegación */}
+                  <div className="flex justify-between mt-6 pt-4 border-t border-gray-200">
+                    <button
+                      onClick={handleBack}
+                      disabled={currentStep === 1 || formLoading}
+                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+                    >
+                      ← Atrás
+                    </button>
+
+                    {currentStep < 3 && (
+                      <button
+                        onClick={handleContinue}
+                        disabled={formLoading || loading || (currentStep === 1 && !selectedSlot)}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+                      >
+                        {formLoading ? 'Procesando...' : 'Continuar →'}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
@@ -1182,10 +1419,10 @@ export default function BookingCalendar({
             ) : (
               <>
                 <div className="text-center mb-6">
-                  <h3 className="text-lg font-semibold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">
                     Información de contacto
                   </h3>
-                  <p className="text-sm text-cyan-300">
+                  <p className="text-sm text-gray-600">
                     Completa tus datos para confirmar la reserva
                   </p>
                 </div>
@@ -1211,10 +1448,12 @@ export default function BookingCalendar({
                         name="nombre"
                         value={formData.nombre}
                         onChange={handleInputChange}
-                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 ${
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white ${
                           formErrors.nombre ? 'border-red-500' : 'border-gray-300'
                         }`}
                         placeholder="Tu nombre completo"
+                        autoComplete="name"
+                        disabled={formLoading}
                       />
                       {formErrors.nombre && (
                         <p className="text-red-500 text-xs mt-1">{formErrors.nombre}</p>
@@ -1240,7 +1479,7 @@ export default function BookingCalendar({
                           name="telefono"
                           value={formData.telefono}
                           onChange={handleInputChange}
-                          className={`flex-1 px-3 py-2 border rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 ${
+                          className={`flex-1 px-3 py-2 border rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white ${
                             formErrors.telefono
                               ? 'border-red-500'
                               : phoneWarnings.length > 0
@@ -1251,6 +1490,8 @@ export default function BookingCalendar({
                             PhoneValidator.getPatternInfo(selectedCountry.country)?.example ||
                             '9 XXXX XXXX'
                           }
+                          autoComplete="tel"
+                          disabled={formLoading}
                         />
                       </div>
                       {formErrors.telefono && (
@@ -1313,7 +1554,7 @@ export default function BookingCalendar({
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 ${
+                      className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white ${
                         formErrors.email
                           ? 'border-red-500'
                           : emailWarnings.length > 0
@@ -1321,6 +1562,8 @@ export default function BookingCalendar({
                             : 'border-gray-300'
                       }`}
                       placeholder="tu.email@empresa.com"
+                      autoComplete="email"
+                      disabled={formLoading}
                     />
                     {formErrors.email && (
                       <p className="text-red-300 text-xs mt-1 flex items-center">
@@ -1380,8 +1623,9 @@ export default function BookingCalendar({
                       value={formData.notas}
                       onChange={handleInputChange}
                       rows="3"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white resize-none"
                       placeholder="Cuéntanos brevemente sobre tu empresa o necesidades específicas..."
+                      disabled={formLoading}
                     />
                   </div>
                 </form>
@@ -1556,13 +1800,17 @@ export default function BookingCalendar({
 
     return (
       <nav aria-label="Progreso de la reserva" className="mb-8">
-        <ol role="list" className="flex items-center justify-center space-x-8">
+        <ol role="list" className="flex items-center justify-center space-x-2 md:space-x-8">
           {steps.map((stepName, stepIdx) => (
             <li key={stepName} className="flex items-center">
               {currentStep > stepIdx + 1 ? (
                 <div className="flex items-center text-blue-300">
-                  <span className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-blue-400 rounded-full">
-                    <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <span className="flex-shrink-0 w-6 h-6 md:w-8 md:h-8 flex items-center justify-center bg-blue-400 rounded-full">
+                    <svg
+                      className="w-3 h-3 md:w-5 md:h-5 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
                       <path
                         fillRule="evenodd"
                         d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -1570,24 +1818,36 @@ export default function BookingCalendar({
                       />
                     </svg>
                   </span>
-                  <span className="ml-2 text-sm font-medium text-blue-300">{stepName}</span>
+                  <span className="ml-1 md:ml-2 text-xs md:text-sm font-medium text-blue-300 hidden xs:inline">
+                    {stepName}
+                  </span>
                 </div>
               ) : currentStep === stepIdx + 1 ? (
                 <div className="flex items-center text-blue-300">
-                  <span className="flex-shrink-0 w-8 h-8 flex items-center justify-center border-2 border-blue-400 rounded-full">
-                    <span className="text-blue-300 font-medium">{stepIdx + 1}</span>
+                  <span className="flex-shrink-0 w-6 h-6 md:w-8 md:h-8 flex items-center justify-center border-2 border-blue-400 rounded-full">
+                    <span className="text-blue-300 font-medium text-xs md:text-sm">
+                      {stepIdx + 1}
+                    </span>
                   </span>
-                  <span className="ml-2 text-sm font-medium text-blue-300">{stepName}</span>
+                  <span className="ml-1 md:ml-2 text-xs md:text-sm font-medium text-blue-300 hidden xs:inline">
+                    {stepName}
+                  </span>
                 </div>
               ) : (
                 <div className="flex items-center text-gray-300">
-                  <span className="flex-shrink-0 w-8 h-8 flex items-center justify-center border-2 border-gray-400 rounded-full">
-                    <span className="text-gray-300 font-medium">{stepIdx + 1}</span>
+                  <span className="flex-shrink-0 w-6 h-6 md:w-8 md:h-8 flex items-center justify-center border-2 border-gray-400 rounded-full">
+                    <span className="text-gray-300 font-medium text-xs md:text-sm">
+                      {stepIdx + 1}
+                    </span>
                   </span>
-                  <span className="ml-2 text-sm font-medium text-gray-300">{stepName}</span>
+                  <span className="ml-1 md:ml-2 text-xs md:text-sm font-medium text-gray-300 hidden xs:inline">
+                    {stepName}
+                  </span>
                 </div>
               )}
-              {stepIdx !== steps.length - 1 && <div className="ml-4 w-16 h-0.5 bg-gray-400"></div>}
+              {stepIdx !== steps.length - 1 && (
+                <div className="ml-1 md:ml-4 w-4 md:w-16 h-0.5 bg-gray-400"></div>
+              )}
             </li>
           ))}
         </ol>
@@ -1619,17 +1879,17 @@ export default function BookingCalendar({
           <h3 className="text-3xl font-bold mb-3 bg-gradient-to-r from-green-400 to-emerald-200 bg-clip-text text-transparent">
             ¡Reserva Confirmada!
           </h3>
-          <p className="text-lg text-white mb-2 font-medium">
+          <p className="text-base md:text-lg text-purple-300 mb-2 font-medium">
             Tu asesoría para el{' '}
-            <span className="text-cyan-300 font-semibold">
+            <span className="text-purple-500 font-semibold">
               {selectedDate?.toLocaleDateString('es-CL', {
-                weekday: 'long',
+                weekday: 'short',
                 day: 'numeric',
                 month: 'long',
               })}
             </span>
             {' a las '}
-            <span className="text-cyan-300 font-semibold">
+            <span className="text-purple-500 font-semibold">
               {selectedSlot?.start.toLocaleTimeString('es-CL', {
                 hour: '2-digit',
                 minute: '2-digit',
@@ -1637,9 +1897,9 @@ export default function BookingCalendar({
             </span>
             {' ha sido confirmada.'}
           </p>
-          <p className="text-sm text-orange-200 mb-6 font-medium">
+          <p className="text-sm text-purple-300 mb-6 font-medium">
             Recibirás un correo electrónico con los detalles en{' '}
-            <span className="text-white font-semibold">{formData.email}</span>.
+            <span className="text-purple-500 font-semibold">{formData.email}</span>.
           </p>
           <button
             onClick={() => {
@@ -1717,29 +1977,50 @@ export default function BookingCalendar({
 
   // Render principal del componente
   if (bookingStatus) {
-    return <div className={`max-w-4xl mx-auto px-4 ${className}`}>{renderBookingStatus()}</div>;
+    return (
+      <div className={`w-full h-full ${className}`}>
+        <div className="bg-white rounded-xl border shadow-xl p-4 sm:p-6 md:p-8 h-full">
+          {renderBookingStatus()}
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className={`max-w-6xl mx-auto px-4 py-8 ${className}`} ref={calendarRef}>
-      {/* Header más simple */}
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">{title}</h1>
-        <p className="text-lg text-gray-600">{description}</p>
-      </div>
-
-      {/* Indicador de pasos horizontales */}
-      {renderStepIndicator()}
-
-      {/* Error message */}
-      {error && (
-        <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-400 rounded-r-md">
-          <p className="text-red-700 text-sm">{error}</p>
+    <div className={`w-full h-full ${className}`} ref={calendarRef}>
+      {/* Contenedor principal unificado con altura completa y border radius */}
+      <div className="bg-white rounded-xl border shadow-xl p-3 sm:p-6 md:p-8 space-y-4 md:space-y-8 h-full overflow-visible flex flex-col">
+        {/* Header más simple */}
+        <div className="text-center">
+          <h1 className="text-xl md:text-3xl font-bold text-gray-900 mb-1 md:mb-2">{title}</h1>
+          <p className="text-sm md:text-lg text-gray-600">{description}</p>
         </div>
-      )}
 
-      {/* Contenido principal */}
-      {renderStepContent()}
+        {/* Indicador de pasos horizontales */}
+        {renderStepIndicator()}
+        
+        {/* Temporizador compacto */}
+        {blockTimeRemaining && (currentStep === 1 || currentStep === 2) && (
+          <div className="text-center">
+            <div className="inline-flex items-center px-3 py-1 bg-blue-50 border border-blue-200 rounded-full text-sm text-blue-700">
+              <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+              </svg>
+              Horario reservado: {Math.floor(blockTimeRemaining / 60)}:{(blockTimeRemaining % 60).toString().padStart(2, '0')}
+            </div>
+          </div>
+        )}
+
+        {/* Error message */}
+        {error && (
+          <div className="p-3 md:p-4 bg-red-50 border-l-4 border-red-400 rounded-r-md">
+            <p className="text-red-700 text-sm">{error}</p>
+          </div>
+        )}
+
+        {/* Contenido principal con contenedor flexible que ocupa el resto del espacio */}
+        <div className="flex-1 flex flex-col">{renderStepContent()}</div>
+      </div>
     </div>
   );
 }

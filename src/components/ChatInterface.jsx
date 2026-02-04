@@ -267,7 +267,23 @@ const ChatInterface = () => {
       // Obtener o crear session_id
       let sessionId = localStorage.getItem('session_id');
       if (!sessionId) {
-        sessionId = crypto.randomUUID().replace(/-/g, '');
+        // Función segura para generar UUID que funciona en todos los navegadores
+        try {
+          // Método moderno usando crypto.randomUUID()
+          if (window.crypto && crypto.randomUUID) {
+            sessionId = crypto.randomUUID().replace(/-/g, '');
+          } else {
+            // Fallback para navegadores que no soportan crypto.randomUUID
+            const buf = new Uint8Array(16);
+            window.crypto.getRandomValues(buf);
+            sessionId = Array.from(buf)
+              .map(b => b.toString(16).padStart(2, '0'))
+              .join('');
+          }
+        } catch (error) {
+          // Último recurso: timestamp + número aleatorio
+          sessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
+        }
         localStorage.setItem('session_id', sessionId);
       }
 

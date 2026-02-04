@@ -134,7 +134,7 @@ html[data-theme='dark'] .animated-gradient-text.shimmer-high .text-content::afte
   position: relative;
   z-index: 2;
   padding: 0; /* Eliminamos el padding */
-  margin: 5px; /* Eliminamos el margen */
+  margin: 2px; /* Eliminamos el margen */
   background-size: 300% 100%;
   background-clip: text;
   -webkit-background-clip: text;
@@ -153,7 +153,7 @@ html[data-theme='dark'] .animated-gradient-text,
 /* Específicamente para el pseudo-elemento en tema oscuro */
 html[data-theme='dark'] .theme-aware::before,
 :root:not([data-theme='light']) .theme-aware::before {
-  background: linear-gradient(to right, #06b6d4, #22c55e, #fb923c, #d946ef, #00b8ff, #22c55e);
+  background: linear-gradient(to right, #00fffb, #007284, #ff8119, #d946ef, #00b8ff, #00b542);
   background-size: 300% 100%;
   animation: gradient 8s linear infinite;
 }

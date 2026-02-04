@@ -8,7 +8,7 @@ interface Props {
 }
 
 const {
-  particleCount = 150, // Mucho más reducido para mejor rendimiento
+  particleCount = window.innerWidth < 768 ? 20 : 40, // Aún más reducido para móvil
   opacity = 0.3,
   speed = 0.5,
   colors = ['#7c3aed', '#a855f7', '#c084fc', '#e879f9'], // Colores morados para contacto
@@ -17,36 +17,33 @@ const {
 
 <div id="chladni-background" class="chladni-background-container">
   <canvas id="chladni-canvas" class="chladni-canvas"></canvas>
+  <div class="relative z-10 w-full h-full">
+    <slot />
+  </div>
 </div>
 
 <style>
   .chladni-background-container {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: -1;
-    pointer-events: none;
+    width: 100%;
+    height: 100%;
     overflow: hidden;
-    opacity: 0;
-    transition: opacity 0.5s ease;
+    z-index: 0;
   }
 
   .chladni-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     display: block;
+    pointer-events: none;
   }
 
-  /* Asegurar que se aplique correctamente en modo claro y oscuro */
-  html[data-theme='dark'] .chladni-background-container {
-    opacity: 0.8;
-  }
 
-  html[data-theme='light'] .chladni-background-container {
-    opacity: 0.6;
-  }
 </style>
 
 <script type="module" define:vars={{ particleCount, opacity, speed, colors }}>
@@ -67,11 +64,18 @@ const {
     }
 
     console.log('ChladniBackground: Inicializando efecto sin Three.js');
+    console.log('Container dimensions:', container.getBoundingClientRect());
 
     // Configuración del canvas
     function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const rect = container.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = rect.height + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      console.log('Canvas resized:', rect.width, 'x', rect.height);
     }
     resizeCanvas();
 
@@ -132,13 +136,13 @@ const {
         }
       }
 
-      draw(ctx, colorIndex, time) {
+      draw(ctx, time) {
         const size = 1 + Math.sin(time * 0.002 + this.phase) * 0.5;
         const alpha = this.life * opacity;
 
         ctx.save();
         ctx.globalAlpha = alpha;
-        ctx.fillStyle = colors[colorIndex % colors.length];
+        ctx.fillStyle = colors[0]; // Color fijo sin rotación
         ctx.beginPath();
         ctx.arc(this.x, this.y, size, 0, Math.PI * 2);
         ctx.fill();
@@ -156,6 +160,8 @@ const {
     let isVisible = false;
     let animationId = null;
     let startTime = Date.now();
+    let currentIntensity = 0;
+    let targetIntensity = 0;
 
     // Función de animación
     function animate() {
@@ -170,43 +176,38 @@ const {
       ctx.fillStyle = `rgba(0, 0, 0, 0.02)`;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Actualizar y dibujar partículas
-      particles.forEach((particle, index) => {
+      // Renderizado simple sin cambios de color
+      particles.forEach((particle) => {
         particle.update(currentTime);
-        const colorIndex = Math.floor(currentTime * 0.0001 + index * 0.1);
-        particle.draw(ctx, colorIndex, currentTime);
+        particle.draw(ctx, currentTime);
       });
 
       animationId = requestAnimationFrame(animate);
     }
 
-    // Detección de visibilidad de la sección contacto-part3
-    const targetSection = document.getElementById('contacto-part3');
-    if (targetSection) {
-      const sectionObserver = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              console.log('ChladniBackground: Activando en contacto-part3');
-              container.style.opacity = '1';
-              isVisible = true;
-              if (!animationId) {
-                animate();
-              }
-            } else {
-              console.log('ChladniBackground: Desactivando');
-              container.style.opacity = '0';
-              isVisible = false;
-            }
-          });
-        },
-        { threshold: 0.1 }
-      );
+    // Intersection Observer para auto-stop/start basado en viewport
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          isVisible = entry.isIntersecting;
+          if (entry.isIntersecting && !animationId) {
+            animate();
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
 
-      sectionObserver.observe(targetSection);
-    } else {
-      console.warn('ChladniBackground: Sección contacto-part3 no encontrada');
+    if (container) {
+      observer.observe(container);
     }
+
+    // Iniciar inmediatamente con delay para asegurar que el DOM esté listo
+    setTimeout(() => {
+      resizeCanvas();
+      isVisible = true;
+      animate();
+    }, 100);
 
     // Manejo de redimensionamiento
     let resizeTimeout;

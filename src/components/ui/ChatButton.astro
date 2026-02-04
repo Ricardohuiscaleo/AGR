@@ -1,0 +1,140 @@
+---
+// src/components/ui/ChatButton.astro
+---
+
+<button
+  id="chat-toggle-button"
+  class="chat-toggle-button"
+  aria-label="Abrir chat"
+  title="Abrir chat"
+>
+  <div class="chat-icon-wrapper">
+    <svg
+      class="chat-icon-svg"
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    </svg>
+  </div>
+  <div class="chat-text-container">
+    <span id="chat-dynamic-phrase" class="chat-dynamic-phrase">¡Hola! Pregúntame algo...</span>
+  </div>
+</button>
+
+<script>
+  declare global {
+    interface DocumentEventMap {
+      chatStatusUpdate: CustomEvent<{ phrase: string }>;
+      openChatModal: CustomEvent;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const chatToggleButton = document.getElementById('chat-toggle-button');
+    const chatDynamicPhrase = document.getElementById('chat-dynamic-phrase');
+
+    if (chatToggleButton && chatDynamicPhrase) {
+      chatToggleButton.addEventListener('click', () => {
+        document.dispatchEvent(new CustomEvent('openChatModal'));
+      });
+
+      document.addEventListener('chatStatusUpdate', (event) => {
+        if (event.detail && event.detail.phrase) {
+          chatDynamicPhrase.textContent = event.detail.phrase;
+        }
+      });
+
+      const phrases = [
+        'Estoy para ayudarte',
+        '¿Hablamos de costos?',
+        'Automatiza tu negocio',
+        'Consulta sobre IA RAG',
+        'Agenda una reunión aquí',
+        '¿Tienes alguna duda?',
+      ];
+      let currentPhraseIndex = 0;
+
+      const updatePhrase = () => {
+        if (!chatDynamicPhrase) return;
+        chatDynamicPhrase.classList.add('phrase-fade-out');
+        setTimeout(() => {
+          currentPhraseIndex = (currentPhraseIndex + 1) % phrases.length;
+          chatDynamicPhrase.textContent = phrases[currentPhraseIndex];
+          chatDynamicPhrase.classList.remove('phrase-fade-out');
+        }, 300);
+      };
+      setInterval(updatePhrase, 5000);
+    }
+  });
+</script>
+
+<style>
+  .chat-toggle-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(110deg, #7c3aed 0%, #a855f7 50%, #7c3aed 100%);
+    background-size: 200% 100%;
+    box-shadow:
+      0 0 20px rgba(124, 58, 237, 0.4),
+      0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    user-select: none;
+  }
+  .chat-toggle-button:hover {
+    background-position: right center;
+    transform: translateY(-3px) scale(1.03);
+    box-shadow:
+      0 0 30px rgba(168, 85, 247, 0.6),
+      0 8px 15px rgba(0, 0, 0, 0.3);
+  }
+  .chat-toggle-button:active {
+    transform: translateY(-1px) scale(1);
+  }
+  .chat-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .chat-icon-svg {
+    transition: transform 0.3s ease;
+  }
+  .chat-toggle-button:hover .chat-icon-svg {
+    transform: rotate(-15deg) scale(1.1);
+  }
+  .chat-text-container {
+    position: relative;
+    height: 1.2em;
+  }
+  .chat-dynamic-phrase {
+    display: inline-block;
+    white-space: nowrap;
+    transition:
+      opacity 0.3s ease-in-out,
+      transform 0.3s ease-in-out;
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .chat-dynamic-phrase.phrase-fade-out {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+</style>

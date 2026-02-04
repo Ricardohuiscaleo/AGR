@@ -148,6 +148,15 @@ export default function TimelineCharts() {
   };
 
   useEffect(() => {
+    // Optimizar para dispositivos móviles
+    if (isMobile()) {
+      // Reducir la calidad de animación en dispositivos móviles
+      Chart.defaults.animation.duration = 500;
+      Chart.defaults.animation.easing = 'linear';
+      Chart.defaults.responsive = true;
+      Chart.defaults.maintainAspectRatio = false;
+    }
+    
     // Limpiar gráficos anteriores
     if (chartInstances.current) {
       chartInstances.current.forEach((chart) => {
@@ -158,16 +167,15 @@ export default function TimelineCharts() {
 
     // Crear nuevos canvas para cada gráfico
     costComparisonChartRef.current = document.createElement('canvas');
-    // Ya no necesitamos los gráficos de anillos individuales, sino un único gráfico de barras
     const costDistributionChartRef = document.createElement('canvas');
     roiChartRef.current = document.createElement('canvas');
     efficiencyChartRef.current = document.createElement('canvas');
     financialChartRef.current = document.createElement('canvas');
 
     // Intentar montar los gráficos en contenedores externos
-    const cost = mountChartToExternalContainer('cost-comparison-container', costComparisonChartRef);
+    mountChartToExternalContainer('cost-comparison-container', costComparisonChartRef);
 
-    // Para el gráfico de distribución, ahora usamos un enfoque diferente con barras comparativas
+    // Para el gráfico de distribución
     const pieChartsContainer = document.getElementById('pie-charts-container');
     if (pieChartsContainer) {
       // Limpiar el contenedor
@@ -182,7 +190,7 @@ export default function TimelineCharts() {
       chartContainer.style.height = '100%';
       chartContainer.style.position = 'relative';
 
-      // Título para el gráfico, he dejado el texto vacío para que se ajuste al nuevo gráfico
+      // Título para el gráfico
       const title = document.createElement('p');
       title.className = 'text-center text-amber-400 mb-4 font-medium text-base md:text-lg';
       title.textContent = '';
@@ -192,7 +200,7 @@ export default function TimelineCharts() {
       chartContainer.appendChild(costDistributionChartRef);
       pieChartsContainer.appendChild(chartContainer);
 
-      // Guardar la referencia del canvas en un ref para poder acceder a él durante el redimensionamiento
+      // Guardar la referencia del canvas
       window.costDistributionChartCanvas = costDistributionChartRef;
 
       // Crear y montar el gráfico de barras comparativas
@@ -200,71 +208,38 @@ export default function TimelineCharts() {
     }
 
     // Montar los demás gráficos
-    const roi = mountChartToExternalContainer('roi-chart-container', roiChartRef);
-    const efficiency = mountChartToExternalContainer(
-      'efficiency-chart-container',
-      efficiencyChartRef
-    );
-    const financial = mountChartToExternalContainer('financial-chart-container', financialChartRef);
+    mountChartToExternalContainer('roi-chart-container', roiChartRef);
+    mountChartToExternalContainer('efficiency-chart-container', efficiencyChartRef);
+    mountChartToExternalContainer('financial-chart-container', financialChartRef);
 
     // Iniciar la creación de gráficos
     initCharts();
 
-    // Añadir listener para redimensionamiento de la ventana
+    // Optimizar el manejo de eventos de redimensionamiento
+    let resizeTimeout;
     const handleResize = () => {
-      // Destruir gráficos existentes
-      chartInstances.current.forEach((chart) => {
-        if (chart) chart.destroy();
-      });
-      chartInstances.current = [];
+      if (resizeTimeout) clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        // Destruir gráficos existentes
+        chartInstances.current.forEach((chart) => {
+          if (chart) chart.destroy();
+        });
+        chartInstances.current = [];
 
-      // Volver a inicializar gráficos con nuevos tamaños
-      initCharts();
-
-      // Comprobar si el canvas del gráfico de distribución existe y recrearlo
-      if (window.costDistributionChartCanvas) {
-        initCostDistributionChart(window.costDistributionChartCanvas);
-      } else {
-        // Si por alguna razón no se guardó la referencia, buscar el contenedor y recrearlo
-        const pieChartsContainer = document.getElementById('pie-charts-container');
-        if (pieChartsContainer) {
-          // Limpiar el contenedor
-          while (pieChartsContainer.firstChild) {
-            pieChartsContainer.removeChild(pieChartsContainer.firstChild);
-          }
-
-          // Crear nuevo canvas
-          const newCanvas = document.createElement('canvas');
-
-          // Crear un contenedor para el nuevo gráfico de barras
-          const chartContainer = document.createElement('div');
-          chartContainer.className = 'w-full h-full';
-          chartContainer.style.width = '100%';
-          chartContainer.style.height = '100%';
-          chartContainer.style.position = 'relative';
-
-          // Título para el gráfico
-          const title = document.createElement('p');
-          title.className = 'text-center text-amber-400 mb-4 font-medium text-base md:text-lg';
-          title.textContent = 'Comparación de Distribución de Costos';
-          pieChartsContainer.appendChild(title);
-
-          // Agregar el canvas al contenedor
-          chartContainer.appendChild(newCanvas);
-          pieChartsContainer.appendChild(chartContainer);
-
-          // Guardar la referencia del canvas
-          window.costDistributionChartCanvas = newCanvas;
-
-          // Crear y montar el gráfico de barras comparativas
-          initCostDistributionChart(newCanvas);
+        // Volver a inicializar gráficos
+        initCharts();
+        
+        // Recrear el gráfico de distribución
+        if (window.costDistributionChartCanvas) {
+          initCostDistributionChart(window.costDistributionChartCanvas);
         }
-      }
+      }, 300);
     };
 
-    window.addEventListener('resize', handleResize);
+    // Usar passive: true para mejorar el rendimiento
+    window.addEventListener('resize', handleResize, { passive: true });
 
-    // Limpiar gráficos y event listeners al desmontar
+    // Limpiar al desmontar
     return () => {
       chartInstances.current.forEach((chart) => {
         if (chart) chart.destroy();
@@ -274,7 +249,10 @@ export default function TimelineCharts() {
   }, []);
 
   const initCharts = () => {
-    // 1. Gráfico de comparación de costos (ahora como gráfico de barras)
+    // Evitar inicializar múltiples veces
+    if (chartInstances.current.length > 0) return;
+    
+    // 1. Gráfico de comparación de costos
     if (costComparisonChartRef.current) {
       const defaultOptions = {
         responsive: true,
@@ -303,7 +281,7 @@ export default function TimelineCharts() {
         },
         plugins: {
           legend: {
-            display: false, // No necesitamos leyenda ya que las etiquetas están en el eje X
+            display: false,
           },
           tooltip: {
             callbacks: {
@@ -384,32 +362,22 @@ export default function TimelineCharts() {
       const labels = isMobile()
         ? ['Mes 1', 'Mes 3', 'Mes 6', 'Mes 9', 'Mes 12']
         : [
-            'Mes 1',
-            'Mes 2',
-            'Mes 3',
-            'Mes 4',
-            'Mes 5',
-            'Mes 6',
-            'Mes 7',
-            'Mes 8',
-            'Mes 9',
-            'Mes 10',
-            'Mes 11',
-            'Mes 12',
+            'Mes 1', 'Mes 2', 'Mes 3', 'Mes 4', 'Mes 5', 'Mes 6',
+            'Mes 7', 'Mes 8', 'Mes 9', 'Mes 10', 'Mes 11', 'Mes 12',
           ];
 
       const investmentData = isMobile()
         ? [8500000, 8500000, 8500000, 8500000, 8500000]
         : [
-            8500000, 8500000, 8500000, 8500000, 8500000, 8500000, 8500000, 8500000, 8500000,
-            8500000, 8500000, 8500000,
+            8500000, 8500000, 8500000, 8500000, 8500000, 8500000,
+            8500000, 8500000, 8500000, 8500000, 8500000, 8500000,
           ];
 
       const savingsData = isMobile()
         ? [1620000, 4860000, 9720000, 14580000, 19440000]
         : [
-            1620000, 3240000, 4860000, 6480000, 8100000, 9720000, 11340000, 12960000, 14580000,
-            16200000, 17820000, 19440000,
+            1620000, 3240000, 4860000, 6480000, 8100000, 9720000,
+            11340000, 12960000, 14580000, 16200000, 17820000, 19440000,
           ];
 
       const roiChart = new Chart(roiChartRef.current, {
@@ -595,8 +563,16 @@ export default function TimelineCharts() {
 
   const initCostDistributionChart = (chartCanvas) => {
     if (!chartCanvas) return;
+    
+    // Verificar si ya existe un gráfico para este canvas
+    const existingChartIndex = chartInstances.current.findIndex(
+      chart => chart.canvas === chartCanvas
+    );
+    
+    // Si ya existe un gráfico para este canvas, no crear uno nuevo
+    if (existingChartIndex !== -1) return;
 
-    // Unified breakpoint function for better consistency
+    // Función para determinar el breakpoint responsive
     const getResponsiveBreakpoint = () => {
       const width = window.innerWidth;
       if (width < 480) return 'mobile';
@@ -663,25 +639,11 @@ export default function TimelineCharts() {
               return label + ': $' + context.raw.toLocaleString('es-CL');
             },
           },
-          titleFont: {
-            size: getResponsiveBreakpoint() === 'mobile' ? 11 : 12,
-          },
-          bodyFont: {
-            size: getResponsiveBreakpoint() === 'mobile' ? 10 : 11,
-          },
-          padding: getResponsiveBreakpoint() === 'mobile' ? 8 : 10,
         },
       },
-      layout: {
-        padding: {
-          left: 5,
-          right: 15,
-          top: getResponsiveBreakpoint() === 'mobile' ? 10 : 15,
-          bottom: getResponsiveBreakpoint() === 'mobile' ? 10 : 15,
-        },
+      animation: {
+        duration: isMobile() ? 500 : 1000,
       },
-      barPercentage: 0.85,
-      categoryPercentage: 0.85,
     };
 
     // Datos para ordenar

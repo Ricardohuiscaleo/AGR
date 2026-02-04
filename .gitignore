@@ -54,3 +54,11 @@ pnpm-lock.yaml
 
 # Build artifacts
 build/
+
+# Deployment
+.vercel/
+.netlify/
+
+# Sensitive files
+api/calendar/service-account.json
+config.php

@@ -6,9 +6,9 @@ import Layout from '../layouts/Layout.astro';
 import NavCard from '../components/ui/nav-card.astro';
 import TextPressureWrapper from '../components/text/TextPressureWrapper.astro';
 import GradientText from '../components/text/GradientText.jsx';
-import AstroP5Container from '../components/AstroP5Container.astro';
+import { P5CursorBackground } from '../components/backgrounds/P5CursorBackground';
 import SplashCursor from '../components/splash/SplashCursor.jsx';
-import { AuroraBackground } from '../components/ui/aurora-background';
+import { ParticleNetworkBackground } from '../components/ui/particle-network-background';
 import CursorOptimizerWrapper from '../components/animations/CursorOptimizerWrapper.astro';
 import ScrollReveal from '../components/animations/ScrollReveal.jsx';
 import ChladniBackgroundOptimized from '../components/particles/ChladniBackgroundOptimized.astro';
@@ -18,13 +18,22 @@ import '../styles/index-styles.css';
 import HolaPart2Content from '../components/sections/HolaPart2Content.astro';
 import HolaPart3Content from '../components/sections/HolaPart3Content.astro';
 import EmpresaPart2Content from '../components/sections/EmpresaPart2Content.astro';
-import EmpresaPart3Content from '../components/sections/EmpresaPart3Content.astro';
+
 import EmpresaPart4Content from '../components/sections/EmpresaPart4Content.astro';
 import SolucionesPart2Content from '../components/sections/SolucionesPart2Content.astro';
+import SolucionesPart3Content from '../components/sections/SolucionesPart3Content.astro';
 import GeneradorBlogIAWrapper from '../components/sections/GeneradorBlogIAWrapper.astro';
 import FAQPart2Content from '../components/sections/FAQPart2Content.astro';
 import ContactoPart2Content from '../components/sections/ContactoPart2Content.astro';
 import ContactoPart3Content from '../components/sections/ContactoPart3Content.astro';
+import ContactoPart4Content from '../components/sections/ContactoPart4Content.astro';
+
+// 🆕 NUEVO: Importar BookingCalendar
+import BookingCalendar from '../components/calendar/BookingCalendar.jsx';
+// 🌌 NUEVO: Importar CubesBackground
+import CubesBackground from '../components/CubesBackground.astro';
+// 🎆 NUEVO: Importar ParticlesBackground
+import ParticlesBackground from '../components/ParticlesBackground.astro';
 
 // =====================================================================
 // 2. LÓGICA DE DATOS Y CONFIGURACIÓN
@@ -43,11 +52,11 @@ const sections = [
 ];
 const sectionParts = {
   hola: 3,
-  empresa: 4,
-  soluciones: 2,
+  empresa: 3,
+  soluciones: 3,
   blog: 2,
   faq: 2, // 🆕 Cambiado de 1 a 2 para incluir FAQ (Parte 2)
-  contacto: 3, // 🆕 Cambiado de 2 a 3 para incluir contacto-part3
+  contacto: 4, // 🆕 Cambiado de 3 a 4 para incluir contacto-calendar
 };
 const generateSubtitle = (sectionId: string, part?: string) => {
   const section = sections.find((s) => sectionId.startsWith(s.id));
@@ -101,7 +110,7 @@ const contentSections: ContentSection[] = [
       hasClaim: true,
     },
     bgColor: 'bg-white',
-    height: 'h-[750px]',
+    height: 'h-[650px] md:h-[950px]', // Altura separada para móvil y escritorio
   },
   {
     id: 'hola-intro',
@@ -146,7 +155,7 @@ const contentSections: ContentSection[] = [
       hasClaim: true,
     },
     bgColor: 'bg-orange-500',
-    height: 'h-[900px]',
+    height: 'h-[650px] md:h-[950px]', // Altura separada para móvil y escritorio
   },
   {
     id: 'hola-part2',
@@ -184,10 +193,10 @@ const contentSections: ContentSection[] = [
       style: 'font-size: 200px',
     },
     subtitle: {
-      text: generateSubtitle('hola', 'Parte 3'),
+      text: generateSubtitle('hola-part3', 'Parte 3'),
       size: 'text-[16px]',
       position: 'top-0 right-0',
-      alignment: 'text-right',
+      alignment: 'text-right text-white',
       hasClaim: true,
     },
     parrafos: [],
@@ -246,10 +255,10 @@ const contentSections: ContentSection[] = [
       style: 'font-size: 200px',
     },
     subtitle: {
-      text: generateSubtitle('empresa', 'Parte 2'),
+      text: generateSubtitle('empresa-part2', 'Parte 2'),
       size: 'text-[16px]',
       position: 'top-0 right-0',
-      alignment: 'text-right',
+      alignment: 'text-right text-white',
       hasClaim: true,
     },
     parrafos: [],
@@ -259,6 +268,7 @@ const contentSections: ContentSection[] = [
     showDivider: true,
     customBgClass: 'empresa-part2-bg',
   },
+
   {
     id: 'empresa-part3',
     number: { text: '', size: 'text-[120px]', position: 'top-5 left-5', alignment: 'text-left' },
@@ -270,25 +280,6 @@ const contentSections: ContentSection[] = [
     },
     subtitle: {
       text: generateSubtitle('empresa', 'Parte 3'),
-      size: 'text-[16px]',
-      position: 'top-0 right-0',
-      alignment: 'text-right',
-      hasClaim: true,
-    },
-    bgColor: 'bg-green-500',
-    height: 'h-auto',
-  },
-  {
-    id: 'empresa-part4',
-    number: { text: '', size: 'text-[120px]', position: 'top-5 left-5', alignment: 'text-left' },
-    title: {
-      text: '',
-      size: 'text-[200px]',
-      position: 'top-5 left-5 right-5',
-      alignment: 'text-left',
-    },
-    subtitle: {
-      text: generateSubtitle('empresa', 'Parte 4'),
       size: 'text-[16px]',
       position: 'top-0 right-0',
       alignment: 'text-right',
@@ -345,7 +336,7 @@ const contentSections: ContentSection[] = [
       alignment: 'text-left',
     },
     subtitle: {
-      text: generateSubtitle('soluciones', 'Parte 2'),
+      text: generateSubtitle('soluciones-part2', 'Parte 2'),
       size: 'text-[16px]',
       position: 'top-0 right-0',
       alignment: 'text-right',
@@ -354,6 +345,25 @@ const contentSections: ContentSection[] = [
     bgColor: 'bg-gray-600',
     height: 'h-auto',
     customBgClass: 'soluciones-part2-bg',
+  },
+  {
+    id: 'soluciones-part3',
+    number: { text: '', size: 'text-[120px]', position: 'top-5 left-5', alignment: 'text-left' },
+    title: {
+      text: '',
+      size: 'text-[200px]',
+      position: 'top-5 left-5 right-5',
+      alignment: 'text-left',
+    },
+    subtitle: {
+      text: '',
+      size: 'text-[16px]',
+      position: 'top-0 right-0',
+      alignment: 'text-right',
+      hasClaim: false,
+    },
+    bgColor: 'bg-transparent',
+    height: 'h-auto',
   },
   {
     id: 'blog-intro',
@@ -513,7 +523,7 @@ const contentSections: ContentSection[] = [
     number: { text: '', size: 'text-[120px]', position: 'top-5 left-5', alignment: 'text-left' },
     title: { text: '', size: 'text-[300px]', position: 'bottom-5 left-5', alignment: 'text-left' },
     subtitle: {
-      text: generateSubtitle('contacto', 'Parte 2'),
+      text: generateSubtitle('contacto-part2', 'Parte 2'),
       size: 'text-[16px]',
       position: 'top-0 right-0',
       alignment: 'text-right',
@@ -526,23 +536,183 @@ const contentSections: ContentSection[] = [
   {
     id: 'contacto-part3',
     number: { text: '', size: 'text-[120px]', position: 'top-5 left-5', alignment: 'text-left' },
+    title: {
+      text: '',
+      size: 'text-[200px]',
+      position: 'top-5 left-5 right-5',
+      alignment: 'text-left',
+    },
+    subtitle: {
+      text: '',
+      size: 'text-[16px]',
+      position: 'top-0 right-0',
+      alignment: 'text-right',
+      hasClaim: false,
+    },
+    bgColor: 'bg-transparent',
+    height: 'h-auto',
+  },
+  {
+    id: 'contacto-part4',
+    number: { text: '', size: 'text-[120px]', position: 'top-5 left-5', alignment: 'text-left' },
     title: { text: '', size: 'text-[300px]', position: 'bottom-5 left-5', alignment: 'text-left' },
     subtitle: {
-      text: generateSubtitle('contacto', 'Parte 3'),
+      text: generateSubtitle('contacto', 'Parte 4'),
       size: 'text-[16px]',
       position: 'top-0 right-0',
       alignment: 'text-right',
       hasClaim: true,
     },
-    bgColor: 'bg-purple-800/30',
+    bgColor: 'bg-black',
     height: 'h-auto',
-    border: 'border-2 border-purple-800', // 🆕 Borde rojo agregado
+    border: 'border-2 border-purple-800',
     customBgClass: 'contacto-part3-blur-bg',
   },
 ];
 ---
 
 <Layout title="Agente RAG - Soluciones con Inteligencia Artificial">
+  <!-- 🔍 Script de debug para clicks -->
+  <script is:inline>
+    console.log('🔍 Click Debug Script cargado');
+
+    document.addEventListener('DOMContentLoaded', () => {
+      let clickCount = 0;
+
+      // Debug de clicks
+      document.addEventListener(
+        'click',
+        (e) => {
+          clickCount++;
+          const target = e.target;
+          console.log(`🖱️ Click #${clickCount}:`, {
+            tag: target?.tagName || 'unknown',
+            class: target?.className || '',
+            id: target?.id || '',
+            x: e.clientX,
+            y: e.clientY,
+            prevented: e.defaultPrevented,
+          });
+        },
+        true
+      );
+
+      // Fix para inputs bloqueados
+      setTimeout(() => {
+        const inputs = document.querySelectorAll('input, textarea, button');
+        inputs.forEach((input, index) => {
+          input.style.pointerEvents = 'auto';
+          input.style.position = 'relative';
+          input.style.zIndex = '9999';
+
+          // Fix específico para focus
+          if (input.tagName === 'INPUT' || input.tagName === 'TEXTAREA') {
+            // Remover listeners existentes
+            input.removeEventListener('click', input._focusHandler);
+
+            // Crear nuevo handler
+            input._focusHandler = (e) => {
+              console.log('🎯 Click interceptado en:', input.id || input.tagName);
+              e.preventDefault();
+              e.stopPropagation();
+
+              // Forzar focus inmediato
+              input.focus();
+
+              // Verificar si el focus funcionó
+              setTimeout(() => {
+                if (document.activeElement === input) {
+                  console.log('✅ Focus exitoso en:', input.id || input.tagName);
+                } else {
+                  console.log('❌ Focus falló en:', input.id || input.tagName);
+                  // Intentar de nuevo
+                  input.focus();
+                }
+              }, 50);
+            };
+
+            // Agregar el listener
+            input.addEventListener('click', input._focusHandler, true);
+            console.log('🔧 Handler agregado a:', input.id || input.tagName);
+          }
+        });
+        console.log('🔧 Fix aplicado a', inputs.length, 'elementos');
+      }, 1000);
+
+      // Detectar elementos con z-index alto
+      setTimeout(() => {
+        const elements = document.querySelectorAll('*');
+        const highZ = [];
+        elements.forEach((el) => {
+          const zIndex = parseInt(window.getComputedStyle(el).zIndex);
+          if (zIndex > 1000) {
+            highZ.push({
+              tag: el.tagName,
+              class: el.className,
+              zIndex: zIndex,
+            });
+          }
+        });
+        if (highZ.length > 0) {
+          console.log('🔝 Elementos con z-index alto:', highZ);
+        }
+      }, 1500);
+
+      // Debug específico para inputs
+      setTimeout(() => {
+        const inputs = document.querySelectorAll('input, textarea');
+        inputs.forEach((input, index) => {
+          // Debug focus
+          input.addEventListener('focus', () => {
+            console.log(`🎯 Focus en input #${index}:`, {
+              id: input.id,
+              tag: input.tagName,
+              disabled: input.disabled,
+              readOnly: input.readOnly,
+              tabIndex: input.tabIndex,
+            });
+          });
+
+          // Debug blur
+          input.addEventListener('blur', () => {
+            console.log(`😵 Blur en input #${index}:`, input.id);
+          });
+
+          // Debug keydown
+          input.addEventListener('keydown', (e) => {
+            console.log(`⌨️ Keydown en input #${index}:`, {
+              key: e.key,
+              code: e.code,
+              prevented: e.defaultPrevented,
+              target: e.target.id,
+            });
+          });
+
+          // Debug input event
+          input.addEventListener('input', (e) => {
+            console.log(`📝 Input event #${index}:`, {
+              value: e.target.value,
+              id: e.target.id,
+            });
+          });
+
+          // Verificar propiedades del input
+          console.log(`🔍 Input #${index} (${input.id}):`, {
+            disabled: input.disabled,
+            readOnly: input.readOnly,
+            tabIndex: input.tabIndex,
+            style: {
+              pointerEvents: window.getComputedStyle(input).pointerEvents,
+              userSelect: window.getComputedStyle(input).userSelect,
+              zIndex: window.getComputedStyle(input).zIndex,
+            },
+          });
+        });
+      }, 2000);
+
+      console.log('🔍 Debug activado. Haz click para ver logs.');
+    });
+  </script>
   <style is:global>
     /* Estilos globales para aurora, fondos, etc. */
     .aurora-background-container {
@@ -601,7 +771,7 @@ const contentSections: ContentSection[] = [
     }
     .hola-part3-bg::before {
       background-image:
-        linear-gradient(to right, #ffa500, #ff69b4),
+        linear-gradient(to right, #e68105, #55534a),
         url('https://assets.codepen.io/16327/noise-e82662fe.png');
     }
     .empresa-part2-bg::before {
@@ -618,6 +788,18 @@ const contentSections: ContentSection[] = [
       background-image:
         linear-gradient(to right, #7c3aed, #a855f7, #c084fc),
         url('https://assets.codepen.io/16327/noise-e82662fe.png');
+    }
+    .contacto-calendar-bg::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-blend-mode: color-dodge;
+      background-repeat: repeat;
+      background-image:
+        linear-gradient(to right, #6b46c1, #7c3aed, #8b5cf6),
+        url('https://assets.codepen.io/16327/noise-e82662fe.png');
+      opacity: 0.95;
+      z-index: 0;
     }
   </style>
 
@@ -667,6 +849,7 @@ const contentSections: ContentSection[] = [
                 'text-white':
                   section.bgColor !== 'bg-white' && section.bgColor !== 'bg-transparent',
               },
+              section.id === 'rag-home' ? 'overflow-hidden' : '', // Asegura que rag-home recorta el contenido que se desborda
               section.border ?? '',
               section.layout === 'rows' ? `section-rows section-rows-${section.rows}` : '',
               section.layout === 'columns'
@@ -677,14 +860,9 @@ const contentSections: ContentSection[] = [
             ]}
           >
             {section.id === 'rag-home' ? (
-              <AuroraBackground
-                className="w-full h-full"
-                showRadialGradient={false}
-                mouseActivatedOnDesktop={true}
-                client:load
-              >
+              <ParticleNetworkBackground className="w-full h-full" client:load>
                 <div class="section-inner relative z-10">
-                  <div class="absolute bottom-[120px] left-1/2 transform -translate-x-1/2 md:bottom-[5px] md:left-5 md:transform-none z-20">
+                  <div class="absolute bottom-[5px] left-5 z-20">
                     {' '}
                     <img
                       src="/compressed/logo-oscuro-optimizado.png"
@@ -695,7 +873,7 @@ const contentSections: ContentSection[] = [
                   </div>
                   {section.subtitle.text && (
                     <div
-                      class={`absolute ${section.subtitle.position} ${section.subtitle.alignment}`}
+                      class={`absolute bottom-[12px] right-2 text-right md:bottom-5 md:right-2 md:text-right`}
                     >
                       {' '}
                       <p
@@ -705,10 +883,10 @@ const contentSections: ContentSection[] = [
                         <GradientText
                           client:only="react"
                           className="animated-gradient-text"
-                          colors={['#9C8AC0', '#78A8D6', '#ACDED8', '#ED645A', '#FF8C00']}
+                          colors={['#00fffb, #007284, #ff8119, #d946ef, #00b8ff, #00b542']}
                           darkModeColors={['#9C8AC0', '#78A8D6', '#ACDED8', '#ED645A', '#FF8C00']}
                           showShimmer={true}
-                          shimmerIntensity="low"
+                          shimmerIntensity=""
                           enhancedContrast={false}
                           id="gradient-text-rag-home"
                         >
@@ -718,13 +896,7 @@ const contentSections: ContentSection[] = [
                       </p>{' '}
                     </div>
                   )}
-                  <div class="flex items-center justify-center h-full w-full">
-                    {' '}
-                    <div class="text-pressure-wrapper">
-                      {' '}
-                      <TextPressureWrapper />{' '}
-                    </div>{' '}
-                  </div>
+
                   <div class={`absolute ${section.number.position} ${section.number.alignment}`}>
                     {' '}
                     <h1
@@ -736,7 +908,7 @@ const contentSections: ContentSection[] = [
                     </h1>{' '}
                   </div>
                 </div>
-              </AuroraBackground>
+              </ParticleNetworkBackground>
             ) : (
               <div class="section-inner relative">
                 {section.subtitle.text && (
@@ -766,44 +938,45 @@ const contentSections: ContentSection[] = [
                     </p>{' '}
                   </div>
                 )}
-                {(section.id === 'hola-part1' ||
-                  section.id === 'empresa-part1' ||
-                  section.id === 'soluciones-part1' ||
-                  section.id === 'blog-part1' ||
-                  section.id === 'faq-part1' ||
-                  section.id === 'contacto-part1') && (
-                  <div class="absolute inset-0 z-0 w-full h-full">
-                    {' '}
-                    <AstroP5Container
-                      fullWidth={true}
-                      fullHeight={true}
-                      isFixed={true}
-                      class="w-full h-full"
-                      sectionId={section.id}
-                    />{' '}
-                  </div>
-                )}
+                {(section.id === 'empresa-part1' || 
+                  section.id === 'blog-part1' || 
+                  section.id === 'faq-part1') && (
+                    <P5CursorBackground
+                      className="absolute inset-0 w-full h-full z-[1]"
+                      client:only="react"
+                    />
+                  )}
+                {section.id === 'contacto-part1' && <ParticlesBackground />}
+                {section.id === 'soluciones-part1' && <CubesBackground />}
 
                 {/* --- ZONA REFACTORIZADA --- */}
                 {section.id === 'hola-part2' && <HolaPart2Content section={section} />}
                 {section.id === 'hola-part3' && <HolaPart3Content section={section} />}
                 {section.id === 'empresa-part2' && <EmpresaPart2Content section={section} />}
-                {section.id === 'empresa-part3' && <EmpresaPart3Content section={section} />}
-                {section.id === 'empresa-part4' && <EmpresaPart4Content section={section} />}
+
+                {section.id === 'empresa-part3' && <EmpresaPart4Content section={section} />}
                 {section.id === 'soluciones-part2' && <SolucionesPart2Content section={section} />}
+                {section.id === 'soluciones-part3' && <SolucionesPart3Content section={section} />}
                 {section.id === 'blog-part2' && <GeneradorBlogIAWrapper section={section} />}
                 {section.id === 'faq-part2' && <FAQPart2Content section={section} />}
                 {section.id === 'contacto-part2' && <ContactoPart2Content section={section} />}
-                {section.id === 'contacto-part3' && (
+                {section.id === 'contacto-part3' && <ContactoPart3Content section={section} />}
+                {section.id === 'contacto-part4' && (
                   <>
                     <ChladniBackgroundOptimized
-                      particleCount={1500}
+                      particleCount={1000}
                       opacity={0.4}
-                      speed={0.6}
+                      speed={0.8}
                       colors={['#7c3aed', '#a855f7', '#c084fc', '#e879f9', '#ddd6fe']}
                     />
-                    <ContactoPart3Content section={section} />
+                    <ContactoPart4Content section={section} />
                   </>
+                )}
+                {section.id === 'contacto-calendar' && (
+                  <div class="absolute inset-0 z-0 w-full h-full">
+                    {' '}
+                    <BookingCalendar className="w-full h-full" client:load />{' '}
+                  </div>
                 )}
 
                 {/* --- ELEMENTOS GENÉRICOS --- */}
@@ -867,6 +1040,36 @@ const contentSections: ContentSection[] = [
   <script>
     // --- SCRIPTS COMPLETOS Y SIN OMITIR ---
     document.addEventListener('DOMContentLoaded', () => {
+      // Desactivar P5CursorSketch en hola-part1
+      const disableP5InHolaPart1 = () => {
+        const holaPart1 = document.getElementById('hola-part1');
+        if (holaPart1) {
+          // Ocultar todos los canvas de p5 en hola-part1
+          const canvases = holaPart1.querySelectorAll('canvas');
+          canvases.forEach((canvas) => {
+            canvas.style.display = 'none';
+            canvas.style.visibility = 'hidden';
+            canvas.style.opacity = '0';
+          });
+
+          // Desactivar instancias P5 si existen
+          if (window._P5CursorInstances && typeof window._P5CursorInstances === 'object') {
+            Object.keys(window._P5CursorInstances).forEach((key) => {
+              const instance = window._P5CursorInstances?.[key];
+              if (instance && instance.sectionId === 'hola-part1') {
+                if (instance.setActive) {
+                  instance.setActive(false);
+                }
+              }
+            });
+          }
+        }
+      };
+
+      // Ejecutar inmediatamente y después de un delay
+      disableP5InHolaPart1();
+      setTimeout(disableP5InHolaPart1, 1000);
+      setTimeout(disableP5InHolaPart1, 3000);
       const contentSections = document.querySelectorAll('.content-section');
       const observer = new IntersectionObserver(
         (entries) => {
@@ -920,6 +1123,17 @@ const contentSections: ContentSection[] = [
       contentSections.forEach((section) => {
         observer.observe(section);
       });
+
+      // Ejecutar desactivación de P5 una vez más después de que todo esté cargado
+      setTimeout(() => {
+        const holaPart1 = document.getElementById('hola-part1');
+        if (holaPart1) {
+          const canvases = holaPart1.querySelectorAll('canvas');
+          canvases.forEach((canvas) => {
+            canvas.remove(); // Remover completamente el canvas
+          });
+        }
+      }, 5000);
     });
   </script>
 </Layout>

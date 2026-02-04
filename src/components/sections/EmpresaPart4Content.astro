@@ -133,7 +133,7 @@ const categoryColors = {
   <div class="timeline-wrapper">
     <!-- Título principal con propiedades CSS específicas -->
     <h2
-      class="text-7xl sm:text-5xl md:text-6xl lg:text-8xl xl:text-9xl font-bold text-white mb-4 md:mb-6 leading-tight"
+      class="text-5xl sm:text-5xl md:text-6xl lg:text-8xl xl:text-9xl font-bold text-white mb-4 md:mb-6 leading-tight"
     >
       Competencias técnicas
     </h2>
@@ -171,22 +171,17 @@ const categoryColors = {
           {`> ${category}`}
         </h3>
         
-        <!-- Carrusel infinito que se activa con viewport -->
+        <!-- Carrusel continuo infinito con scroll -->
         <div 
-          class="scroller viewport-carousel" 
-          data-speed="slow"
+          class="infinite-carousel scrollable" 
           data-direction={index % 2 === 0 ? 'right' : 'left'}
           data-category={category}
         >
-          <ul class="tag-list scroller__inner">
-            {techs.map((tech) => (
-              <li class="tech-tag" data-category={category}>{tech}</li>
+          <div class="carousel-track">
+            {[...techs, ...techs, ...techs].map((tech) => (
+              <div class="tech-tag" data-category={category}>{tech}</div>
             ))}
-            <!-- Duplicamos para el efecto infinito -->
-            {techs.map((tech) => (
-              <li class="tech-tag" data-category={category}>{tech}</li>
-            ))}
-          </ul>
+          </div>
         </div>
       </div>
     ))}
@@ -205,24 +200,98 @@ const categoryColors = {
     gap: 1rem;
   }
 
-  /* Carrusel activado por viewport - más lento */
-  .viewport-carousel {
+  /* Carrusel con scroll manual */
+  .scrollable-carousel {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #00ff41 transparent;
+    -webkit-mask: linear-gradient(90deg, transparent, white 10%, white 90%, transparent);
+    mask: linear-gradient(90deg, transparent, white 10%, white 90%, transparent);
+    cursor: grab;
+  }
+
+  .scrollable-carousel:active {
+    cursor: grabbing;
+  }
+
+  .scrollable-carousel::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .scrollable-carousel::-webkit-scrollbar-track {
+    background: rgba(0, 255, 65, 0.1);
+    border-radius: 3px;
+  }
+
+  .scrollable-carousel::-webkit-scrollbar-thumb {
+    background: #00ff41;
+    border-radius: 3px;
+  }
+
+  .scrollable-carousel::-webkit-scrollbar-thumb:hover {
+    background: #5fff78;
+  }
+
+  /* Carrusel continuo infinito */
+  .infinite-carousel {
     overflow: hidden;
-    -webkit-mask: linear-gradient(90deg, transparent, white 20%, white 80%, transparent);
-    mask: linear-gradient(90deg, transparent, white 20%, white 80%, transparent);
+    width: 100%;
+    position: relative;
+    -webkit-mask: linear-gradient(90deg, transparent, white 5%, white 95%, transparent);
+    mask: linear-gradient(90deg, transparent, white 5%, white 95%, transparent);
   }
 
-  .viewport-carousel .scroller__inner {
+  /* Versión scrolleable */
+  .infinite-carousel.scrollable {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #00ff41 transparent;
+    cursor: grab;
+  }
+
+  .infinite-carousel.scrollable:active {
+    cursor: grabbing;
+  }
+
+  .infinite-carousel.scrollable::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .infinite-carousel.scrollable::-webkit-scrollbar-track {
+    background: rgba(0, 255, 65, 0.1);
+  }
+
+  .infinite-carousel.scrollable::-webkit-scrollbar-thumb {
+    background: #00ff41;
+    border-radius: 2px;
+  }
+
+  .carousel-track {
+    display: flex;
+    gap: 1rem;
     width: max-content;
-    flex-wrap: nowrap;
-    animation-play-state: paused; /* Pausado por defecto */
-    animation: scroll var(--_animation-duration, 120s) var(--_animation-direction, forwards) linear infinite;
-    transition: animation-play-state 0.3s ease;
+    animation: infiniteScroll 60s linear infinite;
   }
 
-  /* Se activa cuando entra en vista */
-  .viewport-carousel.in-view .scroller__inner {
-    animation-play-state: running;
+  .infinite-carousel[data-direction='left'] .carousel-track {
+    animation-direction: reverse;
+  }
+
+  @keyframes infiniteScroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(calc(-100% / 3));
+    }
+  }
+
+  /* Pausar en hover y durante scroll */
+  .infinite-carousel:hover .carousel-track,
+  .infinite-carousel.user-scrolling .carousel-track {
+    animation-play-state: paused;
   }
 
   .scroller[data-direction='right'] {
@@ -350,33 +419,30 @@ const categoryColors = {
   =======================================
 -->
 <script>
-  // Script para carruseles activados por viewport
-  const viewportCarousels = document.querySelectorAll('.viewport-carousel');
-
-  // Solo activar si el usuario no prefiere movimiento reducido
-  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    setupViewportCarousels();
-  }
-
-  function setupViewportCarousels() {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          // Activar carrusel cuando entra en vista
-          entry.target.classList.add('in-view');
-        } else {
-          // Pausar carrusel cuando sale de vista (opcional)
-          entry.target.classList.remove('in-view');
-        }
+  document.addEventListener('DOMContentLoaded', () => {
+    const scrollableCarousels = document.querySelectorAll('.infinite-carousel.scrollable');
+    
+    scrollableCarousels.forEach((carousel) => {
+      let scrollTimeout;
+      
+      // Pausar animación durante scroll
+      carousel.addEventListener('scroll', () => {
+        carousel.classList.add('user-scrolling');
+        clearTimeout(scrollTimeout);
+        
+        scrollTimeout = setTimeout(() => {
+          carousel.classList.remove('user-scrolling');
+        }, 2000);
       });
-    }, {
-      threshold: 0.2, // Se activa cuando el 20% del elemento es visible
-      rootMargin: '0px 0px -50px 0px' // Se activa un poco antes de ser completamente visible
+      
+      // Pausar en touch/mouse
+      carousel.addEventListener('mousedown', () => {
+        carousel.classList.add('user-scrolling');
+      });
+      
+      carousel.addEventListener('touchstart', () => {
+        carousel.classList.add('user-scrolling');
+      });
     });
-
-    // Observar todos los carruseles
-    viewportCarousels.forEach((carousel) => {
-      observer.observe(carousel);
-    });
-  }
+  });
 </script>

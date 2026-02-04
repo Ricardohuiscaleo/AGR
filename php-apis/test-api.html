@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API Gaby</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .card {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        pre {
+            background-color: #f1f1f1;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test API Gaby</h1>
+    
+    <div class="container">
+        <div class="card">
+            <h2>Test GET</h2>
+            <div class="form-group">
+                <label for="getMessage">Mensaje:</label>
+                <input type="text" id="getMessage" value="Hola desde GET">
+            </div>
+            <div class="form-group">
+                <label for="getSession">Session ID:</label>
+                <input type="text" id="getSession" value="test-session-get">
+            </div>
+            <div class="form-group">
+                <label for="getUrl">URL:</label>
+                <input type="text" id="getUrl" value="https://agenterag.com/php-apis/gaby-agent.php">
+            </div>
+            <button onclick="testGet()">Probar GET</button>
+            <h3>Respuesta:</h3>
+            <pre id="getResponse">Esperando respuesta...</pre>
+        </div>
+        
+        <div class="card">
+            <h2>Test POST</h2>
+            <div class="form-group">
+                <label for="postMessage">Mensaje:</label>
+                <input type="text" id="postMessage" value="Hola desde POST">
+            </div>
+            <div class="form-group">
+                <label for="postSession">Session ID:</label>
+                <input type="text" id="postSession" value="test-session-post">
+            </div>
+            <div class="form-group">
+                <label for="postUrl">URL:</label>
+                <input type="text" id="postUrl" value="https://agenterag.com/php-apis/gaby-agent.php">
+            </div>
+            <button onclick="testPost()">Probar POST</button>
+            <h3>Respuesta:</h3>
+            <pre id="postResponse">Esperando respuesta...</pre>
+        </div>
+        
+        <div class="card">
+            <h2>Test API Methods</h2>
+            <div class="form-group">
+                <label for="testMessage">Mensaje:</label>
+                <input type="text" id="testMessage" value="Mensaje de prueba">
+            </div>
+            <div class="form-group">
+                <label for="testSession">Session ID:</label>
+                <input type="text" id="testSession" value="test-session-id">
+            </div>
+            <div class="form-group">
+                <label for="testUrl">URL:</label>
+                <input type="text" id="testUrl" value="https://agenterag.com/php-apis/test-api-methods.php">
+            </div>
+            <button onclick="testApiGet()">Probar GET</button>
+            <button onclick="testApiPost()">Probar POST</button>
+            <h3>Respuesta:</h3>
+            <pre id="testResponse">Esperando respuesta...</pre>
+        </div>
+    </div>
+
+    <script>
+        async function testGet() {
+            const message = document.getElementById('getMessage').value;
+            const sessionId = document.getElementById('getSession').value;
+            const url = document.getElementById('getUrl').value;
+            
+            try {
+                const queryParams = new URLSearchParams({
+                    message: message,
+                    session: sessionId
+                }).toString();
+                
+                const response = await fetch(`${url}?${queryParams}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-session-id': sessionId
+                    }
+                });
+                
+                const data = await response.json();
+                document.getElementById('getResponse').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('getResponse').textContent = `Error: ${error.message}`;
+            }
+        }
+        
+        async function testPost() {
+            const message = document.getElementById('postMessage').value;
+            const sessionId = document.getElementById('postSession').value;
+            const url = document.getElementById('postUrl').value;
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-session-id': sessionId
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        agent_context: null
+                    })
+                });
+                
+                const data = await response.json();
+                document.getElementById('postResponse').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('postResponse').textContent = `Error: ${error.message}`;
+            }
+        }
+        
+        async function testApiGet() {
+            const message = document.getElementById('testMessage').value;
+            const sessionId = document.getElementById('testSession').value;
+            const url = document.getElementById('testUrl').value;
+            
+            try {
+                const queryParams = new URLSearchParams({
+                    message: message,
+                    session: sessionId
+                }).toString();
+                
+                const response = await fetch(`${url}?${queryParams}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-session-id': sessionId
+                    }
+                });
+                
+                const data = await response.json();
+                document.getElementById('testResponse').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('testResponse').textContent = `Error: ${error.message}`;
+            }
+        }
+        
+        async function testApiPost() {
+            const message = document.getElementById('testMessage').value;
+            const sessionId = document.getElementById('testSession').value;
+            const url = document.getElementById('testUrl').value;
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-session-id': sessionId
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        agent_context: null
+                    })
+                });
+                
+                const data = await response.json();
+                document.getElementById('testResponse').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('testResponse').textContent = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

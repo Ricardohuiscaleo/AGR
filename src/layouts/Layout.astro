@@ -1,4 +1,6 @@
 ---
+// 1. Usar ChatInterfaceDarkWrapper que monta ChatInterfaceDarkLegacy
+import ChatInterfaceDarkWrapper from '../components/ChatInterfaceDarkWrapper.astro';
 interface Props {
   title: string;
   description?: string;
@@ -11,7 +13,7 @@ const { title, description } = Astro.props;
 <html lang="es" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <!-- Prevenir solicitudes automáticas de apple-touch-icon -->
     <link rel="apple-touch-icon" href="/compressed/logo-oscuro-optimizado.png" />
@@ -23,6 +25,7 @@ const { title, description } = Astro.props;
     {description && <meta name="description" content={description} />}
     <!-- p5.js library from CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.2/p5.min.js"></script>
+
     <!-- Font Awesome para iconos del chat -->
     <link
       rel="stylesheet"
@@ -31,116 +34,139 @@ const { title, description } = Astro.props;
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
+
+    <!-- Estilos mínimos para corregir el chat -->
+    <style>
+      /* Correcciones mínimas para el chat en móvil */
+      #chat-interface-dark-container textarea {
+        max-height: 80px !important;
+        min-height: 40px !important;
+        resize: none !important;
+      }
+    </style>
   </head>
   <body class="dark:bg-[#ece6dc] bg-[#ece6dc]">
     <!-- Contenedor principal del sitio -->
     <slot />
+    
 
-    <!-- Iframe aislado para el chat (solución nuclear) -->
-    <div
-      id="chat-overlay-container"
-      style="position: fixed; bottom: 0; right: 0; width: 100%; height: 600px; z-index: 99999; pointer-events: none;"
-    >
-      <div
-        style="width: 400px; height: 100%; margin-left: auto; margin-right: 0; pointer-events: none;"
-      >
-        <div
-          id="chat-overlay-inner"
-          style="width: 100%; height: 100%; position: relative; pointer-events: none;"
-        >
-          <!-- Aquí se cargará el componente chat -->
-        </div>
+
+    <!-- Full-screen chat modal -->
+    <div id="full-screen-chat-modal" class="full-screen-chat-modal-hidden">
+      <div class="full-screen-chat-modal-content">
+        <!-- 2. ChatInterfaceDarkWrapper que monta ChatInterfaceDarkLegacy -->
+        <ChatInterfaceDarkWrapper />
       </div>
     </div>
 
     <script>
-      // Script para posicionar el chat y hacerlo interactivo
       document.addEventListener('DOMContentLoaded', function () {
-        // Modificado para ignorar el chat en la sección "Chat (Parte 2)" y "Hola (Parte 4)"
-        const chatSections = [
-          document.getElementById('chat-part2'),
-          document.getElementById('hola-part4'),
-        ];
-        const chatContainer = document.querySelector(
-          '.chat-container:not(.in-section), .chatbot-container:not(.in-section)'
-        );
-        const overlayInner = document.getElementById('chat-overlay-inner');
+        // --- LÓGICA PARA ABRIR Y CERRAR EL MODAL ---
+        const fullScreenChatModal = document.getElementById('full-screen-chat-modal');
 
-        // Marcar el chat dentro de las secciones específicas para que no sean movidos
-        chatSections.forEach((section) => {
-          if (section) {
-            const chatInSection = section.querySelector('.chat-container, .chatbot-container');
-            if (chatInSection) {
-              chatInSection.classList.add('in-section');
+        // Función para abrir el modal
+        function openChatModal() {
+          if (fullScreenChatModal) {
+            fullScreenChatModal.classList.remove('full-screen-chat-modal-hidden');
+            fullScreenChatModal.classList.add('full-screen-chat-modal-visible');
+            document.body.style.overflow = 'hidden';
+            document.body.classList.add('modal-open'); // Agregar clase para móviles
+
+            // Forzar recálculo de altura en móvil
+            if (window.visualViewport) {
+              fullScreenChatModal.style.height = `${window.visualViewport.height}px`;
             }
+
+            // Focus en el input del chat después de un pequeño delay
+            setTimeout(() => {
+              const chatInput = document.querySelector('#chat-interface-dark-container textarea');
+              if (chatInput && chatInput instanceof HTMLElement) {
+                chatInput.focus();
+              }
+            }, 300);
+          }
+        }
+
+        // Función para cerrar el modal
+        function closeChatModal() {
+          if (fullScreenChatModal) {
+            fullScreenChatModal.classList.remove('full-screen-chat-modal-visible');
+            fullScreenChatModal.classList.add('full-screen-chat-modal-hidden');
+            document.body.style.overflow = '';
+            document.body.classList.remove('modal-open'); // Remover clase para móviles
+
+            // Resetear altura
+            fullScreenChatModal.style.height = '';
+          }
+        }
+
+        // Event listeners - SÚPER SIMPLE
+        document.addEventListener('openChatModal', (event) => {
+          console.log('💜 Abriendo chat Gaby Legacy');
+          openChatModal();
+        });
+
+        // Botón cerrar ahora está dentro del componente React
+
+        // Cerrar con ESC
+        document.addEventListener('keydown', (e) => {
+          if (
+            e.key === 'Escape' &&
+            fullScreenChatModal &&
+            fullScreenChatModal.classList.contains('full-screen-chat-modal-visible')
+          ) {
+            closeChatModal();
           }
         });
 
-        // Si existe un contenedor de chat (y NO está en una sección especial), moverlo al overlay
-        if (chatContainer && overlayInner) {
-          // Verificar que no está dentro de una sección especial
-          let isInSpecialSection = false;
-          let parent = chatContainer.parentNode;
-          while (parent) {
+        // --- MANEJO MEJORADO DEL TECLADO MÓVIL ---
+        const visualViewport = window.visualViewport;
+
+        if (visualViewport) {
+          visualViewport.addEventListener('resize', () => {
             if (
-              parent instanceof Element &&
-              (parent.id === 'chat-part2' || parent.id === 'hola-part4')
+              fullScreenChatModal &&
+              fullScreenChatModal.classList.contains('full-screen-chat-modal-visible')
             ) {
-              isInSpecialSection = true;
-              break;
-            }
-            parent = parent.parentNode;
-          }
+              // Ajustar altura del modal
+              fullScreenChatModal.style.height = `${visualViewport.height}px`;
 
-          // Solo proceder si NO está en la sección de chat
-          if (!isInSpecialSection) {
-            // Clonar el nodo para evitar referencias
-            const chatClone = chatContainer.cloneNode(true);
-
-            // Hacer que solo el contenedor del chat sea interactivo
-            if (chatClone instanceof HTMLElement) {
-              chatClone.style.pointerEvents = 'auto';
-              chatClone.style.zIndex = '100000';
-              chatClone.style.position = 'relative';
-              chatClone.style.borderRadius = '10px'; // Agregar bordes redondeados
-              chatClone.style.overflow = 'hidden'; // Asegura que el contenido respete los bordes
-
-              // Hacer interactivos solo los elementos dentro del chat
-              const allChatElements = chatClone.querySelectorAll('*');
-              allChatElements.forEach((el) => {
-                if (el instanceof HTMLElement) {
-                  el.style.pointerEvents = 'auto';
-                  if (
-                    el.tagName === 'INPUT' ||
-                    el.tagName === 'TEXTAREA' ||
-                    el.tagName === 'BUTTON'
-                  ) {
-                    el.style.zIndex = '100001';
-                  }
+              // Scroll al final del chat cuando aparece el teclado
+              setTimeout(() => {
+                const messagesArea = fullScreenChatModal.querySelector(
+                  '.flex-grow.p-4.overflow-y-auto'
+                );
+                if (messagesArea) {
+                  messagesArea.scrollTop = messagesArea.scrollHeight;
                 }
-              });
+              }, 100);
             }
-
-            // Insertar el clon en el overlay
-            overlayInner.appendChild(chatClone);
-
-            // Ocultar el original
-            if (chatContainer instanceof HTMLElement) {
-              chatContainer.style.display = 'none';
-            }
-
-            // Configurar el overlay interno para permitir eventos solo sobre el chat
-            if (overlayInner instanceof HTMLElement) {
-              overlayInner.style.pointerEvents = 'none';
-            }
-          }
+          });
         }
+
+        // Prevenir scroll en background cuando el modal está abierto
+        fullScreenChatModal?.addEventListener(
+          'touchmove',
+          (e) => {
+            if (e.target === fullScreenChatModal) {
+              e.preventDefault();
+            }
+          },
+          { passive: false }
+        );
       });
     </script>
   </body>
 </html>
 
 <style is:global>
+  /* --- ESTILOS GLOBALES --- */
+  /* Clase personalizada para pantallas extra pequeñas */
+  @media (min-width: 400px) {
+    .xs\:inline {
+      display: inline;
+    }
+  }
   :root {
     --background-color: #ece6dc;
     --accent: 136, 58, 234;
@@ -173,7 +199,7 @@ const { title, description } = Astro.props;
 
   .layout-container {
     position: relative;
-    z-index: 10; /* Aumentamos el z-index para que esté por encima de otros elementos */
+    z-index: 10;
   }
 
   * {
@@ -211,18 +237,11 @@ const { title, description } = Astro.props;
   .chat-input,
   .chat-input *,
   #userInput {
+    font-size: 16px !important;
     pointer-events: auto !important;
-    z-index: 9999 !important;
-    position: relative !important;
   }
 
-  /* Hide cursor when hovering over p5.js canvas - COMENTADO PARA MOSTRAR EL CURSOR REAL
-  canvas.p5Canvas {
-    cursor: none !important;
-  }
-  */
-
-  /* Animaciones necesarias para el chat */
+  /* Animaciones Keyframes */
   @keyframes planeFlight {
     0% {
       transform: rotate(0deg);
@@ -287,5 +306,191 @@ const { title, description } = Astro.props;
     to {
       background-position: -200% 0;
     }
+  }
+
+  /* ==================================================================== */
+  /* === ESTILOS DEL MODAL FULLSCREEN (LA PARTE CORREGIDA Y SIMPLIFICADA) === */
+  /* ==================================================================== */
+  #full-screen-chat-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    background: rgba(17, 24, 39, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 10010;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition:
+      opacity 0.3s,
+      visibility 0.3s;
+    /* Prevenir scroll en iOS */
+    touch-action: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .full-screen-chat-modal-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .full-screen-chat-modal-visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .full-screen-chat-modal-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    /* Sin padding - contenedor limpio */
+    overflow: hidden;
+  }
+
+  /* Estilos específicos para móviles */
+  @media (max-width: 767px) {
+    #full-screen-chat-modal {
+      align-items: stretch; /* Ocupar toda la altura en móvil */
+    }
+
+    .full-screen-chat-modal-content {
+      height: 100vh;
+      height: 100dvh; /* Usar dynamic viewport height */
+      max-height: none;
+    }
+
+    /* Asegurar que el textarea tenga el tamaño correcto en móviles */
+    #chat-interface-dark-container textarea {
+      font-size: 16px !important; /* Prevenir zoom en iOS */
+      -webkit-appearance: none;
+      border-radius: 0;
+    }
+
+    /* Mejorar el scroll en el área de mensajes */
+    #chat-interface-dark-container .flex-grow.p-4.overflow-y-auto {
+      -webkit-overflow-scrolling: touch;
+      overflow-scrolling: touch;
+    }
+  }
+
+  /* Media Query para PANTALLAS MÁS GRANDES (PC) */
+  @media (min-width: 768px) {
+    .full-screen-chat-modal-content {
+      height: 90vh;
+      max-height: 800px;
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4);
+    }
+  }
+
+  /* Correcciones adicionales para el chat */
+  #chat-interface-dark-container {
+    height: 100% !important;
+    overflow: hidden;
+  }
+
+  /* ESTRUCTURA CORRECTA DEL CHAT */
+  #chat-interface-dark-container {
+    height: 100% !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* Asegurar que el componente React hijo tenga la estructura correcta */
+  #chat-interface-dark-container > div {
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* SOLUCIÓN MÓVIL COMPLETA */
+  @media (max-width: 767px) {
+    /* Fijar el modal para que no se mueva con el teclado virtual */
+    #full-screen-chat-modal {
+      position: fixed !important;
+      height: 100vh !important;
+      height: 100dvh !important;
+    }
+
+    /* Evitar que el contenedor del chat cambie de tamaño */
+    #chat-interface-dark-container {
+      height: 100vh !important;
+      height: 100dvh !important;
+      max-height: 100vh !important;
+      max-height: 100dvh !important;
+      overflow: hidden !important;
+    }
+
+    /* Asegurar que el contenedor interno mantenga su estructura */
+    #chat-interface-dark-container > div {
+      height: 100% !important;
+      max-height: 100% !important;
+      position: relative !important;
+      overflow: hidden !important;
+    }
+
+    /* Fijar el área de input en la parte inferior SIN sticky */
+    #chat-interface-dark-container .flex-shrink-0:last-child {
+      position: absolute !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      background: #111827 !important;
+      z-index: 10 !important;
+      border-top: 1px solid #111827 !important;
+      margin: 0 !important;
+      padding-bottom: 0 !important;
+    }
+
+    /* Eliminar margen del contenedor del textarea */
+    #chat-interface-dark-container .flex-shrink-0:last-child > div {
+      margin: 0 !important;
+      padding-bottom: 0 !important;
+    }
+
+    /* Eliminar margen del área de input */
+    #chat-interface-dark-container .flex-shrink-0:last-child .p-4 {
+      padding-bottom: 8px !important;
+    }
+
+    /* Ajustar el área de mensajes para que no se superponga con el input */
+    #chat-interface-dark-container .flex-grow {
+      padding-bottom: 100px !important;
+      height: calc(100% - 100px) !important;
+      overflow-y: auto !important;
+    }
+
+    /* Textarea con comportamiento desktop en móvil */
+    #chat-interface-dark-container textarea {
+      font-size: 16px !important;
+      min-height: 16px !important;
+      max-height: 80px !important;
+      resize: none !important;
+    }
+
+    /* Botón cerrar sin borde en móvil */
+    #chat-interface-dark-container .flex-shrink-0:first-child button {
+      border: none !important;
+      position: relative !important;
+    }
+  }
+
+  /* Asegurar que los botones del chat funcionen correctamente */
+  .send-button-dark,
+  .quick-button-dark,
+  #full-screen-chat-modal-close {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
 </style>

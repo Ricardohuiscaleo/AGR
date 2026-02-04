@@ -1,0 +1,17 @@
+RewriteEngine On
+
+# Habilitar CORS para todas las peticiones
+Header always set Access-Control-Allow-Origin "*"
+Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS, DELETE, PUT"
+Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+
+# Manejar peticiones OPTIONS
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^(.*)$ $1 [R=200,L]
+
+# Rutas amigables para la API
+RewriteRule ^availability/?$ get-availability.php [L]
+RewriteRule ^booking/?$ create-booking.php [L]
+RewriteRule ^create-booking-oauth\.php$ create-booking-oauth.php [L]
+RewriteRule ^temp-block/create/?$ temp-block.php?action=create [L]
+RewriteRule ^temp-block/remove/?$ temp-block.php?action=remove [L]

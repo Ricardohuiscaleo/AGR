@@ -1,0 +1,23 @@
+---
+// Wrapper Astro para el componente Particles React
+---
+
+<div id="particles-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: auto; border-radius: 1rem; overflow: hidden;"></div>
+
+<script>
+  import ReactiveParticles from './ReactiveParticles';
+  import { createElement } from 'react';
+  import { createRoot } from 'react-dom/client';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('🎆 ParticlesBackground: DOM loaded');
+    const container = document.getElementById('particles-container');
+    if (container) {
+      console.log('🎆 ParticlesBackground: Container found, rendering ReactiveParticles');
+      const root = createRoot(container);
+      root.render(createElement(ReactiveParticles));
+    } else {
+      console.warn('🎆 ParticlesBackground: Container not found');
+    }
+  });
+</script>

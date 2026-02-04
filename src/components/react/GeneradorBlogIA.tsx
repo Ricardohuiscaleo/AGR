@@ -144,7 +144,7 @@ const BlogModal: React.FC<{ blog: Blog; onClose: () => void; onLike: (id: string
 
   return (
     <div
-      className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in"
+      className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 animate-fade-in"
       onClick={onClose}
     >
       <div
@@ -271,9 +271,11 @@ export default function GeneradorBlogIA() {
 
       const blogsMethod = esBusquedaPorTema ? 'GET' : 'GET';
 
-      // 🔧 CORREGIDO: buscar-blogs.php espera parámetro 'tema' en URL
+      // En GeneradorBlogIA.tsx, dentro de la función cargarDatos
+
+      // ✅ CORRECCIÓN FINAL: buscar-blogs.php espera el ID del tema, no su nombre
       const blogsUrlFinal = esBusquedaPorTema
-        ? `${blogsUrl}?tema=${encodeURIComponent(temaInfo.nombre)}`
+        ? `${blogsUrl}?tema=${encodeURIComponent(temaInfo.id)}` // <-- LA LÍNEA DE LA GLORIA
         : blogsUrl;
 
       const [blogsRes, statsRes] = await Promise.all([
@@ -430,14 +432,14 @@ export default function GeneradorBlogIA() {
         />
       )}
 
-      <div className="">
+      <div className={`${blogSeleccionado ? 'opacity-20 pointer-events-none' : ''}`}>
         <div className="text-left mb-8">
-          <h2 className="text-6xl md:text-9xl font-bold text-white mb-6 leading-tight">
+          <h2 className="text-5xl md:text-9xl font-bold text-white mb-6 leading-tight">
             Automatizamos la generación de contenido de tú empresa
           </h2>
 
-          <div className="max-w-4xl">
-            <p className="text-lg md:text-4xl text-gray-300 leading-relaxed">
+          <div className="max-w-7xl">
+            <p className="text-base sm:text-lg md:text-2xl lg:text-3xl xl:text-4xl text-blue-200 leading-relaxeds">
               Hoy{' '}
               {new Date().toLocaleDateString('es-ES', {
                 weekday: 'long',
@@ -453,7 +455,7 @@ export default function GeneradorBlogIA() {
                   WebkitBackgroundClip: 'text',
                   backgroundClip: 'text',
                   color: 'transparent',
-                  display: 'inline-block',
+                  display: 'inline',
                   textShadow: 'none',
                   fontWeight: '600',
                 }}

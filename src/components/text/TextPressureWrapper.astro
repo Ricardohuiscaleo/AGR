@@ -5,7 +5,7 @@ import TextPressureComponent from './TextPressure';
 
 <div class="text-pressure-container">
   <TextPressureComponent
-    client:only="solid"
+    client:only="idle"
     text="Agente RAG"
     flex={true}
     alpha={false}
@@ -32,6 +32,7 @@ import TextPressureComponent from './TextPressure';
     margin: 0 auto;
     height: 350px;
     position: relative;
+    overflow: hidden; /* Asegura que el contenido no se desborde */
   }
 
   /* Estilos responsivos para dispositivos medianos */

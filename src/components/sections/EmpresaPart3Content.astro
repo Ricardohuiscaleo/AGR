@@ -1,56 +1,27 @@
 ---
 // =====================================================================
-// COMPONENTE PARA 'empresa-part3' (Metodología)
+// COMPONENTE PARA 'empresa-part3' (METODOLOGÍA - ESTRUCTURA IDÉNTICA A PART2)
 // =====================================================================
 interface Props {
   section: any;
 }
 const { section } = Astro.props;
-
-const methodologySteps = [
-  {
-    step: '01',
-    title: 'Descubrimiento y Análisis',
-    description:
-      'Nos sumergimos en tu negocio para entender tus desafíos y objetivos. Analizamos tus procesos actuales para identificar las oportunidades de automatización más impactantes y con mayor retorno de inversión.',
-    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />`,
-  },
-  {
-    step: '02',
-    title: 'Diseño y Prototipado',
-    description:
-      'Creamos un plan de acción detallado y un prototipo funcional del Agente RAG. Validamos la solución contigo para asegurar que cumple con tus expectativas y se integra perfectamente en tu flujo de trabajo.',
-    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />`,
-  },
-  {
-    step: '03',
-    title: 'Desarrollo e Implementación',
-    description:
-      'Nuestro equipo de expertos construye y entrena a tu Agente IA a medida. Nos encargamos de la implementación completa, asegurando una transición fluida y sin interrupciones para tu operación diaria.',
-    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l-4 4-4-4-4 4" />`,
-  },
-  {
-    step: '04',
-    title: 'Soporte y Optimización',
-    description:
-      'El lanzamiento es solo el comienzo. Monitoreamos el rendimiento, proporcionamos soporte continuo y optimizamos tu agente para que evolucione y se adapte a las nuevas necesidades de tu empresa.',
-    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />`,
-  },
-];
 ---
 
+<!-- Contenedor principal con estructura mínima como el ejemplo -->
 <div
   id="empresa-part3-timeline"
   class="w-full relative z-10"
   style="height: 100%; position: relative; margin: 2rem; margin-left: 1rem; margin-right: 1rem;"
 >
   <div class="timeline-wrapper">
+    <!-- Título principal con propiedades CSS específicas -->
     <h2
       class="text-5xl sm:text-5xl md:text-6xl lg:text-8xl xl:text-9xl font-bold text-white mb-4 md:mb-6 leading-tight"
     >
       Nuestra metodología de desarrollo
     </h2>
-    <div class="max-w-8xl">
+    <div class="max-w-7xl">
       <p
         class="text-base sm:text-lg md:text-2xl lg:text-3xl xl:text-4xl text-gray-300 leading-relaxed"
       >
@@ -72,31 +43,233 @@ const methodologySteps = [
     </div>
   </div>
 
-  <!-- Contenido en Contenedor -->
-  <div class="container mx-auto px-4 pb-16 lg:pb-24 mt-16">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      {
-        methodologySteps.map((step) => (
-          <div class="bg-black/20 backdrop-blur-sm border border-green-400/20 rounded-xl p-8 hover:border-green-400/40 transition-all duration-300">
-            <div class="flex items-start gap-4">
-              <div class="flex-shrink-0 w-16 h-16 bg-green-900/50 rounded-full flex items-center justify-center border-2 border-green-500/50">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-8 w-8 text-green-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  set:html={step.icon}
-                />
-              </div>
-              <div class="flex-1">
-                <h3 class="text-2xl font-bold text-white mb-2">{step.title}</h3>
-                <p class="text-green-100/80 leading-relaxed">{step.description}</p>
-              </div>
-            </div>
+  <!-- CONTENIDO CON MÁRGENES LATERALES -->
+  <div class="mx-auto pb-16 lg:pb-24 mt-16 px-2" style="max-width: calc(100vw - 2rem);">
+    <!-- Grid principal con las 4 fases de metodología -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+      <!-- Fase 1: Descubrimiento y Análisis -->
+      <div
+        class="bg-gradient-to-br from-green-900/60 to-emerald-800/40 backdrop-blur-md rounded-xl p-8 border border-green-400/30 hover:border-green-400/50 transition-all duration-300"
+      >
+        <div class="flex items-center mb-6">
+          <div class="w-16 h-16 bg-green-400 rounded-full flex items-center justify-center mr-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8 text-gray-900"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
           </div>
-        ))
-      }
+          <h3 class="text-3xl font-bold text-white">Descubrimiento y Análisis</h3>
+        </div>
+        <p class="text-green-100 text-lg leading-relaxed">
+          Nos sumergimos en tu negocio para entender tus desafíos y objetivos. Analizamos tus procesos actuales para identificar las oportunidades de automatización más impactantes y con mayor retorno de inversión.
+        </p>
+      </div>
+
+      <!-- Fase 2: Diseño y Prototipado -->
+      <div
+        class="bg-gradient-to-br from-emerald-900/60 to-teal-800/40 backdrop-blur-md rounded-xl p-8 border border-green-400/30 hover:border-green-400/50 transition-all duration-300"
+      >
+        <div class="flex items-center mb-6">
+          <div class="w-16 h-16 bg-emerald-400 rounded-full flex items-center justify-center mr-4">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8 text-gray-900"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+            </svg>
+          </div>
+          <h3 class="text-3xl font-bold text-white">Diseño y Prototipado</h3>
+        </div>
+        <p class="text-green-100 text-lg leading-relaxed">
+          Creamos un plan de acción detallado y un prototipo funcional del Agente RAG. Validamos la solución contigo para asegurar que cumple con tus expectativas y se integra perfectamente en tu flujo de trabajo.
+        </p>
+      </div>
+    </div>
+
+    <!-- Fase 3: Desarrollo e Implementación - Sección destacada -->
+    <div
+      class="bg-gradient-to-r from-green-900/60 to-emerald-800/40 rounded-xl p-6 md:p-8 backdrop-blur-sm border border-green-400/30 mb-8 md:mb-12"
+    >
+      <div class="text-center">
+        <div
+          class="w-20 h-20 md:w-24 md:h-24 bg-teal-400 rounded-full flex items-center justify-center mx-auto mb-6 md:mb-8"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-10 w-10 md:h-12 md:w-12 text-gray-900"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10 20l4-16m4 4l-4 4-4-4-4 4"
+            ></path>
+          </svg>
+        </div>
+        <h3 class="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-4 md:mb-6">
+          Desarrollo e Implementación
+        </h3>
+        <p class="text-green-200 text-lg md:text-xl leading-relaxed max-w-4xl mx-auto px-2">
+          Nuestro equipo de expertos construye y entrena a tu Agente IA a medida. Nos encargamos de la implementación completa, asegurando una transición fluida y sin interrupciones para tu operación diaria.
+        </p>
+      </div>
+    </div>
+
+    <!-- Fase 4: Soporte y Optimización -->
+    <div
+      class="bg-black/50 backdrop-blur-md rounded-xl p-6 md:p-8 border border-green-400/30 mb-6 md:mb-8"
+    >
+      <div class="text-center mb-8 md:mb-10">
+        <h3 class="text-2xl md:text-3xl font-bold text-white mb-4 md:mb-6">Soporte y Optimización Continua</h3>
+        <p class="text-green-200 text-base md:text-lg max-w-3xl mx-auto px-2">
+          El lanzamiento es solo el comienzo. Monitoreamos el rendimiento y optimizamos tu agente para que evolucione con tu empresa.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+        <!-- Monitoreo -->
+        <div class="text-center group">
+          <div
+            class="w-16 h-16 md:w-20 md:h-20 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 group-hover:scale-105 transition-transform duration-300"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8 md:h-10 md:w-10 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+              ></path>
+            </svg>
+          </div>
+          <h4 class="text-lg md:text-xl font-bold text-white mb-3 md:mb-4">Monitoreo</h4>
+          <p class="text-green-200 text-sm md:text-base leading-relaxed">
+            Supervisión continua del rendimiento y métricas clave de tu agente IA.
+          </p>
+        </div>
+
+        <!-- Soporte -->
+        <div class="text-center group">
+          <div
+            class="w-16 h-16 md:w-20 md:h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 group-hover:scale-105 transition-transform duration-300"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8 md:h-10 md:w-10 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"
+              ></path>
+            </svg>
+          </div>
+          <h4 class="text-lg md:text-xl font-bold text-white mb-3 md:mb-4">Soporte 24/7</h4>
+          <p class="text-green-200 text-sm md:text-base leading-relaxed">
+            Asistencia técnica disponible cuando la necesites para resolver cualquier incidencia.
+          </p>
+        </div>
+
+        <!-- Optimización -->
+        <div class="text-center group">
+          <div
+            class="w-16 h-16 md:w-20 md:h-20 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 group-hover:scale-105 transition-transform duration-300"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8 md:h-10 md:w-10 text-gray-900"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 10V3L4 14h7v7l9-11h-7z"
+              ></path>
+            </svg>
+          </div>
+          <h4 class="text-lg md:text-xl font-bold text-white mb-3 md:mb-4">Optimización</h4>
+          <p class="text-green-200 text-sm md:text-base leading-relaxed">
+            Mejoras continuas basadas en datos y feedback para maximizar la eficiencia.
+          </p>
+        </div>
+
+        <!-- Evolución -->
+        <div class="text-center group">
+          <div
+            class="w-16 h-16 md:w-20 md:h-20 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 group-hover:scale-105 transition-transform duration-300"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8 md:h-10 md:w-10 text-white"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              ></path>
+            </svg>
+          </div>
+          <h4 class="text-lg md:text-xl font-bold text-white mb-3 md:mb-4">Evolución</h4>
+          <p class="text-green-200 text-sm md:text-base leading-relaxed">
+            Adaptación constante a las nuevas necesidades y crecimiento de tu empresa.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Llamada a la acción -->
+    <div
+      class="bg-gradient-to-r from-green-800/60 to-emerald-700/40 rounded-xl p-4 md:p-6 backdrop-blur-sm border border-green-400/30 text-center"
+    >
+      <h3 class="text-xl md:text-2xl font-bold text-white mb-3 md:mb-4">
+        ¿Listo para Comenzar tu Transformación Digital?
+      </h3>
+      <p class="text-green-200 text-base md:text-lg mb-4 md:mb-6 max-w-2xl mx-auto">
+        Nuestro proceso probado garantiza una implementación exitosa y resultados medibles desde el primer día.
+      </p>
+      <div class="flex justify-center items-center">
+        <a
+          href="#contacto-part2"
+          class="bg-green-500 hover:bg-green-600 text-gray-900 font-bold py-3 px-6 rounded-lg transition-colors duration-300 min-w-[200px] inline-block text-center"
+        >
+          Iniciar Proceso
+        </a>
+      </div>
     </div>
   </div>
 </div>

@@ -2589,3 +2589,169 @@ Los logs ahora muestran:
 Esta actualización complementa las mejoras previas, resultando en una aplicación más estable, eficiente y con mejor experiencia de desarrollo.
 
 ---
+
+## 10 de mayo de 2025
+
+### Solución para Scroll en Móvil con Componente Cubes Interactivo
+
+#### Problema Identificado
+
+En la sección `soluciones-part1`, que utiliza el componente `Cubes.tsx` (renombrado de `GalaxyBackground` a `CubesBackground` para mayor claridad), se detectó un problema crítico en dispositivos móviles: los usuarios no podían hacer scroll para navegar por la página cuando llegaban a esta sección, ya que los eventos touch eran capturados completamente por el componente de cubos interactivos.
+
+#### Análisis del Problema
+
+El componente `Cubes.tsx` implementaba un manejo de eventos touch que:
+
+1. **Prevenía el comportamiento por defecto** de todos los eventos `touchmove` con `e.preventDefault()`
+2. **Capturaba todos los gestos touch** sin distinguir entre interacción con cubos y scroll de página
+3. **Bloqueaba la navegación natural** en dispositivos móviles
+
+```typescript
+// Implementación problemática original
+const onTouchMove = useCallback(
+  (e: TouchEvent) => {
+    e.preventDefault(); // ❌ Esto bloqueaba TODOS los gestos touch
+    e.stopPropagation();
+    const touch = e.touches[0];
+    if (touch) {
+      handleInteraction(touch.clientX, touch.clientY);
+    }
+  },
+  [handleInteraction]
+);
+```
+
+#### Solución Implementada: Detección Inteligente de Gestos
+
+Se implementó un sistema de detección inteligente que diferencia entre:
+
+1. **Gestos de scroll** (movimiento vertical rápido) - Permite el scroll de página
+2. **Interacción con cubos** (taps o movimientos horizontales) - Activa los efectos
+
+##### 1. Sistema de Tracking de Touch
+
+```typescript
+const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
+
+const onTouchStart = useCallback(
+  (e: TouchEvent) => {
+    const touch = e.touches[0];
+    if (touch) {
+      touchStartRef.current = {
+        x: touch.clientX,
+        y: touch.clientY,
+        time: Date.now()
+      };
+    }
+  },
+  []
+);
+```
+
+##### 2. Detección Inteligente en TouchMove
+
+```typescript
+const onTouchMove = useCallback(
+  (e: TouchEvent) => {
+    const touch = e.touches[0];
+    if (!touch || !touchStartRef.current) return;
+    
+    const deltaX = Math.abs(touch.clientX - touchStartRef.current.x);
+    const deltaY = Math.abs(touch.clientY - touchStartRef.current.y);
+    const deltaTime = Date.now() - touchStartRef.current.time;
+    
+    // Si es un gesto vertical rápido (scroll), no prevenir el comportamiento por defecto
+    if (deltaY > deltaX && deltaY > 10 && deltaTime < 300) {
+      return; // ✅ Permitir scroll
+    }
+    
+    // Si es interacción con cubos (tap o movimiento horizontal)
+    if (deltaTime > 100 || deltaX > deltaY) {
+      e.preventDefault();
+      e.stopPropagation();
+      handleInteraction(touch.clientX, touch.clientY);
+    }
+  },
+  [handleInteraction]
+);
+```
+
+##### 3. Manejo de TouchEnd para Efectos Ripple
+
+```typescript
+const onTouchEnd = useCallback(
+  (e: TouchEvent) => {
+    if (!touchStartRef.current) return;
+    
+    const touch = e.changedTouches[0];
+    if (!touch) return;
+    
+    const deltaX = Math.abs(touch.clientX - touchStartRef.current.x);
+    const deltaY = Math.abs(touch.clientY - touchStartRef.current.y);
+    const deltaTime = Date.now() - touchStartRef.current.time;
+    
+    // Si es un tap (poco movimiento y tiempo corto), activar efecto ripple
+    if (deltaX < 10 && deltaY < 10 && deltaTime < 300) {
+      e.preventDefault();
+      e.stopPropagation();
+      handleClick(touch.clientX, touch.clientY);
+    }
+    
+    touchStartRef.current = null;
+  },
+  [handleClick]
+);
+```
+
+##### 4. Configuración de Event Listeners Optimizada
+
+```typescript
+// Mobile events con configuración passive apropiada
+el.addEventListener("touchstart", onTouchStart, { passive: true });
+el.addEventListener("touchmove", onTouchMove, { passive: false });
+el.addEventListener("touchend", onTouchEnd, { passive: false });
+```
+
+#### Cambios en CSS
+
+Se simplificaron los estilos CSS ya que el componente maneja inteligentemente la detección:
+
+```css
+/* Permitir scroll en móvil para soluciones-part1 */
+@media (max-width: 768px) {
+  #soluciones-part1 {
+    touch-action: auto !important;
+  }
+}
+```
+
+#### Renombrado de Componentes para Claridad
+
+Para evitar confusión, se renombró:
+- `GalaxyBackground.astro` → `CubesBackground.astro`
+- Actualizado el ID del contenedor: `galaxy-container` → `cubes-container`
+- Actualizada la importación en `index.astro`
+
+#### Lógica de Detección de Gestos
+
+El sistema implementado utiliza tres parámetros clave para determinar el tipo de gesto:
+
+1. **Dirección del movimiento**: `deltaY > deltaX` indica movimiento vertical
+2. **Distancia del movimiento**: `deltaY > 10` asegura que no sea un tap accidental
+3. **Velocidad del gesto**: `deltaTime < 300` identifica gestos rápidos de scroll
+
+#### Resultados
+
+✅ **Scroll funcional**: Los usuarios pueden hacer scroll normalmente en móvil
+✅ **Interactividad preservada**: Los cubos siguen respondiendo a taps e interacciones
+✅ **Experiencia fluida**: No hay conflictos entre scroll y efectos visuales
+✅ **Compatibilidad universal**: Funciona en todos los dispositivos móviles
+
+#### Beneficios de la Solución
+
+1. **Experiencia de usuario mejorada**: Navegación natural en móvil sin perder efectos visuales
+2. **Detección inteligente**: El sistema distingue automáticamente entre diferentes tipos de gestos
+3. **Rendimiento optimizado**: Solo previene eventos cuando es necesario
+4. **Mantenibilidad**: Código claro y bien documentado para futuras modificaciones
+
+Esta implementación demuestra cómo combinar efectos visuales avanzados con una experiencia de usuario móvil fluida, resolviendo el conflicto común entre interactividad y navegación en dispositivos táctiles.

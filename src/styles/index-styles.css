@@ -97,6 +97,12 @@
   animation: fadeIn 1s ease-in-out 0.5s forwards;
 }
 
+/* Asegurar que el subtitle en rag-home respete los márgenes */
+#rag-home .section-subtitle {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -171,7 +177,7 @@
     height: auto;
     background: transparent;
     z-index: 100;
-    padding: 0.5rem;
+    padding: 0;
   }
 
   .nav-container {
@@ -182,7 +188,7 @@
     -ms-overflow-style: none;
     scroll-behavior: smooth;
     gap: 0.5rem;
-    padding: 0 0.5rem;
+    padding: 0;
   }
 
   .nav-container::-webkit-scrollbar {
@@ -191,8 +197,11 @@
 
   .main-content {
     margin-left: 0;
-    padding: 1rem;
-    padding-bottom: calc(100px + 1rem);
+    padding: 0 1px;
+  }
+
+  .section-inner {
+    padding: 1rem 0;
   }
 
   .text-pressure-wrapper {
@@ -205,7 +214,7 @@
 
 @media (max-width: 480px) {
   .section-inner {
-    padding: 1rem 1.5rem;
+    padding: 1rem 0;
   }
 
   .text-pressure-wrapper {
@@ -221,6 +230,31 @@
   transform: translate(-50%, 50%);
   width: 100%;
   text-align: center;
+}
+
+/* Gradiente dinámico para hola-part1 */
+#hola-part1 {
+  background: linear-gradient(45deg, #ff6b35, #f7931e, #ffcc02, #ff8c42, #e74c3c, #ff9500);
+  background-size: 400% 400%;
+  animation: dynamicGradient 8s ease-in-out infinite;
+}
+
+@keyframes dynamicGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  25% {
+    background-position: 100% 50%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  75% {
+    background-position: 0% 100%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 /* Estilos para la sección hola-part2 */
@@ -871,7 +905,7 @@
     rgba(255, 140, 0, 0.8) 100%
   );
   background-size: 400% 400%;
-  animation: aurora-animation 15s ease infinite;
+  animation: aurora-animation 10s ease infinite;
 }
 
 @keyframes aurora-animation {
@@ -984,6 +1018,12 @@
   margin: 0;
 }
 
+/* Estilos específicos para el timeline de la sección empresa-part2 */
+#empresa-part2 .section-inner {
+  padding: 0;
+  margin: 0;
+}
+
 #hola-part3-timeline .section-inner {
   padding: 0;
   margin: 0;
@@ -1067,7 +1107,7 @@
   #hola-part3-timeline .timeline-wrapper h2 {
     width: 100% !important;
     max-width: 95% !important;
-    font-size: clamp(4.3rem, 8vw, 3.5rem) !important;
+    font-size: clamp(3rem, 6vw, 3rem) !important;
     padding: 1rem;
     margin: 1rem 0.5rem;
     line-height: 1.3 !important;
@@ -1972,20 +2012,99 @@
   padding-right: 2rem !important;
 }
 #empresa-part3 .section-inner {
-  padding-left: 0rem !important;
+  padding-left: 2rem !important;
   padding-right: 2rem !important;
 }
 #empresa-part4 .section-inner {
   padding-left: 0rem !important;
   padding-right: 2rem !important;
 }
+
+/* Estilos específicos para empresa-part3 - Metodología */
+#empresa-part3.content-section {
+  background: linear-gradient(135deg, rgba(0, 20, 10, 0.9) 0%, rgba(0, 40, 20, 0.8) 100%);
+}
+
+#empresa-part3 h2 {
+  color: #ffffff !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+#empresa-part3 .text-gray-300 {
+  color: #e5e7eb !important;
+}
+
+#empresa-part3 .animated-gradient-text {
+  background: linear-gradient(45deg, #10b981, #34d399, #6ee7b7, #34d399, #10b981) !important;
+  background-size: 200% 100% !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+  animation: gradient-shift 3s ease-in-out infinite;
+}
+
+@keyframes gradient-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+#empresa-part3 .bg-black\/20 {
+  background: rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(16, 185, 129, 0.3) !important;
+  transition: all 0.3s ease;
+}
+
+#empresa-part3 .bg-black\/20:hover {
+  background: rgba(0, 0, 0, 0.6) !important;
+  border-color: rgba(16, 185, 129, 0.6) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2);
+}
+
+#empresa-part3 .bg-green-900\/50 {
+  background: rgba(6, 78, 59, 0.8) !important;
+  border-color: rgba(16, 185, 129, 0.6) !important;
+}
+
+#empresa-part3 .text-green-400 {
+  color: #34d399 !important;
+}
+
+#empresa-part3 .text-green-100\/80 {
+  color: #d1fae5 !important;
+  font-size: 1.1rem;
+  line-height: 1.7;
+}
+
+#empresa-part3 h3 {
+  color: #ffffff !important;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  #empresa-part3 .section-inner {
+    padding: 0.5rem 0 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  #empresa-part3 .section-inner {
+    padding: 0.5rem 0 !important;
+  }
+}
 #blog-part2 .section-inner {
   padding-left: 0 !important;
   padding-right: 0 !important;
 }
 #faq-part2 .section-inner {
-  padding-left: 0 !important;
-  padding-right: 0 !important;
+  padding-left: 0rem !important;
+  padding-right: 1rem !important;
 }
 #soluciones-part2 .section-inner {
   padding-left: 0 !important;
@@ -1995,7 +2114,141 @@
   padding-left: 0 !important;
   padding-right: 2 !important;
 }
+
 #contacto-part3 .section-inner {
   padding-left: 0 !important;
   padding-right: 2 !important;
+}
+#contacto-part4 .section-inner {
+  padding-left: 0 !important;
+  padding-right: 2 !important;
+}
+/* Excepción para eliminar TODO el padding de soluciones-part3 */
+#soluciones-part3 .section-inner {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Excepción para eliminar márgenes y border-radius de soluciones-part3 */
+#soluciones-part3.content-section {
+  margin-bottom: 0 !important;
+  border-radius: 0 !important;
+}
+/* Excepción para eliminar TODO el padding de contacto-part3 */
+#contacto-part3 .section-inner {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0.1 !important;
+}
+
+/* Excepción para eliminar márgenes y border-radius de contacto-part3 */
+#contacto-part3.content-section {
+  margin-bottom: 0 !important;
+  border-radius: 0 !important;
+}
+
+/* Desactivar p5cursores solo en hola-part1 */
+#hola-part1 * {
+  cursor: default !important;
+}
+
+#hola-part1 .p5cursor,
+#hola-part1 [class*='p5cursor'],
+#hola-part1 [id*='p5cursor'],
+#hola-part1 canvas {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+}
+
+#hola-part1 .P5CursorBackground {
+  display: none !important;
+}
+
+/* Desactivar p5cursores en soluciones-part1 y aplicar efecto ripple con datos */
+#soluciones-part1 {
+  position: relative;
+  background: #374151;
+  overflow: hidden;
+}
+
+#soluciones-part1 > div:first-child {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
+}
+
+#soluciones-part1 .section-inner {
+  position: relative;
+  z-index: 2;
+}
+
+#soluciones-part1 * {
+  cursor: default !important;
+}
+
+#soluciones-part1 .p5cursor,
+#soluciones-part1 [class*='p5cursor'],
+#soluciones-part1 [id*='p5cursor'],
+#soluciones-part1 canvas {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+}
+
+#soluciones-part1 .P5CursorBackground {
+  display: none !important;
+}
+
+/* Permitir scroll en móvil para soluciones-part1 */
+@media (max-width: 768px) {
+  #soluciones-part1 {
+    touch-action: auto !important;
+  }
+}
+
+/* Aumentar tamaño de título en secciones part1 para vista móvil */
+@media (max-width: 768px) {
+  #hola-part1 .section-title,
+  #empresa-part1 .section-title,
+  #soluciones-part1 .section-title,
+  #blog-part1 .section-title,
+  #faq-part1 .section-title,
+  #contacto-part1 .section-title {
+    font-size: clamp(52px, 18.5vw, 350px) !important;
+  }
+}
+
+/* Asegurar que contacto-part1 permita backgrounds */
+#contacto-part1 {
+  position: relative !important;
+  overflow: visible !important;
+}
+
+#contacto-part1 .section-inner {
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+#contacto-part1 canvas {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* Permitir scroll en móvil para contacto-part1 */
+@media (max-width: 768px) {
+  #contacto-part1 {
+    touch-action: auto !important;
+  }
 }

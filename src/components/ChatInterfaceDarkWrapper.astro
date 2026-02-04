@@ -9,23 +9,25 @@
 <script>
   import React from 'react';
   import { createRoot } from 'react-dom/client';
-  import ChatInterfaceDark from './ChatInterfaceDark.jsx';
+  import ChatInterfaceDarkLegacy from './ChatInterfaceDarkLegacy.jsx';
 
-  // Función para montar el componente React
+  // Función para montar ChatInterfaceDarkLegacy (SIEMPRE GABY)
   function mountChatInterfaceDark() {
     const container = document.getElementById('chat-interface-dark-container');
 
     if (container && !container.hasAttribute('data-react-mounted')) {
       container.setAttribute('data-react-mounted', 'true');
 
-      const root = createRoot(container);
-      root.render(React.createElement(ChatInterfaceDark));
+      console.log('💜 MONTANDO GABY LEGACY - Siempre Gaby con poderes de FAQ');
 
-      console.log('ChatInterfaceDark montado correctamente');
+      const root = createRoot(container);
+      root.render(React.createElement(ChatInterfaceDarkLegacy));
+      
+      console.log('💜 Gaby Legacy montado exitosamente');
     }
   }
 
-  // Montar cuando el DOM esté listo
+  // Montar inmediatamente
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', mountChatInterfaceDark);
   } else {

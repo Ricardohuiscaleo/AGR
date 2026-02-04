@@ -228,7 +228,7 @@ export const AuroraBackground = ({
           auroraElement.style.animationPlayState = 'paused';
         } else {
           // Ajustar velocidades: más rápido en escritorio, más lento en móvil
-          const baseDuration = isDesktop ? 5 : 90;
+          const baseDuration = isDesktop ? 5 : 30; // 5s para escritorio, 30s para móvil
           const slowdownFactor = 4;
           const currentDuration =
             baseDuration + (1 - animationSpeedRef.current) * baseDuration * slowdownFactor;

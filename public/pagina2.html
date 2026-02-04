@@ -1,0 +1,56 @@
+<!-- Copia HTML estática para test de scroll en móvil -->
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Scroll - Pagina2</title>
+    <style>
+      html,
+      body {
+        min-height: 100vh;
+        height: auto;
+        overflow-y: auto;
+        margin: 0;
+        padding: 0;
+        font-family: system-ui, sans-serif;
+        background: #ece6dc;
+      }
+      .section {
+        min-height: 600px;
+        padding: 2rem;
+        border-bottom: 2px solid #ccc;
+        background: #fff;
+        margin-bottom: 2rem;
+      }
+      .section:nth-child(even) {
+        background: #f3f4f6;
+      }
+      .debug {
+        height: 1200px;
+        background: rgba(255, 0, 0, 0.1);
+        text-align: center;
+        font-size: 2rem;
+        padding-top: 4rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="section">
+      <h1>Test Scroll Vertical</h1>
+      <p>Desliza hacia abajo para probar el scroll en móvil.</p>
+    </div>
+    <div class="section">
+      <h2>Sección 2</h2>
+      <p>Más contenido de prueba.</p>
+    </div>
+    <div class="section">
+      <h2>Sección 3</h2>
+      <p>Incluso más contenido de prueba.</p>
+    </div>
+    <div class="debug">
+      Si puedes ver este mensaje, el scroll vertical funciona correctamente.<br />
+      (Esta caja es solo para test de scroll)
+    </div>
+  </body>
+</html>

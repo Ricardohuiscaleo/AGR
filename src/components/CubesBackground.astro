@@ -1,0 +1,32 @@
+---
+// Wrapper Astro para el componente Cubes React
+---
+
+<div id="cubes-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: auto;"></div>
+
+<script>
+  import Cubes from './Cubes';
+  import { createElement } from 'react';
+  import { createRoot } from 'react-dom/client';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('cubes-container');
+    if (container) {
+      const root = createRoot(container);
+      root.render(
+        createElement(Cubes, {
+          gridSize: 8,
+          maxAngle: 60,
+          radius: 4,
+          borderStyle: "1px solid rgba(148, 163, 184, 0.3)",
+          faceColor: "rgba(51, 65, 85, 0.7)",
+          rippleColor: "#7dd3fc",
+          rippleSpeed: 1.8,
+          autoAnimate: true,
+          rippleOnClick: true,
+          shadow: "0 0 8px rgba(125, 211, 252, 0.2)"
+        })
+      );
+    }
+  });
+</script>

@@ -1,145 +1,81 @@
 <?php
 /**
- * API: Obtener blog completo por ID
- * Equivalente a: src/pages/api/blog/obtener-completo/[blogId].ts
- * Ruta: /php-apis/obtener-completo-blog.php?id=BLOG_ID
+ * API para obtener un blog completo por ID e incrementar su vista. [Versión Final y Corregida]
+ * Utiliza la carga de config.php clonada y funciones RPC de Supabase.
  */
 
+// --- Carga de Configuración Segura (LÓGICA CLONADA DEL TEST EXITOSO) ---
+$config_path = __DIR__ . '/../../config.php'; 
+
+if (!file_exists($config_path) || !is_readable($config_path)) {
+    http_response_code(500);
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'error' => 'Error Crítico: No se pudo cargar config.php desde la ruta verificada.']);
+    exit;
+}
+
+$config = require $config_path;
+
+if (empty($config['PUBLIC_SUPABASE_URL']) || empty($config['PUBLIC_SUPABASE_ANON_KEY'])) {
+    http_response_code(500);
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'error' => 'Error Crítico: Faltan claves de Supabase en el config.php cargado.']);
+    exit;
+}
+
+// --- Script Principal ---
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
-
-// Manejar preflight
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    exit();
-}
-
-// 🔐 FUNCIÓN SEGURA para cargar variables de entorno
-function loadEnvSafe($path) {
-    if (!file_exists($path)) {
-        return false;
-    }
-    
-    $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    if ($lines === false) {
-        return false;
-    }
-    
-    foreach ($lines as $line) {
-        $line = trim($line);
-        if (empty($line) || strpos($line, '#') === 0) {
-            continue;
-        }
-        
-        if (strpos($line, '=') !== false) {
-            list($key, $value) = explode('=', $line, 2);
-            $key = trim($key);
-            $value = trim($value, '"\'');
-            $_ENV[$key] = $value;
-            putenv("$key=$value");
-        }
-    }
-    return true;
-}
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { exit(); }
 
 try {
-    // Validar método
-    if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-        throw new Exception('Solo se permite método GET');
+    if ($_SERVER['REQUEST_METHOD'] !== 'GET') { 
+        throw new Exception('Solo se permite el método GET.', 405); 
     }
 
-    // Obtener ID del blog
-    $blogId = $_GET['id'] ?? '';
-    if (empty($blogId)) {
-        throw new Exception('ID del blog es requerido');
+    $blogId = $_GET['id'] ?? null;
+    if (!$blogId) { 
+        throw new Exception('El parámetro ID del blog es requerido.', 400); 
     }
 
-    // 🔒 Buscar .env en ubicaciones seguras
-    $env_paths = [
-        __DIR__ . '/../../.env',
-        __DIR__ . '/../.env',
-        $_SERVER['DOCUMENT_ROOT'] . '/../.env'
-    ];
+    // 1. Incrementar la vista usando la función RPC segura.
+    // Lo hacemos primero para que no dependa de si el get funciona.
+    $rpcUrl = $config['PUBLIC_SUPABASE_URL'] . '/rest/v1/rpc/increment_post_views';
+    $ch_rpc = curl_init($rpcUrl);
+    curl_setopt($ch_rpc, CURLOPT_POST, true);
+    curl_setopt($ch_rpc, CURLOPT_POSTFIELDS, json_encode(['post_id' => $blogId]));
+    curl_setopt($ch_rpc, CURLOPT_HTTPHEADER, [ 'Content-Type: application/json', 'apikey: ' . $config['PUBLIC_SUPABASE_ANON_KEY'], 'Authorization: Bearer ' . $config['PUBLIC_SUPABASE_ANON_KEY'] ]);
+    curl_setopt($ch_rpc, CURLOPT_RETURNTRANSFER, true);
+    curl_exec($ch_rpc); // Ejecutamos pero no necesitamos la respuesta
+    curl_close($ch_rpc);
 
-    foreach ($env_paths as $env_path) {
-        if (loadEnvSafe($env_path)) {
-            break;
+    // 2. Obtener los datos completos del blog.
+    $blogUrl = $config['PUBLIC_SUPABASE_URL'] . '/rest/v1/blog_posts?select=*&id=eq.' . urlencode($blogId);
+    $ch_get = curl_init($blogUrl);
+    curl_setopt($ch_get, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch_get, CURLOPT_HTTPHEADER, [ 
+        'apikey: ' . $config['PUBLIC_SUPABASE_ANON_KEY'], 
+        'Authorization: Bearer ' . $config['PUBLIC_SUPABASE_ANON_KEY'] 
+    ]);
+    $response = curl_exec($ch_get);
+    $httpcode = curl_getinfo($ch_get, CURLINFO_HTTP_CODE);
+    curl_close($ch_get);
+    
+    if ($httpcode === 200) {
+        $blogs = json_decode($response, true);
+        if (empty($blogs)) {
+            throw new Exception('Blog no encontrado.', 404);
         }
+        echo json_encode(['success' => true, 'blog' => $blogs[0]]);
+    } else {
+        throw new Exception("Error al obtener el blog completo. Código: " . $httpcode);
     }
-
-    // Variables de Supabase
-    $SUPABASE_URL = $_ENV['PUBLIC_SUPABASE_URL'] ?? 'https://uznvakpuuxnpdhoejrog.supabase.co';
-    $SUPABASE_ANON_KEY = $_ENV['PUBLIC_SUPABASE_ANON_KEY'] ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6bnZha3B1dHhucGRob2Vqcm9nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkwODg0MTAsImV4cCI6MjA2NDY2NDQxMH0.OxbLYkjlgpWFnqd28gaZSwar_NQ6_qUS3U76bqbcXVg';
-
-    // 📖 Obtener blog específico por ID
-    $blog_url = $SUPABASE_URL . '/rest/v1/blog_posts?select=*&id=eq.' . urlencode($blogId) . '&publicado=eq.true';
-    
-    $context = stream_context_create([
-        'http' => [
-            'header' => [
-                "Authorization: Bearer $SUPABASE_ANON_KEY",
-                "apikey: $SUPABASE_ANON_KEY",
-                "Content-Type: application/json"
-            ]
-        ]
-    ]);
-
-    $response = file_get_contents($blog_url, false, $context);
-    
-    if ($response === FALSE) {
-        throw new Exception('Error conectando con Supabase');
-    }
-
-    $blogs = json_decode($response, true);
-    
-    if (empty($blogs)) {
-        http_response_code(404);
-        echo json_encode([
-            'success' => false,
-            'error' => 'Blog no encontrado'
-        ]);
-        exit;
-    }
-
-    $blog = $blogs[0];
-
-    // 📊 Incrementar vistas automáticamente al obtener el blog completo
-    $update_url = $SUPABASE_URL . '/rest/v1/blog_posts?id=eq.' . urlencode($blogId);
-    $current_views = intval($blog['vistas'] ?? 0);
-    $new_views = $current_views + 1;
-    
-    $update_context = stream_context_create([
-        'http' => [
-            'method' => 'PATCH',
-            'header' => [
-                "Authorization: Bearer $SUPABASE_ANON_KEY",
-                "apikey: $SUPABASE_ANON_KEY",
-                "Content-Type: application/json",
-                "Prefer: return=minimal"
-            ],
-            'content' => json_encode(['vistas' => $new_views])
-        ]
-    ]);
-
-    // Intentar actualizar vistas (no crítico si falla)
-    @file_get_contents($update_url, false, $update_context);
-    
-    // Actualizar el valor en la respuesta
-    $blog['vistas'] = $new_views;
-
-    // Respuesta exitosa
-    echo json_encode([
-        'success' => true,
-        'blog' => $blog
-    ], JSON_UNESCAPED_UNICODE);
 
 } catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode([
-        'success' => false,
-        'error' => 'Error interno del servidor',
-        'message' => $e->getMessage()
-    ], JSON_UNESCAPED_UNICODE);
+    $errorCode = $e->getCode();
+    http_response_code(is_int($errorCode) && $errorCode >= 400 && $errorCode < 600 ? $errorCode : 500);
+    echo json_encode(['success' => false, 'error' => 'CONFESIÓN GET-COMPLETO: ' . $e->getMessage()]);
 }
 ?>

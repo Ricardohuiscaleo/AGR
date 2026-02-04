@@ -22,7 +22,16 @@ Sitio web completo con sistema de autenticación, generación de blogs con IA, y
 
 ## 🚀 Deploy
 
-Este proyecto está configurado para desplegarse en Railway con dominio personalizado.
+Este proyecto está listo para desplegarse en Easypanel con GitHub.
+
+### Deploy automático:
+
+1. Sube el código a GitHub
+2. Conecta el repositorio en Easypanel
+3. Configura las variables de entorno
+4. Deploy automático con Dockerfile
+
+Ver [DEPLOY.md](./DEPLOY.md) para instrucciones detalladas.
 
 ### Variables de entorno requeridas:
 

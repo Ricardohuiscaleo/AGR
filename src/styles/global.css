@@ -1,0 +1,8 @@
+/* Estilos globales para la aplicación */
+
+/* Añadir esta clase para pantallas extra pequeñas */
+@media (min-width: 400px) {
+  .xs\:inline {
+    display: inline;
+  }
+}

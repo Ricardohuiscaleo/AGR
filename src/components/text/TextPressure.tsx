@@ -44,7 +44,7 @@ const TextPressure: React.FC<TextPressureProps> = ({
   const mouseRef = useRef({ x: 0, y: 0 });
   const cursorRef = useRef({ x: 0, y: 0 });
   const scrollRef = useRef(0);
-  const isMobileRef = useRef(false);
+  const [isMobile, setIsMobile] = useState(false); // Changed to state
 
   const [fontSize, setFontSize] = useState(minFontSize);
   const [scaleY, setScaleY] = useState(1);
@@ -61,7 +61,8 @@ const TextPressure: React.FC<TextPressureProps> = ({
   const chars = text.split('');
 
   const checkIfMobile = () => {
-    isMobileRef.current = window.innerWidth <= 768;
+    // Now updates state
+    setIsMobile(window.innerWidth <= 768);
   };
 
   const dist = (a: { x: number; y: number }, b: { x: number; y: number }) => {
@@ -121,51 +122,40 @@ const TextPressure: React.FC<TextPressureProps> = ({
     checkIfMobile();
 
     const handleMouseMove = (e: MouseEvent) => {
-      cursorRef.current.x = e.clientX;
-      cursorRef.current.y = e.clientY;
+      const rect = containerRef.current!.getBoundingClientRect();
+      cursorRef.current.x = e.clientX - rect.left; // Coordenadas relativas al contenedor
+      cursorRef.current.y = e.clientY - rect.top; // Coordenadas relativas al contenedor
     };
 
     const handleTouchMove = (e: TouchEvent) => {
       e.preventDefault();
 
       const t = e.touches[0];
-      cursorRef.current.x = t.clientX;
-      cursorRef.current.y = t.clientY;
+      const rect = containerRef.current!.getBoundingClientRect();
+      cursorRef.current.x = t.clientX - rect.left; // Coordenadas relativas al contenedor
+      cursorRef.current.y = t.clientY - rect.top; // Coordenadas relativas al contenedor
     };
 
     const handleTouchStart = (e: TouchEvent) => {
       const t = e.touches[0];
-      cursorRef.current.x = t.clientX;
-      cursorRef.current.y = t.clientY;
-      mouseRef.current.x = t.clientX;
-      mouseRef.current.y = t.clientY;
+      const rect = containerRef.current!.getBoundingClientRect();
+      cursorRef.current.x = t.clientX - rect.left; // Coordenadas relativas al contenedor
+      cursorRef.current.y = t.clientY - rect.top; // Coordenadas relativas al contenedor
+      mouseRef.current.x = t.clientX - rect.left; // Coordenadas relativas al contenedor
+      mouseRef.current.y = t.clientY - rect.top; // Coordenadas relativas al contenedor
+    };
+
+    const handleMouseLeave = () => {
+      // Al salir el mouse, reseteamos la posición al centro del contenedor
+      const rect = containerRef.current!.getBoundingClientRect();
+      cursorRef.current.x = rect.width / 2;
+      cursorRef.current.y = rect.height / 2;
     };
 
     const handleScroll = () => {
-      if (!isMobileRef.current) return;
-
+      // Esta función NO debe actualizar cursorRef.current para el efecto de presión.
+      // El efecto de presión debe reaccionar solo a eventos de puntero reales.
       scrollRef.current = window.scrollY;
-
-      if (containerRef.current) {
-        const rect = containerRef.current.getBoundingClientRect();
-        const isInView = rect.top < window.innerHeight && rect.bottom > 0;
-
-        if (isInView) {
-          const visiblePercentage = Math.min(
-            (window.innerHeight - rect.top) / rect.height,
-            rect.bottom / window.innerHeight
-          );
-
-          const scrollPercent = window.scrollY / (document.body.scrollHeight - window.innerHeight);
-
-          const horizontalPosition = window.innerWidth * scrollPercent;
-
-          const verticalPosition = rect.top + rect.height * visiblePercentage;
-
-          cursorRef.current.x = horizontalPosition;
-          cursorRef.current.y = verticalPosition;
-        }
-      }
     };
 
     const handleResize = () => {
@@ -173,9 +163,9 @@ const TextPressure: React.FC<TextPressureProps> = ({
     };
 
     const handleUpdateColors = (e: CustomEvent) => {
-      const { textColor, strokeColor } = e.detail;
-      if (textColor) setCurrentTextColor(textColor);
-      if (strokeColor) setCurrentStrokeColor(strokeColor);
+      const { textColor: newTextColor, strokeColor: newStrokeColor } = e.detail;
+      if (newTextColor) setCurrentTextColor(newTextColor);
+      if (newStrokeColor) setCurrentStrokeColor(newStrokeColor);
     };
 
     const checkForColorUpdates = () => {
@@ -191,9 +181,15 @@ const TextPressure: React.FC<TextPressureProps> = ({
       }
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('touchmove', handleTouchMove, { passive: false });
-    window.addEventListener('touchstart', handleTouchStart, { passive: false });
+    const container = containerRef.current; // Aseguramos que el contenedor esté disponible
+    if (container) {
+      container.addEventListener('mousemove', handleMouseMove);
+      container.addEventListener('mouseleave', handleMouseLeave);
+      // Usamos passive: false para touchmove para poder llamar a e.preventDefault()
+      container.addEventListener('touchmove', handleTouchMove, { passive: false });
+      container.addEventListener('touchstart', handleTouchStart, { passive: false });
+    }
+
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('resize', handleResize);
 
@@ -210,20 +206,20 @@ const TextPressure: React.FC<TextPressureProps> = ({
       }
     }
 
-    if (containerRef.current) {
-      const { left, top, width, height } = containerRef.current.getBoundingClientRect();
-      mouseRef.current.x = left + width / 2;
-      mouseRef.current.y = top + height / 2;
-      cursorRef.current.x = mouseRef.current.x;
-      cursorRef.current.y = mouseRef.current.y;
-    }
-
-    handleScroll();
+    // Centrado inicial de mouseRef y cursorRef relativo al contenedor
+    const rect = container.getBoundingClientRect();
+    mouseRef.current.x = rect.width / 2;
+    mouseRef.current.y = rect.height / 2;
+    cursorRef.current.x = mouseRef.current.x;
+    cursorRef.current.y = mouseRef.current.y;
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('touchmove', handleTouchMove);
-      window.removeEventListener('touchstart', handleTouchStart);
+      if (container) {
+        container.removeEventListener('mousemove', handleMouseMove);
+        container.removeEventListener('mouseleave', handleMouseLeave);
+        container.removeEventListener('touchmove', handleTouchMove);
+        container.removeEventListener('touchstart', handleTouchStart);
+      }
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', handleResize);
     };

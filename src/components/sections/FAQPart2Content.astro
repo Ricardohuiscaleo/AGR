@@ -3,9 +3,6 @@
 // SECCIÓN FAQ (PARTE 2) - LA EVOLUCIÓN DEL FAQ
 // =====================================================================
 
-// Importamos el wrapper del chat claro que combina con tonos rojos
-import ChatInterfaceWrapper from '../ChatInterfaceWrapper.astro';
-
 // Definimos las props que recibe
 interface Props {
   section: any;
@@ -15,179 +12,117 @@ const { section } = Astro.props;
 
 <div class="section-inner w-full p-0 m-0 relative overflow-hidden">
   <div class="w-full relative z-10">
-    <!-- Container principal con padding responsive -->
-    <div class="container mx-auto py-6 md:py-10 px-4 md:px-5">
-      <!-- Grid principal: Texto a la izquierda, Chat a la derecha -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center min-h-[600px]">
-        <!-- LADO IZQUIERDO: Título "La evolución del FAQ" -->
-        <div class="flex flex-col justify-center space-y-6 lg:space-y-8">
-          <!-- Título principal en letras grandes -->
-          <div class="space-y-4">
-            <h2 class="text-7xl md:text-6xl lg:text-7xl xl:text-9xl font-bold leading-tight">
-              <span class="block text-gray-900 mb-2">La evolución</span>
-              <span
-                class="block text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-red-500 to-red-700"
-              >
-                del FAQ
-              </span>
-            </h2>
+    <!-- Container principal con estilo similar a ContactoPart2Content -->
+    <div
+      id="faq-part2-timeline"
+      class="w-full relative z-10"
+      style="height: 100%; position: relative; margin: 1rem;"
+    >
+      <div class="timeline-wrapper">
+        <!-- Título principal con estilo grande -->
+        <h2
+          class="text-4xl sm:text-5xl md:text-6xl lg:text-8xl xl:text-9xl font-bold mb-4 md:mb-6 leading-tight"
+        >
+          Preguntas frecuentes con
+          <span
+            class="text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-red-500 to-red-700"
+          >
+            FAQ inteligente
+          </span>
+        </h2>
 
-            <!-- Línea decorativa -->
-            <div class="w-24 md:w-32 h-1 bg-gradient-to-r from-red-600 to-red-400 rounded-full">
-            </div>
-          </div>
-
-          <!-- Subtítulo descriptivo -->
-          <div class="space-y-4">
-            <p class="text-lg md:text-xl lg:text-2xl text-gray-700 leading-relaxed">
-              De preguntas estáticas a conversaciones inteligentes
-            </p>
-            <p class="text-base md:text-lg text-gray-600 leading-relaxed max-w-lg">
-              Los FAQ tradicionales han evolucionado. Ahora puedes tener conversaciones naturales y
-              obtener respuestas personalizadas en tiempo real gracias a la IA.
-            </p>
-          </div>
-
-          <!-- Características destacadas -->
-          <div class="space-y-3">
-            <div class="flex items-center space-x-3">
-              <div class="w-3 h-3 bg-red-500 rounded-full"></div>
-              <span class="text-gray-700 font-medium">Respuestas instantáneas 24/7</span>
-            </div>
-            <div class="flex items-center space-x-3">
-              <div class="w-3 h-3 bg-red-500 rounded-full"></div>
-              <span class="text-gray-700 font-medium">Conversaciones naturales</span>
-            </div>
-            <div class="flex items-center space-x-3">
-              <div class="w-3 h-3 bg-red-500 rounded-full"></div>
-              <span class="text-gray-700 font-medium">Aprendizaje continuo</span>
-            </div>
-          </div>
-
-          <!-- Call to action -->
-          <div class="pt-4"></div>
-        </div>
-
-        <!-- LADO DERECHO: Chat Interface Claro -->
-        <div class="flex justify-center lg:justify-end">
-          <div class="w-full max-w-lg lg:max-w-3xl xl:max-w-4xl">
-            <!-- 🆕 Aumentado de xl:max-w-xl a xl:max-w-2xl -->
-            <!-- Contenedor del chat con efectos visuales -->
-            <div class="relative">
-              <!-- Efecto de sombra/glow sutil -->
-              <div class=""></div>
-
-              <!-- Chat container -->
-              <div class="">
-                <ChatInterfaceWrapper />
-              </div>
-
-              <!-- Elementos decorativos -->
-              <div
-                class="absolute -top-4 -right-4 w-8 h-8 bg-red-500 rounded-full opacity-80 animate-pulse"
-              >
-              </div>
-              <div
-                class="absolute -bottom-4 -left-4 w-6 h-6 bg-red-300 rounded-full opacity-60 animate-pulse"
-                style="animation-delay: 1s;"
-              >
-              </div>
-            </div>
-          </div>
+        <div class="max-w-7xl">
+          <p
+            class="text-base sm:text-lg md:text-2xl lg:text-3xl xl:text-4xl text-gray-700 leading-relaxed"
+          >
+            De preguntas estáticas a
+            <span
+              class="animated-gradient-text"
+              style="background-image: linear-gradient(45deg, #4d4d4d, #282727, #4c434b, #7e7777); -webkit-background-clip: text; background-clip: text; color: transparent; display: inline;"
+            >
+              conversaciones inteligentes
+            </span>
+            con IA para respuestas
+            <span
+              class="inline-block bg-gradient-to-r from-gray-400 via-gray-800 to-gray-500 bg-[length:200%_100%] text-transparent bg-clip-text font-semibold italic transform -rotate-1 animate-shimmer"
+            >
+              personalizadas en tiempo real
+            </span>
+          </p>
         </div>
       </div>
 
-      <!-- Sección adicional: Comparativa FAQ tradicional vs IA -->
-      <div class="mt-16 lg:mt-24">
-        <div class="bg-gradient-to-r from-gray-200 to-gray-200 rounded-2xl p-8 md:p-12">
-          <h3 class="text-2xl md:text-3xl font-bold text-center mb-8 text-gray-900">
-            FAQ Tradicional vs FAQ con IA
-          </h3>
+      <!-- Botón del chat destacado con ancho máximo disponible -->
+      <div
+        class="bg-white/80 backdrop-blur-md rounded-xl p-4 sm:p-8 shadow-lg border border-red-100 w-[calc(100%-2rem)] mx-4 text-center mt-8"
+      >
+        <h3 class="text-xl sm:text-2xl font-semibold mb-2 sm:mb-4 text-gray-800">
+          Asistente virtual
+        </h3>
+        <p class="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">Resuelve tus dudas</p>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- FAQ Tradicional -->
-            <div class="bg-white rounded-xl p-6 shadow-md">
-              <div class="flex items-center mb-4">
-                <div class="w-12 h-12 bg-gray-400 rounded-lg flex items-center justify-center mr-4">
-                  <svg
-                    class="w-6 h-6 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                    ></path>
-                  </svg>
-                </div>
-                <h4 class="text-xl font-semibold text-gray-900">FAQ Tradicional</h4>
-              </div>
-              <ul class="space-y-3 text-gray-600">
-                <li class="flex items-start space-x-2">
-                  <span class="text-red-400 mt-1">×</span>
-                  <span>Preguntas limitadas y predefinidas</span>
-                </li>
-                <li class="flex items-start space-x-2">
-                  <span class="text-red-400 mt-1">×</span>
-                  <span>Respuestas estáticas</span>
-                </li>
-                <li class="flex items-start space-x-2">
-                  <span class="text-red-400 mt-1">×</span>
-                  <span>Búsqueda manual</span>
-                </li>
-                <li class="flex items-start space-x-2">
-                  <span class="text-red-400 mt-1">×</span>
-                  <span>No contextual</span>
-                </li>
-              </ul>
+        <!-- Eliminado el texto estático fuera del botón en móvil -->
+
+        <button
+          id="faq-chat-button"
+          class="chat-toggle-button mx-auto mb-4 sm:mb-6"
+          aria-label="Abrir chat"
+          title="Abrir chat"
+        >
+          <div class="chat-icon-wrapper">
+            <svg
+              class="chat-icon-svg sm:chat-icon-svg-static"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </div>
+          <!-- Texto estático en el botón para todas las pantallas -->
+          <div class="chat-text-container">
+            <span class="chat-dynamic-phrase">Haz una pregunta...</span>
+          </div>
+        </button>
+
+        <!-- Características con emojis para móvil y texto para desktop -->
+        <div
+          class="flex justify-center items-center gap-x-4 sm:gap-x-6 mt-2 sm:mt-4 text-xs text-gray-500"
+        >
+          <!-- Versión móvil con emojis -->
+          <div class="sm:hidden flex justify-center gap-x-8">
+            <div class="text-center text-lg">⚡</div>
+            <div class="text-center text-lg">💬</div>
+            <div class="text-center text-lg">🧠</div>
+          </div>
+
+          <!-- Versión desktop con texto -->
+          <div class="hidden sm:flex flex-wrap justify-center gap-x-6 gap-y-2">
+            <div class="flex items-center">
+              <div class="w-2 h-2 bg-red-400 rounded-full mr-2"></div>
+              <span>Respuestas instantáneas 24/7</span>
             </div>
-
-            <!-- FAQ con IA -->
-            <div class="bg-gradient-to-br from-white to-white rounded-xl p-6 shadow-md border-2">
-              <div class="flex items-center mb-4">
-                <div class="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center mr-4">
-                  <svg
-                    class="w-6 h-6 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                    ></path>
-                  </svg>
-                </div>
-                <h4 class="text-xl font-semibold text-gray-900">FAQ con IA</h4>
-              </div>
-              <ul class="space-y-3 text-gray-700">
-                <li class="flex items-start space-x-2">
-                  <span class="text-red-500 mt-1">✓</span>
-                  <span>Conversaciones naturales ilimitadas</span>
-                </li>
-                <li class="flex items-start space-x-2">
-                  <span class="text-red-500 mt-1">✓</span>
-                  <span>Respuestas personalizadas</span>
-                </li>
-                <li class="flex items-start space-x-2">
-                  <span class="text-red-500 mt-1">✓</span>
-                  <span>Comprensión inteligente</span>
-                </li>
-                <li class="flex items-start space-x-2">
-                  <span class="text-red-500 mt-1">✓</span>
-                  <span>Aprendizaje continuo</span>
-                </li>
-              </ul>
+            <div class="flex items-center">
+              <div class="w-2 h-2 bg-red-400 rounded-full mr-2"></div>
+              <span>Conversaciones naturales</span>
+            </div>
+            <div class="flex items-center">
+              <div class="w-2 h-2 bg-red-400 rounded-full mr-2"></div>
+              <span>Aprendizaje continuo</span>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Espacio adicional al final -->
+    <div class="mt-8 md:mt-12"></div>
   </div>
 </div>
 
@@ -197,20 +132,27 @@ const { section } = Astro.props;
     background: linear-gradient(135deg, #ffffff);
   }
 
-  /* Efecto de hover MEJORADO para el título "del FAQ" */
-  .section-inner h2 span.text-transparent {
-    transition: all 0.3s ease;
-    position: relative;
+  /* Animación shimmer para efectos de texto */
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
   }
 
-  .section-inner h2:hover span.text-transparent {
-    background: linear-gradient(45deg, #dc2626, #ef4444, #f87171, #dc2626);
-    background-size: 300% 300%;
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: gradient-shift 3s ease infinite;
-    transform: scale(1.05);
+  .animate-shimmer {
+    animation: shimmer 3s ease-in-out infinite;
+  }
+
+  /* Estilo mínimo para wrapper */
+  .timeline-wrapper {
+    margin-bottom: 2rem;
+  }
+
+  .timeline-wrapper h2 {
+    margin-bottom: 1.5rem;
   }
 
   @keyframes gradient-shift {
@@ -241,3 +183,108 @@ const { section } = Astro.props;
     }
   }
 </style>
+
+<!-- ESTILOS DEL BOTÓN DEL CHAT -->
+<style>
+  .chat-toggle-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px 20px;
+    width: 240px; /* Ancho fijo para evitar saltos */
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 14px; /* Texto más pequeño en móvil */
+    font-weight: 600;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(110deg, #dc2626 0%, #ef4444 50%, #dc2626 100%);
+    background-size: 200% 100%;
+    box-shadow:
+      0 0 20px rgba(220, 38, 38, 0.4),
+      0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: background-position 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    user-select: none;
+  }
+
+  @media (min-width: 640px) {
+    .chat-toggle-button {
+      padding: 14px 28px;
+      width: 280px; /* Ancho fijo más grande para desktop */
+      font-size: 16px; /* Texto más grande en desktop */
+    }
+  }
+  .chat-toggle-button:hover {
+    background-position: right center;
+    box-shadow:
+      0 0 30px rgba(239, 68, 68, 0.6),
+      0 8px 15px rgba(0, 0, 0, 0.3);
+  }
+  .chat-toggle-button:active {
+    opacity: 0.9;
+  }
+  .chat-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .chat-icon-svg {
+    transition: transform 0.3s ease;
+    animation: pulse-mobile 2s infinite ease-in-out;
+  }
+
+  @keyframes pulse-mobile {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.2) rotate(-10deg);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .chat-icon-svg-static {
+    animation: none;
+  }
+
+  .chat-toggle-button:hover .chat-icon-svg {
+    transform: rotate(-15deg) scale(1.1);
+    animation: none;
+  }
+  .chat-text-container {
+    position: relative;
+    height: 1.2em;
+  }
+  .chat-dynamic-phrase {
+    display: inline-block;
+    white-space: nowrap;
+    opacity: 1;
+  }
+</style>
+
+<!-- SCRIPT DEL BOTÓN DEL CHAT -->
+<script>
+  declare global {
+    interface DocumentEventMap {
+      chatStatusUpdate: CustomEvent<{ phrase: string }>;
+      openChatModal: CustomEvent;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const chatToggleButton = document.getElementById('faq-chat-button');
+
+    if (chatToggleButton) {
+      chatToggleButton.addEventListener('click', () => {
+        document.dispatchEvent(new CustomEvent('openChatModal', {
+          detail: { buttonId: 'faq-chat-button' }
+        }));
+      });
+    }
+  });
+</script>

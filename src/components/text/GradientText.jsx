@@ -6,7 +6,7 @@ export default function GradientText({
   className = '',
   colors = ['#40ffaa', '#4079ff', '#40ffaa', '#4079ff', '#40ffaa'], // Default colors for light mode
   darkModeColors, // New prop for dark mode colors
-  animationSpeed = 8, // Default animation speed in seconds
+  animationSpeed = 15, // Default animation speed in seconds
   showBorder = false, // Default overlay visibility (ahora siempre falso)
   showShimmer = false, // New prop to enable the shimmer effect
   shimmerIntensity = 'low', // Puede ser 'low', 'medium', 'high'

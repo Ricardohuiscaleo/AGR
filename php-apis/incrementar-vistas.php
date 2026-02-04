@@ -1,152 +1,71 @@
 <?php
 /**
- * API: Incrementar vistas de un blog
- * Equivalente a: src/pages/api/blog/incrementar-vistas.ts.legacy
- * Ruta: /php-apis/incrementar-vistas.php
+ * API para incrementar las vistas de un blog. [Versión Final y Corregida]
+ * Utiliza la carga de config.php clonada y la función RPC de Supabase.
  */
 
+// --- Carga de Configuración Segura (LÓGICA CLONADA DEL TEST EXITOSO) ---
+$config_path = __DIR__ . '/../../config.php'; 
+
+if (!file_exists($config_path) || !is_readable($config_path)) {
+    http_response_code(500);
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'error' => 'Error Crítico: No se pudo cargar config.php desde la ruta verificada.']);
+    exit;
+}
+
+$config = require $config_path;
+
+if (empty($config['PUBLIC_SUPABASE_URL']) || empty($config['PUBLIC_SUPABASE_ANON_KEY'])) {
+    http_response_code(500);
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'error' => 'Error Crítico: Faltan claves de Supabase en el config.php cargado.']);
+    exit;
+}
+
+// --- Script Principal ---
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
-
-// Manejar preflight
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    exit();
-}
-
-// 🔐 FUNCIÓN SEGURA para cargar variables de entorno
-function loadEnvSafe($path) {
-    if (!file_exists($path)) {
-        return false;
-    }
-    
-    $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    if ($lines === false) {
-        return false;
-    }
-    
-    foreach ($lines as $line) {
-        $line = trim($line);
-        if (empty($line) || strpos($line, '#') === 0) {
-            continue;
-        }
-        
-        if (strpos($line, '=') !== false) {
-            list($key, $value) = explode('=', $line, 2);
-            $key = trim($key);
-            $value = trim($value, '"\'');
-            $_ENV[$key] = $value;
-            putenv("$key=$value");
-        }
-    }
-    return true;
-}
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { exit(); }
 
 try {
-    // Validar método
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        throw new Exception('Solo se permite método POST');
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') { 
+        throw new Exception('Solo se permite el método POST.', 405); 
     }
-
-    // Obtener datos del request
-    $input = file_get_contents('php://input');
-    $data = json_decode($input, true);
     
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        throw new Exception('JSON inválido');
-    }
-
-    $postId = $data['postId'] ?? '';
-    if (empty($postId)) {
-        throw new Exception('ID del post es requerido');
-    }
-
-    // 🔒 Buscar .env en ubicaciones seguras
-    $env_paths = [
-        __DIR__ . '/../../.env',
-        __DIR__ . '/../.env',
-        $_SERVER['DOCUMENT_ROOT'] . '/../.env'
-    ];
-
-    foreach ($env_paths as $env_path) {
-        if (loadEnvSafe($env_path)) {
-            break;
-        }
-    }
-
-    // Variables de Supabase
-    $SUPABASE_URL = $_ENV['PUBLIC_SUPABASE_URL'] ?? 'https://uznvakpuuxnpdhoejrog.supabase.co';
-    $SUPABASE_ANON_KEY = $_ENV['PUBLIC_SUPABASE_ANON_KEY'] ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV6bnZha3B1dHhucGRob2Vqcm9nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkwODg0MTAsImV4cCI6MjA2NDY2NDQxMH0.OxbLYkjlgpWFnqd28gaZSwar_NQ6_qUS3U76bqbcXVg';
-
-    // 📊 Obtener vistas actuales
-    $get_url = $SUPABASE_URL . '/rest/v1/blog_posts?select=vistas&id=eq.' . urlencode($postId);
+    $data = json_decode(file_get_contents('php://input'), true);
+    $postId = $data['postId'] ?? null;
     
-    $get_context = stream_context_create([
-        'http' => [
-            'header' => [
-                "Authorization: Bearer $SUPABASE_ANON_KEY",
-                "apikey: $SUPABASE_ANON_KEY",
-                "Content-Type: application/json"
-            ]
-        ]
+    if (!$postId) { 
+        throw new Exception('El parámetro postId es requerido.', 400); 
+    }
+    
+    // Llamar a la función RPC para incrementar las vistas
+    $apiUrl = $config['PUBLIC_SUPABASE_URL'] . '/rest/v1/rpc/increment_post_views';
+    $ch = curl_init($apiUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['post_id' => $postId]));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [ 
+        'Content-Type: application/json', 
+        'apikey: ' . $config['PUBLIC_SUPABASE_ANON_KEY'], 
+        'Authorization: Bearer ' . $config['PUBLIC_SUPABASE_ANON_KEY'] 
     ]);
-
-    $response = file_get_contents($get_url, false, $get_context);
+    curl_exec($ch);
+    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
     
-    if ($response === FALSE) {
-        throw new Exception('Error conectando con Supabase');
+    // La RPC 'increment_post_views' devuelve 204 No Content si tiene éxito.
+    if ($httpcode === 204) {
+        echo json_encode(['success' => true, 'message' => 'Vista incrementada.']);
+    } else {
+        throw new Exception("Error al llamar a la RPC increment_post_views. Código de respuesta: " . $httpcode);
     }
-
-    $posts = json_decode($response, true);
-    
-    if (empty($posts)) {
-        http_response_code(404);
-        echo json_encode([
-            'success' => false,
-            'error' => 'Post no encontrado'
-        ]);
-        exit;
-    }
-
-    $current_views = intval($posts[0]['vistas'] ?? 0);
-    $new_views = $current_views + 1;
-
-    // 📊 Actualizar vistas
-    $update_url = $SUPABASE_URL . '/rest/v1/blog_posts?id=eq.' . urlencode($postId);
-    
-    $update_context = stream_context_create([
-        'http' => [
-            'method' => 'PATCH',
-            'header' => [
-                "Authorization: Bearer $SUPABASE_ANON_KEY",
-                "apikey: $SUPABASE_ANON_KEY",
-                "Content-Type: application/json",
-                "Prefer: return=minimal"
-            ],
-            'content' => json_encode(['vistas' => $new_views])
-        ]
-    ]);
-
-    $update_response = file_get_contents($update_url, false, $update_context);
-    
-    if ($update_response === FALSE) {
-        throw new Exception('Error actualizando vistas');
-    }
-
-    // Respuesta exitosa
-    echo json_encode([
-        'success' => true,
-        'vistas' => $new_views,
-        'message' => 'Vista agregada exitosamente'
-    ], JSON_UNESCAPED_UNICODE);
-
 } catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode([
-        'success' => false,
-        'error' => 'Error interno del servidor',
-        'message' => $e->getMessage()
-    ], JSON_UNESCAPED_UNICODE);
+    $errorCode = $e->getCode();
+    http_response_code(is_int($errorCode) && $errorCode >= 400 && $errorCode < 600 ? $errorCode : 500);
+    echo json_encode(['success' => false, 'error' => 'CONFESIÓN VISTAS: ' . $e->getMessage()]);
 }
 ?>

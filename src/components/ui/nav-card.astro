@@ -242,7 +242,7 @@ const { sectionId, number, title, bgColor, hoverColor } = Astro.props;
       border-radius: 0.8rem;
       width: 100px; /* Ancho base, será modificado dinámicamente por JS */
       min-width: 120px; /* Asegurar tamaño mínimo para scroll */
-      height: 40px; /* Altura fija en móvil */
+      height: 60px; /* Altura aumentada para mejor UX táctil */
       transform: translateX(0);
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       flex-shrink: 0; /* Evitar que se encoja durante el scroll */
@@ -323,7 +323,7 @@ const { sectionId, number, title, bgColor, hoverColor } = Astro.props;
     }
 
     .nav-number {
-      font-size: 12px; /* Reducido un 30% aproximadamente (de 14px) */
+      font-size: 14px; /* Aumentado de 12px a 14px */
       margin-right: 4px;
       margin-bottom: 0;
       margin-top: 2px; /* Ajustar a 2px desde el top, igual que en desktop */
@@ -331,7 +331,7 @@ const { sectionId, number, title, bgColor, hoverColor } = Astro.props;
     }
 
     .nav-link {
-      font-size: 12px;
+      font-size: 14px; /* Aumentado de 12px a 14px */
       white-space: nowrap;
       overflow: visible; /* Cambiar de hidden a visible para mostrar todo el texto */
       text-overflow: clip; /* Cambiar de ellipsis a clip */
@@ -554,7 +554,7 @@ const { sectionId, number, title, bgColor, hoverColor } = Astro.props;
       // Restablecer dimensiones cuando no está activo
       if (isMobileView) {
         container.style.width = `${minNavWidth}px`;
-        container.style.height = '40px'; // Altura fija en móvil establecida por JS
+        container.style.height = '60px'; // Altura fija en móvil establecida por JS
       } else {
         container.style.height = `${minNavHeight}px`;
         container.style.width = ''; // Usar el valor del CSS
@@ -611,7 +611,7 @@ const { sectionId, number, title, bgColor, hoverColor } = Astro.props;
               // Vista móvil: ancho variable, altura fija
               container.style.width = `${Math.round(containerWidth)}px`;
               container.style.minWidth = `${Math.round(containerWidth)}px`; // También establecer min-width
-              container.style.height = '40px'; // Altura fija en móvil
+              container.style.height = '60px'; // Altura fija en móvil
 
               // Para marcar la sección activa cuando se hace clic manualmente
               if (container.hasAttribute('data-user-clicked')) {
@@ -679,7 +679,7 @@ const { sectionId, number, title, bgColor, hoverColor } = Astro.props;
         // Usar asignación como string indexada en lugar de la notación de punto para msOverflowStyle
         (navContainer.style as any)['msOverflowStyle'] = 'none'; // IE/Edge
         navContainer.style.width = '100%';
-        navContainer.style.paddingBottom = '12px'; // Espacio para scroll
+        navContainer.style.paddingBottom = '0'; // Sin espacio inferior
 
         // Ocultar scrollbar en WebKit (Chrome, Safari)
         const styleEl = document.createElement('style');
