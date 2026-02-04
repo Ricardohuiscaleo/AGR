@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 
 // URLs de los agentes
-const GABY_API_URL = 'https://api.agenterag.com/php-apis/gaby-agent.php';
+const GABY_API_URL = '/api/chat-openai';
 
 // Componente de Tooltip Animado Simple
 const SimpleAnimatedTooltip = ({ children, content }) => {
@@ -348,23 +348,19 @@ const ChatInterfaceDark = ({ onShowConfetti }) => {
         }
         localStorage.setItem('session_id', sessionId);
       }
-      // Determinar URL del agente actual
-      const apiUrl = currentAgent === 'gaby' ? GABY_API_URL : IGNACIO_API_URL;
-      console.log('Using agent:', currentAgent, 'URL:', apiUrl);
+      // Usar OpenAI directamente
+      const apiUrl = GABY_API_URL;
+      console.log('Using OpenAI:', apiUrl);
 
-      // Enviar el ID de sesión en el header para mantener persistencia con el agente RAG
-      // Cambiado a GET para compatibilidad con el backend
-      const queryParams = new URLSearchParams({
-        message: text,
-        session: sessionId
-      }).toString();
-      
-      const response = await fetch(`${apiUrl}?${queryParams}`, {
-        method: 'GET',
+      const response = await fetch(apiUrl, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-session-id': sessionId,
-        }
+        },
+        body: JSON.stringify({
+          message: text,
+          session: sessionId
+        })
       });
 
       console.log('Request sent:', {
