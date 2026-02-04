@@ -23,28 +23,34 @@ COPY --from=build /app/dist /usr/share/nginx/html
 COPY api /usr/share/nginx/html/api
 
 # Configurar Nginx para PHP
-RUN echo 'server { \n\
-    listen 80; \n\
-    root /usr/share/nginx/html; \n\
-    index index.html index.php; \n\
-    location / { \n\
-        try_files $uri $uri/ /index.html; \n\
-    } \n\
-    location ~ \.php$ { \n\
-        fastcgi_pass 127.0.0.1:9000; \n\
-        fastcgi_index index.php; \n\
-        include fastcgi_params; \n\
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name; \n\
-    } \n\
-}' > /etc/nginx/http.d/default.conf
+RUN echo 'server {' > /etc/nginx/http.d/default.conf && \
+    echo '    listen 80;' >> /etc/nginx/http.d/default.conf && \
+    echo '    root /usr/share/nginx/html;' >> /etc/nginx/http.d/default.conf && \
+    echo '    index index.html index.php;' >> /etc/nginx/http.d/default.conf && \
+    echo '    location / {' >> /etc/nginx/http.d/default.conf && \
+    echo '        try_files $uri $uri/ /index.html;' >> /etc/nginx/http.d/default.conf && \
+    echo '    }' >> /etc/nginx/http.d/default.conf && \
+    echo '    location ~ \.php$ {' >> /etc/nginx/http.d/default.conf && \
+    echo '        fastcgi_pass 127.0.0.1:9000;' >> /etc/nginx/http.d/default.conf && \
+    echo '        fastcgi_index index.php;' >> /etc/nginx/http.d/default.conf && \
+    echo '        include fastcgi_params;' >> /etc/nginx/http.d/default.conf && \
+    echo '        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;' >> /etc/nginx/http.d/default.conf && \
+    echo '    }' >> /etc/nginx/http.d/default.conf && \
+    echo '}' >> /etc/nginx/http.d/default.conf
 
-# Configurar Supervisor para ejecutar nginx y php-fpm
-RUN echo '[supervisord] \n\
-nodaemon=true \n\
-[program:php-fpm] \n\
-command=php-fpm8 -F \n\
-[program:nginx] \n\
-command=nginx -g "daemon off;"' > /etc/supervisord.conf
+# Configurar Supervisor
+RUN echo '[supervisord]' > /etc/supervisord.conf && \
+    echo 'nodaemon=true' >> /etc/supervisord.conf && \
+    echo '' >> /etc/supervisord.conf && \
+    echo '[program:php-fpm]' >> /etc/supervisord.conf && \
+    echo 'command=php-fpm8 -F' >> /etc/supervisord.conf && \
+    echo 'autostart=true' >> /etc/supervisord.conf && \
+    echo 'autorestart=true' >> /etc/supervisord.conf && \
+    echo '' >> /etc/supervisord.conf && \
+    echo '[program:nginx]' >> /etc/supervisord.conf && \
+    echo 'command=nginx -g "daemon off;"' >> /etc/supervisord.conf && \
+    echo 'autostart=true' >> /etc/supervisord.conf && \
+    echo 'autorestart=true' >> /etc/supervisord.conf
 
 EXPOSE 80
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
