@@ -1,5 +1,4 @@
 import { useEffect, useRef, useMemo, useState } from 'react';
-import { gsap } from 'gsap';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 
