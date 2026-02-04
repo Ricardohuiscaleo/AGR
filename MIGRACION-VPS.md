@@ -238,6 +238,40 @@ NODE_ENV=production
 ✅ SSL/HTTPS configurado  
 ✅ Ya NO dependes del hosting compartido  
 
+## 🗄️ Bonus: Instalar phpMyAdmin (Una sola vez para todos los proyectos)
+
+### En Easypanel:
+
+1. **Create Service → Docker Image**
+2. **Image:** `phpmyadmin/phpmyadmin:latest`
+3. **Environment Variables:**
+   ```
+   PMA_HOST=host.docker.internal
+   PMA_PORT=3306
+   PMA_USER=tu_usuario_mysql
+   PMA_PASSWORD=tu_password_mysql
+   ```
+4. **Port:** 80
+5. **Deploy**
+
+### Configurar Dominio:
+
+1. **DNS en Hostinger:**
+   ```
+   Tipo: A
+   Nombre: phpmyadmin
+   Apunta a: TU_VPS_IP
+   TTL: 14400
+   ```
+
+2. **Easypanel → Domains:**
+   - Host: `phpmyadmin.tu-dominio.com`
+   - Enable SSL
+
+3. **Acceder:** `https://phpmyadmin.tu-dominio.com`
+
+**Nota:** Este phpMyAdmin sirve para gestionar TODAS las bases de datos de TODOS tus proyectos en el VPS.  
+
 ## 💰 Ahorro
 
 - Hosting compartido: ~$10-20/mes
