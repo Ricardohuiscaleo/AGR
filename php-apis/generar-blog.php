@@ -22,10 +22,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { exit(); }
 $config_path = __DIR__ . '/../../config.php'; 
 
 $config = @require $config_path;
-if (!$config) { http_response_code(500); echo json_encode(['success' => false, 'error' => 'Error Crítico v15: No se pudo cargar config.php.']); exit; }
-$required_keys = ['PUBLIC_SUPABASE_URL', 'PUBLIC_SUPABASE_ANON_KEY', 'gemini_api_key', 'unsplash_access_key'];
-foreach ($required_keys as $key) {
-    if (empty($config[$key])) { http_response_code(500); echo json_encode(['success' => false, 'error' => "Error Crítico v15: La clave '$key' no se encontró."]); exit; }
+if (!$config) {
+    $config = [
+        'PUBLIC_SUPABASE_URL' => getenv('PUBLIC_SUPABASE_URL'),
+        'PUBLIC_SUPABASE_ANON_KEY' => getenv('PUBLIC_SUPABASE_ANON_KEY'),
+        'unsplash_access_key' => getenv('UNSPLASH_ACCESS_KEY'),
+        'ollama_url' => getenv('OLLAMA_URL') ?: 'http://agenterag-com_ollama:11434',
+        'ollama_model' => getenv('OLLAMA_MODEL') ?: 'llama3.2:3b'
+    ];
 }
 
 // ==========================================================
@@ -47,36 +51,31 @@ function generarEnfoqueDinamico($tema) {
     return $enfoques[array_rand($enfoques)];
 }
 
-function generarEstructuraDinamica() {
-    $estructuras = [ "Estructura Clásica: Introducción, Fundamentos, Aplicaciones, Desafíos, Futuro, Conclusión.", "Estructura Problema-Solución: El Problema, Por Qué Importa, La Solución (el tema), Cómo Funciona, Casos de Éxito, Obstáculos, Conclusión.", "Estructura Comparativa: Panorama Actual, Opción A vs Opción B, Ventajas del Tema, Cuándo Usar Cada Uno, Conclusión.", "Estructura de Guía Paso a Paso: Prerrequisitos, Paso 1 (Evaluación), Paso 2 (Diseño), Paso 3 (Implementación), Errores Comunes, Próximos Pasos." ];
-    return $estructuras[array_rand($estructuras)];
-}
-
-function generarElementosVariabilidad() {
-    $elementos = [ 'Incluye estadísticas y datos específicos de ' . date("Y") . '.', 'Menciona herramientas y empresas reales del sector.', 'Incorpora citas de expertos reconocidos en el campo.', 'Agrega ejemplos de código o implementación cuando sea relevante.', 'Incluye métricas de performance y benchmarks.', 'Menciona regulaciones y compliance relevantes.', 'Incorpora análisis de costos y ROI.', 'Agrega perspectivas de diferentes industrias.', 'Incluye un roadmap o timeline de implementación.', 'Menciona riesgos y estrategias de mitigación específicas.' ];
-    shuffle($elementos);
-    return "- " . implode("\n- ", array_slice($elementos, 0, rand(3, 4)));
-}
-
-function generarBlogConGemini($tema, $apiKey) {
+function generarBlogConOllama($tema, $ollamaUrl, $ollamaModel) {
     $enfoque = generarEnfoqueDinamico($tema);
-    $estructura = generarEstructuraDinamica();
-    $elementos = generarElementosVariabilidad();
     $semilla = rand(0, 1000);
-    $prompt = "SEMILLA DE VARIACIÓN: $semilla. TEMA BASE: {$tema['nombre']}. ENFOQUE ESPECÍFICO: $enfoque. ESTRUCTURA: $estructura. ELEMENTOS ADICIONALES:\n$elementos\n\nREQUISITOS: Escribe en español un artículo profesional y único de mínimo 1800 palabras. Usa formato Markdown limpio. La respuesta DEBE ser un único objeto JSON válido y nada más, con esta estructura: {\"titulo\":\"...\",\"resumen\":\"...\",\"contenido\":\"...\",\"tiempo_lectura\":5,\"tags\":[\"...\"],\"meta_titulo\":\"...\",\"meta_descripcion\":\"...\"}";
-    $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' . $apiKey;
-    $data = ['contents' => [['parts' => [['text' => $prompt]]]], 'generationConfig' => ['response_mime_type' => 'application/json']];
+    $prompt = "SEMILLA: $semilla. TEMA: {$tema['nombre']}. ENFOQUE: $enfoque.\n\nEscribe en español un artículo profesional de mínimo 1800 palabras sobre {$tema['nombre']}. Usa formato Markdown limpio. La respuesta DEBE ser un único objeto JSON válido con esta estructura: {\"titulo\":\"...\",\"resumen\":\"...\",\"contenido\":\"...\",\"tiempo_lectura\":5,\"tags\":[\"...\"],\"meta_titulo\":\"...\",\"meta_descripcion\":\"...\"}";
+    
+    $url = rtrim($ollamaUrl, '/') . '/api/generate';
+    $data = ['model' => $ollamaModel, 'prompt' => $prompt, 'stream' => false, 'format' => 'json'];
+    
     $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
     curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 120);
+    
     $response = curl_exec($ch);
-    if (curl_errno($ch)) { throw new Exception('Error cURL Gemini: ' . curl_error($ch)); }
+    if (curl_errno($ch)) { throw new Exception('Error cURL Ollama: ' . curl_error($ch)); }
     curl_close($ch);
+    
     $result = json_decode($response, true);
-    if (!isset($result['candidates'][0]['content']['parts'][0]['text'])) { throw new Exception('Respuesta inválida de Gemini AI: ' . ($result['error']['message'] ?? 'Formato inesperado.')); }
-    $blogData = json_decode($result['candidates'][0]['content']['parts'][0]['text'], true);
-    if (json_last_error() !== JSON_ERROR_NONE) { throw new Exception('Gemini no devolvió un JSON válido. Error: ' . json_last_error_msg()); }
+    if (!isset($result['response'])) { throw new Exception('Respuesta inválida de Ollama: ' . json_encode($result)); }
+    
+    $blogData = json_decode($result['response'], true);
+    if (json_last_error() !== JSON_ERROR_NONE) { throw new Exception('Ollama no devolvió un JSON válido: ' . json_last_error_msg()); }
+    
     return $blogData;
 }
 
@@ -144,20 +143,21 @@ try {
         'etica-ia' => ['nombre' => 'Ética en IA', 'keywords' => ['AI Ethics', 'Bias', 'Fairness', 'Transparency', 'Responsible AI'], 'prompt' => 'Discute sesgos algorítmicos, transparencia y regulaciones como el AI Act de la UE.']
     ];
     
-    if (!isset($temas[$temaId])) { throw new Exception('El "temaId" (' . htmlspecialchars($temaId) . ') no es válido.', 400); }
+    if (!isset($temas[$temaId])) { throw new Exception('El temaId no es válido.', 400); }
     $temaSeleccionado = $temas[$temaId];
+    $temaSeleccionado['id'] = $temaId;
 
     $tiempoInicio = microtime(true);
     $fechaInicio = date('c');
 
-    $blogGenerado = generarBlogConGemini($temaSeleccionado, $config['gemini_api_key']);
+    $blogGenerado = generarBlogConOllama($temaSeleccionado, $config['ollama_url'], $config['ollama_model']);
     $imagenUrl = generarImagenConUnsplash($temaSeleccionado['keywords'], $config['unsplash_access_key']);
     $postCreado = guardarEnSupabase($blogGenerado, $temaSeleccionado, $imagenUrl, $config);
 
     $tiempoGeneracionMs = round((microtime(true) - $tiempoInicio) * 1000);
     
     registrarMetricas($postCreado['id'], [
-        'p_post_id' => $postCreado['id'], 'p_modelo_usado' => 'gemini-2.0-flash', 'p_proveedor' => 'Google',
+        'p_post_id' => $postCreado['id'], 'p_modelo_usado' => $config['ollama_model'], 'p_proveedor' => 'Ollama',
         'p_tiempo_generacion_ms' => $tiempoGeneracionMs, 'p_tiempo_inicio' => $fechaInicio, 'p_tiempo_fin' => date('c'),
         'p_tema_seleccionado' => $temaSeleccionado['nombre']
     ], $config);
@@ -167,6 +167,6 @@ try {
 } catch (Exception $e) {
     $errorCode = $e->getCode();
     http_response_code(is_int($errorCode) && $errorCode >= 400 && $errorCode < 600 ? $errorCode : 500);
-    echo json_encode(['success' => false, 'error' => 'CONFESIÓN v14: ' . $e->getMessage()]);
+    echo json_encode(['success' => false, 'error' => 'Error Ollama: ' . $e->getMessage()]);
 }
 ?>

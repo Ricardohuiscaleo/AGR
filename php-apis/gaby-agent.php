@@ -40,7 +40,8 @@ if (empty($config['PUBLIC_SUPABASE_URL']) || empty($config['PUBLIC_SUPABASE_ANON
 // Definir variables globales para compatibilidad con el código existente
 $SUPABASE_URL = $config['PUBLIC_SUPABASE_URL'];
 $SUPABASE_ANON_KEY = $config['PUBLIC_SUPABASE_ANON_KEY'];
-$GEMINI_API_KEY = $config['gemini_api_key'] ?? '';
+$OLLAMA_URL = $config['ollama_url'] ?? getenv('OLLAMA_URL') ?: 'http://agenterag-com_ollama:11434';
+$OLLAMA_MODEL = $config['ollama_model'] ?? getenv('OLLAMA_MODEL') ?: 'llama3.2:3b';
 $DB_CONFIG = [
     'host' => $config['rag_db_host'] ?? 'localhost',
     'database' => $config['rag_db_name'] ?? 'agenterag',
@@ -127,7 +128,8 @@ function generateSessionId() {
 
 class GabyAgent {
     private $db;
-    private $geminiApiKey;
+    private $ollamaUrl;
+    private $ollamaModel;
     private $supabaseUrl;
     private $supabaseKey;
     private $conversationState;
@@ -135,14 +137,16 @@ class GabyAgent {
     
     public function __construct() {
         global $DB_CONFIG, $GEMINI_API_KEY, $SUPABASE_URL, $SUPABASE_ANON_KEY;
-        $this->geminiApiKey = $GEMINI_API_KEY;
+        global $OLLAMA_URL, $OLLAMA_MODEL;
+        $this->ollamaUrl = $OLLAMA_URL;
+        $this->ollamaModel = $OLLAMA_MODEL;
         $this->supabaseUrl = $SUPABASE_URL;
         $this->supabaseKey = $SUPABASE_ANON_KEY;
         $this->tools = new GabyTools();
         $this->initDatabase();
         
         // Registrar información de depuración
-        error_log("GabyAgent inicializado con: SUPABASE_URL=" . substr($this->supabaseUrl, 0, 10) . "..., GEMINI_API_KEY=" . (empty($this->geminiApiKey) ? "NO CONFIGURADO" : "CONFIGURADO"));
+        error_log("GabyAgent inicializado con: SUPABASE_URL=" . substr($this->supabaseUrl, 0, 10) . "..., OLLAMA_URL=" . $this->ollamaUrl);
     }
     
     private function initDatabase() {
@@ -719,21 +723,17 @@ REGLAS:
     }
     
     private function callGeminiAPI($prompt) {
-        $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' . $this->geminiApiKey;
+        $url = rtrim($this->ollamaUrl, '/') . '/api/generate';
         
         $data = [
-            'contents' => [
-                [
-                    'parts' => [
-                        ['text' => $prompt]
-                    ]
-                ]
-            ],
-            'generationConfig' => [
+            'model' => $this->ollamaModel,
+            'prompt' => $prompt,
+            'stream' => false,
+            'options' => [
                 'temperature' => 0.7,
-                'topK' => 40,
-                'topP' => 0.95,
-                'maxOutputTokens' => 1024
+                'top_k' => 40,
+                'top_p' => 0.95,
+                'num_predict' => 1024
             ]
         ];
         
@@ -775,8 +775,8 @@ REGLAS:
                 
                 $result = json_decode($response, true);
                 
-                if (isset($result['candidates'][0]['content']['parts'][0]['text'])) {
-                    return $result['candidates'][0]['content']['parts'][0]['text'];
+                if (isset($result['response'])) {
+                    return $result['response'];
                 }
                 
                 // Si el JSON es válido pero no tiene contenido

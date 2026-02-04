@@ -71,13 +71,15 @@ function generateSessionId() {
 
 class RAGAgent {
     private $db;
-    private $geminiApiKey;
+    private $ollamaUrl;
+    private $ollamaModel;
     private $supabaseUrl;
     private $supabaseKey;
     
     public function __construct() {
-        global $DB_CONFIG, $GEMINI_API_KEY, $SUPABASE_URL, $SUPABASE_ANON_KEY;
-        $this->geminiApiKey = $GEMINI_API_KEY;
+        global $DB_CONFIG, $SUPABASE_URL, $SUPABASE_ANON_KEY;
+        $this->ollamaUrl = getenv('OLLAMA_URL') ?: 'http://agenterag-com_ollama:11434';
+        $this->ollamaModel = getenv('OLLAMA_MODEL') ?: 'llama3.2:3b';
         $this->supabaseUrl = $SUPABASE_URL;
         $this->supabaseKey = $SUPABASE_ANON_KEY;
         $this->initDatabase();
@@ -215,85 +217,60 @@ class RAGAgent {
     }
     
     private function generateResponse($userMessage, $history, $relevantInfo) {
-        $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' . $this->geminiApiKey;
+        $url = rtrim($this->ollamaUrl, '/') . '/api/generate';
         
-        // Construir contexto
         $contextInfo = $this->buildContext($relevantInfo);
         $conversationContext = $this->buildConversationContext($history);
         
-        $systemPrompt = "Eres un agente RAG especializado en automatización, ahorro de costos y consultoría empresarial. 
-
-INFORMACIÓN RELEVANTE:
-{$contextInfo}
-
-HISTORIAL DE CONVERSACIÓN:
-{$conversationContext}
-
-INSTRUCCIONES:
-- Responde de manera profesional y útil
-- Usa la información proporcionada cuando sea relevante
-- Si no tienes información específica, sé honesto al respecto
-- Enfócate en automatización, ahorro de costos y eficiencia empresarial
-- Usa formato HTML para respuestas estructuradas cuando sea apropiado
-- Mantén un tono conversacional pero profesional
-
-MENSAJE DEL USUARIO: {$userMessage}
-
-Responde de manera directa y útil:";
+        $systemPrompt = "Eres un agente RAG especializado en automatización, ahorro de costos y consultoría empresarial. \n\nINFORMACIÓN RELEVANTE:\n{$contextInfo}\n\nHISTORIAL DE CONVERSACIÓN:\n{$conversationContext}\n\nINSTRUCCIONES:\n- Responde de manera profesional y útil\n- Usa la información proporcionada cuando sea relevante\n- Si no tienes información específica, sé honesto al respecto\n- Enfócate en automatización, ahorro de costos y eficiencia empresarial\n- Usa formato HTML para respuestas estructuradas cuando sea apropiado\n- Mantén un tono conversacional pero profesional\n\nMENSAJE DEL USUARIO: {$userMessage}\n\nResponde de manera directa y útil:";
 
         $data = [
-            'contents' => [
-                [
-                    'parts' => [
-                        ['text' => $systemPrompt]
-                    ]
-                ]
-            ],
-            'generationConfig' => [
+            'model' => $this->ollamaModel,
+            'prompt' => $systemPrompt,
+            'stream' => false,
+            'options' => [
                 'temperature' => 0.7,
-                'topK' => 40,
-                'topP' => 0.95,
-                'maxOutputTokens' => 1024
+                'top_k' => 40,
+                'top_p' => 0.95,
+                'num_predict' => 1024
             ]
         ];
         
-        $options = [
-            'http' => [
-                'header' => "Content-type: application/json\r\n",
-                'method' => 'POST',
-                'content' => json_encode($data)
-            ]
-        ];
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         
-        $context = stream_context_create($options);
-        $response = file_get_contents($url, false, $context);
+        $response = curl_exec($ch);
         
         if ($response === FALSE) {
-            // Log del error HTTP
-            $error = error_get_last();
-            error_log("Gemini API Error: " . ($error['message'] ?? 'Unknown error'));
-            return "Error de conexión con Gemini API. Intenta nuevamente.";
+            $error = curl_error($ch);
+            curl_close($ch);
+            error_log("Ollama API Error: " . $error);
+            return "Error de conexión con Ollama API. Intenta nuevamente.";
         }
         
+        curl_close($ch);
         $result = json_decode($response, true);
         
         if (!$result) {
-            error_log("Gemini JSON Error: " . json_last_error_msg());
-            error_log("Gemini Response: " . $response);
-            return "Error al procesar respuesta de Gemini. Intenta nuevamente.";
+            error_log("Ollama JSON Error: " . json_last_error_msg());
+            return "Error al procesar respuesta de Ollama. Intenta nuevamente.";
         }
         
         if (isset($result['error'])) {
-            error_log("Gemini API Error: " . json_encode($result['error']));
-            return "Error de Gemini API: " . ($result['error']['message'] ?? 'Error desconocido');
+            error_log("Ollama API Error: " . json_encode($result['error']));
+            return "Error de Ollama API: " . ($result['error'] ?? 'Error desconocido');
         }
         
-        if (!isset($result['candidates'][0]['content']['parts'][0]['text'])) {
-            error_log("Gemini Structure Error: " . json_encode($result));
-            return "Respuesta inesperada de Gemini. Intenta nuevamente.";
+        if (!isset($result['response'])) {
+            error_log("Ollama Structure Error: " . json_encode($result));
+            return "Respuesta inesperada de Ollama. Intenta nuevamente.";
         }
         
-        return $result['candidates'][0]['content']['parts'][0]['text'];
+        return $result['response'];
     }
     
     private function buildContext($relevantInfo) {
