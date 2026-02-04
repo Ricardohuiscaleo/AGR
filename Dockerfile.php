@@ -8,7 +8,20 @@ RUN apk add --no-cache nginx
 
 # Copiar archivos PHP
 COPY php-apis /var/www/html/php-apis
-COPY config.php /var/www/html/config.php
+
+# Crear config.php desde variables de entorno
+RUN echo '<?php' > /var/www/html/config.php && \
+    echo 'return [' >> /var/www/html/config.php && \
+    echo '    "booking_db_host" => "172.17.0.1",' >> /var/www/html/config.php && \
+    echo '    "booking_db_name" => "u958525313_booking",' >> /var/www/html/config.php && \
+    echo '    "booking_db_user" => "agenterag",' >> /var/www/html/config.php && \
+    echo '    "booking_db_pass" => "Agente2025!",' >> /var/www/html/config.php && \
+    echo '    "rag_db_host" => "172.17.0.1",' >> /var/www/html/config.php && \
+    echo '    "rag_db_name" => "u958525313_rag_database",' >> /var/www/html/config.php && \
+    echo '    "rag_db_user" => "agenterag",' >> /var/www/html/config.php && \
+    echo '    "rag_db_pass" => "Agente2025!"' >> /var/www/html/config.php && \
+    echo '];' >> /var/www/html/config.php && \
+    echo '?>' >> /var/www/html/config.php
 
 # Configurar nginx
 RUN mkdir -p /run/nginx
