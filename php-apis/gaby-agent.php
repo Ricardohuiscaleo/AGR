@@ -716,15 +716,19 @@ REGLAS:
     private function callGeminiAPI($prompt) {
         $url = rtrim($this->ollamaUrl, '/') . '/api/generate';
         
+        // Prompt optimizado para tinyllama
+        $optimizedPrompt = "Responde SOLO como Gaby, sin explicaciones adicionales.\n\n" . $prompt . "\n\nRespuesta directa:";
+        
         $data = [
             'model' => $this->ollamaModel,
-            'prompt' => $prompt,
+            'prompt' => $optimizedPrompt,
             'stream' => false,
             'options' => [
-                'temperature' => 0.7,
-                'top_k' => 40,
-                'top_p' => 0.95,
-                'num_predict' => 1024
+                'temperature' => 0.3,
+                'top_k' => 20,
+                'top_p' => 0.9,
+                'num_predict' => 150,
+                'stop' => ['\n\n', 'Usuario:', 'Gaby:', 'Conversación']
             ]
         ];
         
