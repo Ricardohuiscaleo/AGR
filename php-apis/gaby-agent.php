@@ -4,28 +4,13 @@
  * Replica la funcionalidad completa del agente de n8n
  */
 
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, x-session-id');
-
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
-
-if ($_SERVER['REQUEST_METHOD'] !== 'POST' && $_SERVER['REQUEST_METHOD'] !== 'GET') {
-    http_response_code(405);
-    echo json_encode(['error' => 'Método no permitido']);
-    exit();
-}
-
+// Cargar configuración y clases SIEMPRE
 $config_path = __DIR__ . '/../../config.php';
 $config = file_exists($config_path) ? require $config_path : [];
 
 $SUPABASE_URL = $config['PUBLIC_SUPABASE_URL'] ?? getenv('PUBLIC_SUPABASE_URL');
 $SUPABASE_ANON_KEY = $config['PUBLIC_SUPABASE_ANON_KEY'] ?? getenv('PUBLIC_SUPABASE_ANON_KEY');
-$GEMINI_API_KEY = $config['GOOGLE_GEMINI_API_KEY'] ?? getenv('GOOGLE_GEMINI_API_KEY');
+$OPENAI_API_KEY = $config['OPENAI_API_KEY'] ?? getenv('OPENAI_API_KEY');
 $DB_CONFIG = [
     'host' => $config['rag_db_host'] ?? getenv('RAG_DB_HOST') ?: 'localhost',
     'database' => $config['rag_db_name'] ?? getenv('RAG_DB_NAME') ?: 'agenterag',
@@ -33,84 +18,103 @@ $DB_CONFIG = [
     'password' => $config['rag_db_pass'] ?? getenv('RAG_DB_PASS') ?: ''
 ];
 
-if (empty($SUPABASE_URL) || empty($SUPABASE_ANON_KEY)) {
-    http_response_code(500);
-    echo json_encode(['success' => false, 'error' => 'Error: Faltan variables de entorno SUPABASE']);
-    exit;
-}
-
 require_once 'gaby-tools-fixed.php';
 
-try {
-    // Registrar información de depuración detallada
-    error_log("gaby-agent.php: Iniciando procesamiento de solicitud " . $_SERVER['REQUEST_METHOD']);
-    error_log("gaby-agent.php: Headers recibidos: " . json_encode(getallheaders()));
-    
-    // Manejar tanto GET como POST
-    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        $input = ['message' => isset($_GET['message']) ? $_GET['message'] : 'Hola'];
-        $sessionId = isset($_GET['session']) ? $_GET['session'] : null;
-        error_log("Solicitud GET recibida: " . json_encode($input));
-    } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $rawInput = file_get_contents('php://input');
-        error_log("Datos POST recibidos (raw): " . $rawInput);
-        $input = json_decode($rawInput, true);
-        error_log("Datos POST decodificados: " . json_encode($input));
-        $sessionId = isset($_SERVER['HTTP_X_SESSION_ID']) ? $_SERVER['HTTP_X_SESSION_ID'] : null;
-        error_log("Session ID del header: " . $sessionId);
-    } else {
-        throw new Exception('Método no permitido: ' . $_SERVER['REQUEST_METHOD']);
+// SOLO ejecutar si se llama directamente (no cuando se incluye)
+if (basename($_SERVER['SCRIPT_FILENAME']) === basename(__FILE__)) {
+    header('Content-Type: application/json');
+    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type, x-session-id');
+
+    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        http_response_code(200);
+        exit();
     }
-    
-    if (!$input || !isset($input['message'])) {
-        throw new Exception('Mensaje es requerido');
+
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST' && $_SERVER['REQUEST_METHOD'] !== 'GET') {
+        http_response_code(405);
+        echo json_encode(['error' => 'Método no permitido']);
+        exit();
     }
-    
-    $userMessage = trim($input['message']);
-    
-    if (empty($userMessage)) {
-        throw new Exception('Mensaje no puede estar vacío');
+
+    if (empty($SUPABASE_URL) || empty($SUPABASE_ANON_KEY)) {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'error' => 'Error: Faltan variables de entorno SUPABASE']);
+        exit;
     }
-    
-    if (!$sessionId) {
-        $sessionId = generateSessionId();
+
+    try {
+        // Registrar información de depuración detallada
+        error_log("gaby-agent.php: Iniciando procesamiento de solicitud " . $_SERVER['REQUEST_METHOD']);
+        error_log("gaby-agent.php: Headers recibidos: " . json_encode(getallheaders()));
+        
+        // Manejar tanto GET como POST
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $input = ['message' => isset($_GET['message']) ? $_GET['message'] : 'Hola'];
+            $sessionId = isset($_GET['session']) ? $_GET['session'] : null;
+            error_log("Solicitud GET recibida: " . json_encode($input));
+        } else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $rawInput = file_get_contents('php://input');
+            error_log("Datos POST recibidos (raw): " . $rawInput);
+            $input = json_decode($rawInput, true);
+            error_log("Datos POST decodificados: " . json_encode($input));
+            $sessionId = isset($_SERVER['HTTP_X_SESSION_ID']) ? $_SERVER['HTTP_X_SESSION_ID'] : null;
+            error_log("Session ID del header: " . $sessionId);
+        } else {
+            throw new Exception('Método no permitido: ' . $_SERVER['REQUEST_METHOD']);
+        }
+        
+        if (!$input || !isset($input['message'])) {
+            throw new Exception('Mensaje es requerido');
+        }
+        
+        $userMessage = trim($input['message']);
+        
+        if (empty($userMessage)) {
+            throw new Exception('Mensaje no puede estar vacío');
+        }
+        
+        if (!$sessionId) {
+            $sessionId = generateSessionId();
+        }
+        
+        // Inicializar Gaby Agent
+        error_log("Inicializando GabyAgent con sessionId: " . $sessionId);
+        $gabyAgent = new GabyAgent();
+        
+        // Verificar si hay contexto de otro agente
+        $contextFromOtherAgent = isset($input['agent_context']) ? $input['agent_context'] : null;
+        
+        // Procesar mensaje con personalidad y tools
+        error_log("Procesando mensaje: " . $userMessage);
+        $response = $gabyAgent->processMessage($userMessage, $sessionId, $contextFromOtherAgent);
+        
+        error_log("Respuesta generada exitosamente");
+        echo json_encode([
+            'output' => $response,
+            'session_id' => $sessionId,
+            'timestamp' => date('Y-m-d H:i:s')
+        ]);
+        
+    } catch (PDOException $e) {
+        error_log("ERROR DE BASE DE DATOS en gaby-agent.php: " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode([
+            'error' => 'Error de conexión a la base de datos',
+            'output' => 'Lo siento, ha ocurrido un problema con nuestra base de datos. Por favor intenta nuevamente más tarde.',
+            'details' => $e->getMessage()
+        ]);
+    } catch (Exception $e) {
+        error_log("ERROR GENERAL en gaby-agent.php: " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode([
+            'error' => 'Error interno del servidor',
+            'output' => 'Lo siento, ha ocurrido un error. Por favor intenta nuevamente.',
+            'details' => $e->getMessage()
+        ]);
     }
-    
-    // Inicializar Gaby Agent
-    error_log("Inicializando GabyAgent con sessionId: " . $sessionId);
-    $gabyAgent = new GabyAgent();
-    
-    // Verificar si hay contexto de otro agente
-    $contextFromOtherAgent = isset($input['agent_context']) ? $input['agent_context'] : null;
-    
-    // Procesar mensaje con personalidad y tools
-    error_log("Procesando mensaje: " . $userMessage);
-    $response = $gabyAgent->processMessage($userMessage, $sessionId, $contextFromOtherAgent);
-    
-    error_log("Respuesta generada exitosamente");
-    echo json_encode([
-        'output' => $response,
-        'session_id' => $sessionId,
-        'timestamp' => date('Y-m-d H:i:s')
-    ]);
-    
-} catch (PDOException $e) {
-    error_log("ERROR DE BASE DE DATOS en gaby-agent.php: " . $e->getMessage());
-    http_response_code(500);
-    echo json_encode([
-        'error' => 'Error de conexión a la base de datos',
-        'output' => 'Lo siento, ha ocurrido un problema con nuestra base de datos. Por favor intenta nuevamente más tarde.',
-        'details' => $e->getMessage()
-    ]);
-} catch (Exception $e) {
-    error_log("ERROR GENERAL en gaby-agent.php: " . $e->getMessage());
-    http_response_code(500);
-    echo json_encode([
-        'error' => 'Error interno del servidor',
-        'output' => 'Lo siento, ha ocurrido un error. Por favor intenta nuevamente.',
-        'details' => $e->getMessage()
-    ]);
-}
+} // Fin del if (basename($_SERVER['SCRIPT_FILENAME']) === basename(__FILE__))
 
 function generateSessionId() {
     return bin2hex(random_bytes(16));
@@ -118,22 +122,21 @@ function generateSessionId() {
 
 class GabyAgent {
     private $db;
-    private $geminiApiKey;
+    private $openaiApiKey;
     private $supabaseUrl;
     private $supabaseKey;
     private $conversationState;
     private $tools;
     
     public function __construct() {
-        global $DB_CONFIG, $GEMINI_API_KEY, $SUPABASE_URL, $SUPABASE_ANON_KEY;
-        $this->geminiApiKey = $GEMINI_API_KEY;
+        global $DB_CONFIG, $OPENAI_API_KEY, $SUPABASE_URL, $SUPABASE_ANON_KEY;
+        $this->openaiApiKey = $OPENAI_API_KEY;
         $this->supabaseUrl = $SUPABASE_URL;
         $this->supabaseKey = $SUPABASE_ANON_KEY;
         $this->tools = new GabyTools();
         $this->initDatabase();
         
-        // Registrar información de depuración
-        error_log("GabyAgent inicializado con: SUPABASE_URL=" . substr($this->supabaseUrl, 0, 10) . "..., GEMINI_API_KEY=" . (empty($this->geminiApiKey) ? 'NOT SET' : 'SET'));
+        error_log("GabyAgent inicializado con OpenAI: " . (empty($this->openaiApiKey) ? 'NOT SET' : 'SET'));
     }
     
     private function initDatabase() {
@@ -509,7 +512,7 @@ class GabyAgent {
         }
         $prompt .= "\nResponde como Gaby:";
         
-        return $this->callGeminiAPI($prompt);
+        return $this->callOpenAI($prompt);
     }
     
     // NUEVA FUNCIÓN: Respuesta FAQ (knowledge base)
@@ -544,7 +547,7 @@ class GabyAgent {
         }
         $prompt .= "\nResponde como Gaby:";
         
-        return $this->callGeminiAPI($prompt);
+        return $this->callOpenAI($prompt);
     }
     
     // NUEVA FUNCIÓN: Forzar búsqueda de información
@@ -595,7 +598,7 @@ class GabyAgent {
         $prompt .= "- Si tienes nombre, email y empresa, ofrece servicios concretos\n\n";
         $prompt .= "Responde como Gaby:";
         
-        return $this->callGeminiAPI($prompt);
+        return $this->callOpenAI($prompt);
     }
     
     // NUEVA FUNCIÓN: Respuesta casual
@@ -634,7 +637,7 @@ class GabyAgent {
         $prompt .= "- Máximo 30 palabras\n\n";
         $prompt .= "Responde como Gaby:";
         
-        return $this->callGeminiAPI($prompt);
+        return $this->callOpenAI($prompt);
     }
     
     // NUEVA FUNCIÓN: Determinar si debe preguntar el nombre
@@ -709,19 +712,17 @@ REGLAS:
 - Mantén conversación rápida y directa";
     }
     
-    private function callGeminiAPI($prompt) {
-        $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=' . $this->geminiApiKey;
+    private function callOpenAI($prompt) {
+        $url = 'https://api.openai.com/v1/chat/completions';
         
         $data = [
-            'contents' => [[
-                'parts' => [['text' => $prompt]]
-            ]],
-            'generationConfig' => [
-                'temperature' => 0.7,
-                'topK' => 40,
-                'topP' => 0.95,
-                'maxOutputTokens' => 1024
-            ]
+            'model' => 'gpt-4o-mini',
+            'messages' => [
+                ['role' => 'system', 'content' => 'Eres Gaby de Agente RAG.'],
+                ['role' => 'user', 'content' => $prompt]
+            ],
+            'temperature' => 0.7,
+            'max_tokens' => 1024
         ];
         
         $ch = curl_init($url);
@@ -729,7 +730,10 @@ REGLAS:
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => json_encode($data),
-            CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json',
+                'Authorization: Bearer ' . $this->openaiApiKey
+            ],
             CURLOPT_TIMEOUT => 30,
             CURLOPT_CONNECTTIMEOUT => 10,
             CURLOPT_SSL_VERIFYPEER => true
@@ -740,17 +744,17 @@ REGLAS:
         curl_close($ch);
         
         if ($response === false || $httpCode !== 200) {
-            error_log("Gemini API error: HTTP {$httpCode}");
+            error_log("OpenAI API error: HTTP {$httpCode}");
             return $this->generateFallbackResponse();
         }
         
         $result = json_decode($response, true);
         
-        if (isset($result['candidates'][0]['content']['parts'][0]['text'])) {
-            return $result['candidates'][0]['content']['parts'][0]['text'];
+        if (isset($result['choices'][0]['message']['content'])) {
+            return $result['choices'][0]['message']['content'];
         }
         
-        error_log("Gemini API respuesta sin contenido: " . $response);
+        error_log("OpenAI API respuesta sin contenido: " . $response);
         return $this->generateFallbackResponse();
     }
     
