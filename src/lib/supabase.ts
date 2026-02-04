@@ -3,10 +3,10 @@ import { createBrowserClient } from '@supabase/ssr';
 import { createServerClient, type CookieOptions as SupabaseCookieOptions } from '@supabase/ssr';
 import type { AstroCookies } from 'astro';
 
-const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
 
-if (!supabaseUrl || !supabaseAnonKey) {
+if (!import.meta.env.PUBLIC_SUPABASE_URL || !import.meta.env.PUBLIC_SUPABASE_ANON_KEY) {
   console.warn(
     'Faltan variables de entorno de Supabase. La autenticación no funcionará correctamente.'
   );
