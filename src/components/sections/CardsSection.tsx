@@ -3,7 +3,8 @@
 import React, { useEffect, useRef } from 'react';
 import { Card } from '../ui/card';
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 
 // Registrar plugins de GSAP
 if (typeof window !== 'undefined') {
